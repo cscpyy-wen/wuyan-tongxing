@@ -14,7 +14,7 @@
     "verify:package": "node scripts/verify-package.mjs"
   },
   "devDependencies": {
-    "@cloudbase/cli": "3.8.0",
+    "@cloudbase/cli": "3.8.1",
     "adm-zip": "0.6.0"
   }
 }
