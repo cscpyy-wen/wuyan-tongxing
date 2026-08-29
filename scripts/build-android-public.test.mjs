@@ -54,15 +54,43 @@ test('public APK identity requires debug suffix and Android Debug certificate', 
   })
   assert.doesNotThrow(() => assertPublicDebugIdentity({
     ...badging,
-    signerOutput: 'Signer #1 certificate DN: C=US, O=Android, CN=Android Debug\n',
+    signerOutput: 'Number of signers: 1\nSigner #1 certificate DN: C=US, O=Android, CN=Android Debug\n',
+  }, '0.1.0-personal.31'))
+  assert.doesNotThrow(() => assertPublicDebugIdentity({
+    ...badging,
+    signerOutput: 'Number of signers: 1\nV2 Signer: certificate DN: C=US, O=Android, CN=Android Debug\n',
   }, '0.1.0-personal.31'))
   assert.throws(() => assertPublicDebugIdentity({
     ...badging,
     packageName: 'cn.wuyantongxing.personal',
-    signerOutput: 'Signer #1 certificate DN: CN=Maintainer\n',
+    signerOutput: 'Number of signers: 1\nSigner #1 certificate DN: CN=Maintainer\n',
   }, '0.1.0-personal.31'), /包名错误/)
   assert.throws(() => assertPublicDebugIdentity({
     ...badging,
-    signerOutput: 'Signer #1 certificate DN: CN=Maintainer\n',
+    signerOutput: 'Number of signers: 1\nV2 Signer: certificate DN: CN=Maintainer\n',
+  }, '0.1.0-personal.31'), /Android Debug 证书/)
+  assert.throws(() => assertPublicDebugIdentity({
+    ...badging,
+    signerOutput: [
+      'Number of signers: 2',
+      'V2 Signer #1: certificate DN: C=US, O=Android, CN=Android Debug',
+      'V2 Signer #2: certificate DN: CN=Maintainer',
+    ].join('\n'),
+  }, '0.1.0-personal.31'), /Android Debug 证书/)
+  assert.throws(() => assertPublicDebugIdentity({
+    ...badging,
+    signerOutput: 'V2 Signer: certificate DN: C=US, O=Android, CN=Android Debug\n',
+  }, '0.1.0-personal.31'), /Android Debug 证书/)
+  assert.throws(() => assertPublicDebugIdentity({
+    ...badging,
+    signerOutput: [
+      'Number of signers: 1',
+      'Number of signers: 1',
+      'V2 Signer: certificate DN: C=US, O=Android, CN=Android Debug',
+    ].join('\n'),
+  }, '0.1.0-personal.31'), /Android Debug 证书/)
+  assert.throws(() => assertPublicDebugIdentity({
+    ...badging,
+    signerOutput: 'Number of signers: 1\nV2 Signer: certificate DN: CN=Android Debug Maintainer\n',
   }, '0.1.0-personal.31'), /Android Debug 证书/)
 })

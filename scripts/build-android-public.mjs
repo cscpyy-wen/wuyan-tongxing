@@ -155,7 +155,14 @@ export function assertPublicDebugIdentity({ packageName, versionName, signerOutp
   if (versionName !== `${expectedBaseVersion}-debug`) {
     throw new Error(`公开 debug APK 版本名错误：${versionName ?? '未知'}`)
   }
-  if (!/Signer #1 certificate DN:[^\r\n]*CN=Android Debug/i.test(signerOutput)) {
+  const signerCounts = [...signerOutput.matchAll(/Number of signers:\s*(\d+)/gi)]
+    .map((match) => Number(match[1]))
+  const signerDns = [...signerOutput.matchAll(
+    /(?:Signer\s+#\d+|V\d+(?:\.\d+)?\s+Signer(?:\s+#\d+)?):?\s+certificate\s+DN:\s*([^\r\n]+)/gi,
+  )].map((match) => match[1].trim())
+  const isAndroidDebugDn = (dn) => /(?:^|,)\s*CN\s*=\s*Android Debug\s*(?:,|$)/i.test(dn)
+  if (signerCounts.length !== 1 || signerCounts[0] !== 1
+    || signerDns.length === 0 || signerDns.some((dn) => !isAndroidDebugDn(dn))) {
     throw new Error('公开构建必须使用 Android Debug 证书，不得伪装维护者签名制品')
   }
 }
