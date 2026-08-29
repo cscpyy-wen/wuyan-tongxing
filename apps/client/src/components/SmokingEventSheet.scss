@@ -1,0 +1,220 @@
+.smoking-sheet {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-top: calc(28px + var(--safe-top));
+  background: rgba(10, 23, 18, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.smoking-sheet__panel {
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 430px;
+  max-height: calc(100vh - 28px - var(--safe-top));
+  padding: 10px 20px calc(16px + var(--safe-bottom));
+  border-radius: 24px 24px 0 0;
+  background: var(--paper);
+  box-shadow: 0 -14px 40px rgba(15, 51, 40, 0.2);
+}
+
+.smoking-sheet__entry-guard {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.smoking-sheet__handle {
+  width: 42px;
+  height: 4px;
+  margin: 0 auto 12px;
+  border-radius: 999px;
+  background: #cdd5d1;
+}
+
+.smoking-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.smoking-sheet__eyebrow,
+.smoking-sheet__title,
+.smoking-sheet__question {
+  display: block;
+}
+
+.smoking-time-row {
+  display: grid;
+  grid-template-columns: 1.35fr 0.8fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.smoking-time-field {
+  min-height: 44px;
+  padding: 11px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--forest-900);
+  background: white;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.smoking-sheet__eyebrow {
+  color: #8f3027;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.smoking-sheet__title {
+  margin-top: 3px;
+  color: var(--forest-900);
+  font-size: 22px;
+  font-weight: 760;
+}
+
+.smoking-sheet__close {
+  display: flex;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 0 3px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--forest-050);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.smoking-sheet__close::after,
+.smoking-reason::after,
+.smoking-intensity__choice::after {
+  border: 0;
+}
+
+.smoking-sheet__question {
+  margin: 16px 0 9px;
+  color: var(--forest-900);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.smoking-reason-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.smoking-reason {
+  display: flex;
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 9px 8px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  background: white;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.smoking-reason--active {
+  color: #8f3027;
+  border: 2px solid #c65a4d;
+  background: var(--coral-100);
+  font-weight: 700;
+}
+
+.smoking-intensity {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.smoking-intensity__choice {
+  display: flex;
+  width: auto;
+  min-width: 0;
+  min-height: 58px;
+  margin: 0;
+  padding: 6px 2px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  background: white;
+  line-height: 1.1;
+}
+
+.smoking-intensity__choice--active {
+  color: white;
+  border-color: var(--coral-500);
+  background: var(--coral-500);
+}
+
+.smoking-intensity__number,
+.smoking-intensity__label {
+  display: block;
+}
+
+.smoking-intensity__number {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.smoking-intensity__label {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.smoking-sheet__save {
+  min-height: 58px;
+  margin-top: 16px;
+  background: var(--coral-500);
+}
+
+.smoking-sheet__save[disabled] {
+  color: #46534d;
+  background: #e4e7e4;
+  opacity: 1;
+}
+
+.smoking-sheet__sos {
+  min-height: 46px;
+  margin-top: 4px;
+  color: #235f50;
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .smoking-sheet__panel {
+    animation: smoking-sheet-rise 180ms ease-out;
+  }
+}
+
+@keyframes smoking-sheet-rise {
+  from { transform: translateY(18px); opacity: 0.7; }
+  to { transform: translateY(0); opacity: 1; }
+}

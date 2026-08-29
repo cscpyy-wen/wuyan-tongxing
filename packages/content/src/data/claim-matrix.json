@@ -1,0 +1,146 @@
+[
+  {
+    "id": "claim-001",
+    "claim": "行为支持与适合的戒烟药物联合，通常比单独使用其中一种更有效。",
+    "evidenceIds": ["WHO-TOBACCO-CESSATION-2024"],
+    "contentIds": ["prep-07", "day-20", "medication-01", "faq-07"],
+    "wordingBoundary": "仅作人群层面指南结论；不得宣称所有人适合药物或保证个体成功。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-002",
+    "claim": "数字戒烟工具可用于自助或辅助支持，但手机应用的研究结果并不一致。",
+    "evidenceIds": ["WHO-TOBACCO-CESSATION-2024", "COCHRANE-MOBILE-2019"],
+    "contentIds": ["faq-08"],
+    "wordingBoundary": "不得把应用参与度等同于戒烟疗效，不使用保证成功率或个体疗效预测。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-003",
+    "claim": "记录时间、场景、情绪和烟瘾可用于识别个人触发模式。",
+    "evidenceIds": ["NCI-QUITSTART", "BCT-TAXONOMY-V1-2013"],
+    "contentIds": ["prep-02", "day-05", "maintenance-week-05", "lapse-02"],
+    "wordingBoundary": "只称为行为模式识别，不据此诊断尼古丁依赖或精神疾病。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-004",
+    "claim": "接纳烟瘾和认知解离可作为不立即吸烟的行为练习。",
+    "evidenceIds": ["ICANQUIT-ACT-RCT-2020"],
+    "contentIds": ["prep-01", "day-02", "day-15", "sos-surf", "sos-reasons"],
+    "wordingBoundary": "不声称三分钟练习能治疗精神疾病或保证烟瘾消失。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-005",
+    "claim": "具体的“如果—那么”计划可帮助把高风险场景与替代动作连接起来。",
+    "evidenceIds": ["IMPLEMENTATION-INTENTIONS-2020"],
+    "contentIds": ["prep-04", "day-04", "day-11", "maintenance-week-05", "lapse-03"],
+    "wordingBoundary": "系统评价的平均效果较小；只能称为计划工具，不能作成功保证。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-006",
+    "claim": "伙伴和专业人员可提供不同形式的社会支持。",
+    "evidenceIds": ["WHO-TOBACCO-CESSATION-2024", "COCHRANE-INDIVIDUAL-COUNSELLING-2017"],
+    "contentIds": ["prep-06", "day-21", "day-24", "day-26", "sos-partner", "share-invite", "share-help"],
+    "wordingBoundary": "普通伙伴不承担医疗或危机干预职责，数字自助不能等同于专业咨询。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-007",
+    "claim": "滑倒后应尽快停止继续吸烟、复盘触发点并恢复计划。",
+    "evidenceIds": ["NCI-LAPSE-RECOVERY", "NCI-QUITSTART"],
+    "contentIds": ["day-07", "day-22", "lapse-01", "lapse-02", "lapse-03", "lapse-04", "faq-03", "share-restart"],
+    "wordingBoundary": "不把滑倒恢复模块宣传为经独立验证的复吸预防治疗。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-008",
+    "claim": "NRT 通过受控方式提供尼古丁，可帮助减轻戒断并避免卷烟燃烧产生的许多有害物。",
+    "evidenceIds": ["WHO-TOBACCO-CESSATION-2024", "COCHRANE-NRT-2023", "CHINA-NHC-SMOKING-REPORT-2020"],
+    "contentIds": ["medication-02"],
+    "wordingBoundary": "不称 NRT 无风险，不根据应用数据判断个体适用性。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-009",
+    "claim": "贴片与短效 NRT 的联合方案在部分人群中可比单一剂型提高戒烟机会。",
+    "evidenceIds": ["COCHRANE-NRT-2023"],
+    "contentIds": ["medication-03"],
+    "wordingBoundary": "只提示向专业人员咨询，不给出剂量、组合方式或自动推荐。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-010",
+    "claim": "WHO 成人戒烟指南列出伐尼克兰、NRT、安非他酮和金雀花碱等有效药物选项。",
+    "evidenceIds": ["WHO-TOBACCO-CESSATION-2024", "COCHRANE-PARTIAL-AGONISTS-2023"],
+    "contentIds": ["medication-04"],
+    "wordingBoundary": "必须说明中国批准、供应和适用条件可能不同；处方药需合格医务人员评估。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-011",
+    "claim": "中国成人短信和微信组合干预研究支持本地化、持续触达和多组件设计，但长期留存与效果仍有不确定性。",
+    "evidenceIds": ["CHINA-HAPPY-QUIT-RCT-2019", "CHINA-PERSONALIZED-SMS-RCT-2023", "CHINA-WAY-TO-QUIT-RCT-2026"],
+    "contentIds": ["day-14", "day-27", "day-28", "maintenance-week-08", "faq-08", "faq-11"],
+    "wordingBoundary": "组合干预效果不能归因于小程序单一组件；不外推为本产品疗效。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-012",
+    "claim": "3、6、12 个月结局使用标准化自报口径，并把漏答保留为未知。",
+    "evidenceIds": ["WHO-TOBACCO-CESSATION-2024", "CHINA-WAY-TO-QUIT-RCT-2026"],
+    "contentIds": ["followup-month-03", "followup-month-06", "followup-month-12", "faq-09"],
+    "wordingBoundary": "所有结果须标明未经生化验证，不得作为临床诊断或本产品疗效证明。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-013",
+    "claim": "吸烟和二手烟危害健康，停止吸烟有健康收益。",
+    "evidenceIds": ["CHINA-NHC-SMOKING-REPORT-2020", "WHO-TOBACCO-CESSATION-2024"],
+    "contentIds": ["prep-05", "day-24", "day-25"],
+    "wordingBoundary": "只呈现人群层面科普，不承诺个人在特定日期出现特定恢复。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-014",
+    "claim": "健康与吸烟记录属于需要严格保护的信息，云同步和成效统计应分别由用户选择。",
+    "evidenceIds": ["CHINA-PIPL-2021"],
+    "contentIds": ["faq-10", "share-invite", "share-milestone"],
+    "wordingBoundary": "合规表述仍需结合上线时有效规则和法律审核，不把假名化称作匿名。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-015",
+    "claim": "本产品只提供健康教育、自我管理和转介，不开展互联网诊断或处方。",
+    "evidenceIds": ["CHINA-INTERNET-DIAGNOSIS-2022"],
+    "contentIds": ["prep-07", "day-20", "medication-01", "medication-03", "medication-04", "medication-05"],
+    "wordingBoundary": "不得输出个体诊断、药物排序、剂量、处方或疗效预测。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-016",
+    "claim": "12356 是全国统一心理援助热线；急性医疗或人身危险应联系 120/110。",
+    "evidenceIds": ["CHINA-NHC-12356-2025"],
+    "contentIds": ["day-05", "day-10", "faq-02", "faq-12"],
+    "wordingBoundary": "不宣称小程序能检测危机；热线能力可能因地区和时段而异。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-017",
+    "claim": "电子烟并非无害，本产品不把电子烟作为推荐方案。",
+    "evidenceIds": ["CHINA-NHC-SMOKING-REPORT-2020"],
+    "contentIds": ["faq-06"],
+    "wordingBoundary": "不提供品牌、购买或使用指导，也不据此评估个体风险。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  },
+  {
+    "id": "claim-018",
+    "claim": "内容采用 BCT 和 COM-B 等框架描述机制，但机制标签本身不是疗效证据。",
+    "evidenceIds": ["BCT-TAXONOMY-V1-2013", "COMB-BCW-2011"],
+    "contentIds": ["prep-01", "prep-02", "prep-03", "day-07", "day-27"],
+    "wordingBoundary": "不得把框架引用写成产品临床验证或监管认证。",
+    "reviewStatus": "evidence_checked_medical_review_pending"
+  }
+]

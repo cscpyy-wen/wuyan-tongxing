@@ -1,0 +1,111 @@
+.lapse-reassurance {
+  margin-top: 22px;
+}
+
+.lapse-reassurance__number,
+.lapse-reassurance__text {
+  display: block;
+}
+
+.lapse-count-stepper {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.lapse-count-stepper__button {
+  display: flex;
+  width: 52px;
+  min-height: 52px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b8d5ca;
+  border-radius: 14px;
+  color: var(--forest-700);
+  background: white;
+  font-size: 24px;
+}
+
+.lapse-count-stepper__button::after { border: 0; }
+
+.lapse-count-stepper__value {
+  color: var(--forest-700);
+  font-size: 26px;
+  font-weight: 760;
+}
+
+.lapse-intensity {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lapse-intensity__choice {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: white;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.lapse-intensity__choice--active {
+  color: white;
+  border-color: var(--forest-700);
+  background: var(--forest-700);
+}
+
+.lapse-reassurance__number {
+  color: var(--forest-900);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.lapse-reassurance__text {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.recovery-choice {
+  display: flex;
+  min-height: 58px;
+  margin: 0;
+  padding: 13px 15px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: white;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recovery-choice::after { border: 0; }
+
+.recovery-choice--active {
+  color: var(--forest-900);
+  border: 2px solid var(--forest-600);
+  background: var(--forest-050);
+  font-weight: 700;
+}
+
+.lapse-save {
+  margin-top: 28px;
+}
+
+.lapse-note {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+}

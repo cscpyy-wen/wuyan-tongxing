@@ -1,0 +1,41 @@
+.faq-list {
+  margin-top: 22px;
+}
+
+.faq-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.faq-card__number,
+.faq-card__question,
+.faq-card__answer {
+  display: block;
+}
+
+.faq-card__number {
+  color: var(--forest-600);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.faq-card__question {
+  color: var(--forest-900);
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.faq-card__answer {
+  margin-top: 9px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.faq-card__boundary {
+  display: block;
+  margin-top: 10px;
+}

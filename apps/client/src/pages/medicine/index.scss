@@ -1,0 +1,56 @@
+.medicine-boundary {
+  margin-top: 22px;
+}
+
+.medicine-topic {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-top: 0;
+}
+
+.medicine-topic__number {
+  display: flex;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: var(--forest-100);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.medicine-topic__title,
+.medicine-topic__body {
+  display: block;
+}
+
+.medicine-topic__title {
+  color: var(--forest-900);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.medicine-topic__body {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.medicine-topic__action {
+  margin: 12px 0 8px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: var(--forest-700);
+  background: var(--forest-050);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.medicine-referral {
+  margin-top: 24px;
+}

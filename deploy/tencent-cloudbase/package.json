@@ -1,0 +1,20 @@
+{
+  "name": "wuyan-tongxing-tencent-cloudbase",
+  "version": "0.1.0-rc.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.14.1 <25"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs && node scripts/verify.mjs",
+    "package": "node scripts/package.mjs",
+    "verify": "node scripts/verify.mjs",
+    "verify:live": "node scripts/verify-live.mjs",
+    "verify:package": "node scripts/verify-package.mjs"
+  },
+  "devDependencies": {
+    "@cloudbase/cli": "3.8.0",
+    "adm-zip": "0.6.0"
+  }
+}

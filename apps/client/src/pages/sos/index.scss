@@ -1,0 +1,236 @@
+.sos-level {
+  margin-top: 8px;
+  padding: 14px;
+  box-shadow: none;
+}
+
+.sos-options-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  margin: 12px 0 0;
+  padding: 8px 13px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #cbdcd5;
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sos-options-toggle::after { border: 0; }
+
+.sos-options-toggle__action {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sos-options-panel {
+  margin-top: 8px;
+}
+
+.sos-head {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sos-head .page-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.sos-lapse-short {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #edcbc5;
+  border-radius: 12px;
+  color: #9c3c31;
+  background: white;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.sos-lapse-short::after { border: 0; }
+
+.sos-level__value {
+  color: var(--coral-500);
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.sos-level-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.sos-level-choice {
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  background: white;
+  font-weight: 750;
+}
+
+.sos-level-choice::after { border: 0; }
+
+.sos-level-choice--active {
+  color: white;
+  border-color: var(--coral-500);
+  background: var(--coral-500);
+}
+
+.technique-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.technique-tabs::-webkit-scrollbar { display: none; }
+
+.technique-tab {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 7px 2px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: white;
+  font-size: 11px;
+}
+
+.technique-tab::after { border: 0; }
+
+.technique-tab--active {
+  color: white;
+  border-color: var(--forest-700);
+  background: var(--forest-700);
+  font-weight: 700;
+}
+
+.sos-practice {
+  min-height: 280px;
+  margin-top: 10px;
+  padding: 20px 18px;
+  border-radius: 24px;
+  background: linear-gradient(150deg, #eef8f3, #fffefa);
+  box-shadow: inset 0 0 0 1px rgba(23, 107, 85, 0.1);
+  text-align: center;
+}
+
+.sos-practice__title,
+.sos-practice__instruction,
+.sos-practice__timer,
+.breath-cue,
+.reason-quote {
+  display: block;
+}
+
+.sos-practice__title {
+  color: var(--forest-900);
+  font-size: 21px;
+  font-weight: 760;
+}
+
+.breath-cue {
+  display: flex;
+  width: 104px;
+  height: 104px;
+  margin: 14px auto 8px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--forest-700);
+  background: rgba(116, 190, 164, 0.23);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.breath-cue--running { animation: breathe 10s ease-in-out infinite; }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(0.82); }
+  40% { transform: scale(1); }
+}
+
+.sos-practice .button + .button { margin-top: 8px; }
+
+.reason-quote {
+  margin: 14px 0 4px;
+  color: var(--forest-700);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.sos-practice__instruction {
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.sos-practice__track {
+  margin: 14px 0 8px;
+}
+
+.sos-practice__timer {
+  margin-bottom: 12px;
+  color: var(--forest-900);
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 760;
+}
+
+.sos-complete__mark,
+.sos-complete__title,
+.sos-complete__text {
+  display: block;
+}
+
+.sos-complete__mark {
+  display: flex;
+  width: 80px;
+  height: 80px;
+  margin: 25px auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--forest-700);
+  background: var(--forest-100);
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.sos-complete__title {
+  color: var(--forest-900);
+  font-size: 23px;
+  font-weight: 760;
+}
+
+.sos-complete__text {
+  margin: 12px 0 25px;
+  color: var(--muted);
+}
+
+.sos-footer {
+  margin-top: 12px;
+}

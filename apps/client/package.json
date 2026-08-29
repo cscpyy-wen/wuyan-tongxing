@@ -1,0 +1,60 @@
+{
+  "name": "@wuyan/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "无烟同行 Taro 微信小程序与 H5 客户端",
+  "browserslist": [
+    "Chrome >= 61"
+  ],
+  "scripts": {
+    "dev": "pnpm build:h5 && node ../../scripts/serve-h5.mjs 4173",
+    "dev:h5": "pnpm build:h5 && node ../../scripts/serve-h5.mjs 4173",
+    "dev:weapp": "taro build --type weapp --watch",
+    "build": "pnpm build:h5 && pnpm build:weapp",
+    "build:h5": "taro build --type h5 && node ../../scripts/prepare-h5-offline.mjs",
+    "build:weapp": "taro build --type weapp",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@capacitor/app": "8.1.1",
+    "@capacitor/core": "8.5.0",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/share": "8.0.1",
+    "@tarojs/components": "^4.2.1",
+    "@tarojs/plugin-framework-react": "^4.2.1",
+    "@tarojs/plugin-platform-h5": "^4.2.1",
+    "@tarojs/plugin-platform-weapp": "^4.2.1",
+    "@tarojs/react": "^4.2.1",
+    "@tarojs/runtime": "^4.2.1",
+    "@tarojs/shared": "^4.2.1",
+    "@tarojs/taro": "^4.2.1",
+    "@wuyan/content": "workspace:*",
+    "@wuyan/contracts": "workspace:*",
+    "@wuyan/domain": "workspace:*",
+    "@wuyan/rules": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@tarojs/cli": "^4.2.1",
+    "@tarojs/webpack5-runner": "^4.2.1",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitest/coverage-v8": "^4.1.11",
+    "babel-preset-taro": "^4.2.1",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.6",
+    "react-refresh": "^0.14.2",
+    "sass": "^1.83.4",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "webpack": "5.104.1"
+  }
+}

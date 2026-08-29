@@ -1,0 +1,44 @@
+.followup-preview,
+.followup-intro {
+  margin-top: 20px;
+}
+
+.followup-intro .fine-print {
+  display: block;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #dce9e3;
+}
+
+.followup-question {
+  display: block;
+}
+
+.tri-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tri-grid .choice {
+  min-height: 46px;
+  padding: 9px 7px;
+  font-size: 12px;
+}
+
+.followup-score {
+  flex: 0 0 auto;
+  color: var(--forest-700);
+  font-size: 18px;
+  font-weight: 760;
+}
+
+.followup-save {
+  margin-top: 28px;
+}
+
+.followup-disclaimer {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+}

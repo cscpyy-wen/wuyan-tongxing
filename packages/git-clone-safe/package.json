@@ -1,0 +1,14 @@
+{
+  "name": "git-clone",
+  "version": "0.2.1",
+  "private": true,
+  "description": "Workspace-local hardened drop-in for the unmaintained git-clone package",
+  "main": "index.cjs",
+  "scripts": {
+    "test": "node --test index.test.cjs"
+  },
+  "license": "ISC",
+  "engines": {
+    "node": ">=24.14.1 <25"
+  }
+}

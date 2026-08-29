@@ -1,0 +1,32 @@
+无烟同行
+Copyright 2026 无烟同行 contributors
+
+The original software source code, configuration, and tests in this
+repository are licensed under the Apache License, Version 2.0, except where
+an individual file or directory states otherwise.
+
+Original project-specific artwork in
+apps/android-shell/android/app/src/main/res/drawable/ic_launcher_foreground.xml
+and deploy/tencent-cloudbase/assets/favicon.svg is also licensed under the
+Apache License, Version 2.0. This copyright license does not grant trademark
+rights or permission to imply endorsement.
+
+Original educational content in packages/content/src/data and original
+narrative documentation in docs are licensed under Creative Commons
+Attribution 4.0 International. External evidence, cited publications,
+trademarks, and third-party materials are not relicensed by this notice.
+
+packages/git-clone-safe is distributed under the ISC license stated in that
+directory and retains its upstream attribution.
+
+Portions of apps/android-shell/android are derived from the Capacitor Android
+template distributed with @capacitor/cli 8.5.0, Copyright (c) 2017-present
+Drifty Co., under the MIT License. The complete notice and permission text is
+in apps/android-shell/android/LICENSE-CAPACITOR. Gradle Wrapper components in
+that directory retain their upstream Apache-2.0 notices.
+
+Third-party components remain subject to their respective licenses. See
+THIRD_PARTY_NOTICES.md, docs/third-party-licenses.json, and docs/sbom.cdx.json.
+
+No medical organization, guideline publisher, research author, or cited
+institution endorses this project merely because its work is referenced.

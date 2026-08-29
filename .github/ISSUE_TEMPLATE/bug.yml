@@ -1,0 +1,72 @@
+name: 缺陷报告
+description: 报告可复现的普通问题；安全漏洞请使用私密报告
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。**请勿提交真实健康记录、导出文件、凭证、密钥或其他敏感信息。** 安全漏洞请改用 [GitHub 私密漏洞报告](https://github.com/cscpyy-wen/wuyan-tongxing/security/advisories/new)。
+  - type: dropdown
+    id: component
+    attributes:
+      label: 受影响组件
+      options:
+        - H5
+        - 微信小程序
+        - Android 壳
+        - API / Worker
+        - 内容与规则
+        - 构建、测试或文档
+        - 不确定
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本与环境
+      description: 请提供版本或提交、操作系统、浏览器或运行时；不要包含设备标识符。
+      placeholder: 例如：v0.1.0-personal.31，Android 16；或提交 SHA，Windows 11，Chrome 版本号
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: 问题概述
+      description: 简要说明发生了什么，以及影响范围。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 最小复现步骤
+      description: 请使用人工构造的数据，给出稳定、最小的复现步骤。
+      placeholder: |
+        1. 打开……
+        2. 输入合成数据……
+        3. 观察到……
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: 预期结果与实际结果
+      description: 分别说明你预期看到什么、实际看到了什么。
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 已脱敏的诊断信息
+      description: 可选。粘贴最短必要日志或截图前，请移除个人数据、路径、凭证和内部地址。
+      render: shell
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 提交确认
+      options:
+        - label: 我已搜索现有 Issue，未发现相同报告。
+          required: true
+        - label: 本报告只包含人工构造或充分脱敏的数据，不含真实个人健康数据、凭证或密钥。
+          required: true
+        - label: 这不是需要私密披露的安全漏洞。
+          required: true

@@ -1,0 +1,28 @@
+{
+  "name": "@wuyan/admin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4311",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@wuyan/contracts": "workspace:*",
+    "@wuyan/content": "workspace:*",
+    "@wuyan/rules": "workspace:*",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
+    "typescript": "^7.0.2",
+    "vite": "^7.1.4",
+    "vitest": "^4.1.11"
+  }
+}

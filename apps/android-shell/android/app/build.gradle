@@ -1,0 +1,154 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import java.security.MessageDigest
+import java.util.Properties
+
+apply plugin: 'com.android.application'
+
+dependencyLocking {
+    lockAllConfigurations()
+    lockMode = LockMode.STRICT
+}
+
+def personalVersion = new JsonSlurper().parse(rootProject.file('../personal-version.json'))
+def signingPropertiesPath = System.getenv('WUYAN_ANDROID_SIGNING_PROPERTIES')
+def signingProperties = new Properties()
+def releaseTaskRequested = gradle.startParameter.taskNames.any { taskName ->
+    def leaf = taskName.tokenize(':').last().toLowerCase(Locale.ROOT)
+    leaf in ['assemblerelease', 'bundlerelease', 'lintrelease', 'installrelease', 'packagerelease']
+}
+if (signingPropertiesPath != null && !signingPropertiesPath.isBlank()) {
+    def signingPropertiesFile = new File(signingPropertiesPath)
+    if (!signingPropertiesFile.isFile()) {
+        throw new GradleException("个人签名配置不存在：${signingPropertiesFile}")
+    }
+    signingPropertiesFile.withInputStream { signingProperties.load(it) }
+    ['storeFile', 'storePassword', 'keyAlias', 'keyPassword'].each { key ->
+        if (signingProperties.getProperty(key) == null || signingProperties.getProperty(key).isBlank()) {
+            throw new GradleException("个人签名配置缺少 ${key}")
+        }
+    }
+}
+
+android {
+    namespace = personalVersion.packageName
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId personalVersion.packageName
+        minSdkVersion personalVersion.minSdk
+        targetSdkVersion personalVersion.targetSdk
+        versionCode personalVersion.versionCode
+        versionName personalVersion.versionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        personal {
+            if (!signingProperties.isEmpty()) {
+                storeFile new File(signingProperties.getProperty('storeFile'))
+                storePassword signingProperties.getProperty('storePassword')
+                keyAlias signingProperties.getProperty('keyAlias')
+                keyPassword signingProperties.getProperty('keyPassword')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+        release {
+            if (signingProperties.isEmpty() && releaseTaskRequested) {
+                throw new GradleException('release 构建必须由 scripts/build-android.mjs 注入个人专用签名')
+            }
+            if (!signingProperties.isEmpty()) {
+                signingConfig signingConfigs.personal
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+tasks.register('printReleaseRuntimeDependencies') {
+    group = 'verification'
+    description = 'Prints the resolved external Android release runtime modules as deterministic JSON.'
+    doLast {
+        def artifactsByModule = configurations.releaseRuntimeClasspath.incoming.artifactView {
+            componentFilter { identifier ->
+                identifier instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier
+            }
+        }.artifacts.artifacts.groupBy { artifact ->
+            def id = artifact.id.componentIdentifier
+            "${id.group}:${id.module}:${id.version}".toString()
+        }
+        def sha256 = { File artifact ->
+            def digest = MessageDigest.getInstance('SHA-256')
+            artifact.withInputStream { input ->
+                byte[] buffer = new byte[8192]
+                int count
+                while ((count = input.read(buffer)) != -1) digest.update(buffer, 0, count)
+            }
+            digest.digest().encodeHex().toString()
+        }
+        def modules = configurations.releaseRuntimeClasspath.incoming.resolutionResult.allComponents.collect { component ->
+            def identifier = component.id
+            if (identifier instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier) {
+                def coordinates = "${identifier.group}:${identifier.module}:${identifier.version}".toString()
+                def artifacts = (artifactsByModule[coordinates] ?: []).collect { artifact ->
+                    [
+                        fileName: artifact.file.name,
+                        extension: artifact.file.name.tokenize('.').last(),
+                        sha256: sha256(artifact.file),
+                    ]
+                }.unique { artifact -> "${artifact.fileName}:${artifact.sha256}" }
+                 .sort { left, right -> left.fileName <=> right.fileName }
+                return [
+                    group: identifier.group,
+                    name: identifier.module,
+                    version: identifier.version,
+                    artifacts: artifacts,
+                ]
+            }
+            return null
+        }.findAll { it != null }
+          .unique { module -> "${module.group}:${module.name}:${module.version}" }
+          .sort { left, right ->
+              "${left.group}:${left.name}:${left.version}" <=> "${right.group}:${right.name}:${right.version}"
+          }
+        println("WUYAN_GRADLE_DEPENDENCIES=${JsonOutput.toJson(modules)}")
+    }
+}
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

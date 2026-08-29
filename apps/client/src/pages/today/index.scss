@@ -1,0 +1,426 @@
+.today-page .section-title {
+  margin-bottom: 12px;
+}
+
+.smoking-hero {
+  margin-top: 18px;
+  padding: 18px;
+  border-color: #efd6d1;
+  background: linear-gradient(160deg, #fff 0%, #fff9f7 100%);
+}
+
+.smoking-hero__count,
+.smoking-hero__metric-value,
+.smoking-hero__metric-label {
+  display: block;
+}
+
+.smoking-day-confirm {
+  min-height: 44px;
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px solid #d9e8e1;
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: var(--forest-050);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.smoking-day-confirm::after { border: 0; }
+
+.smoking-day-confirmed {
+  display: flex;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 0 6px 0 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #d9e8e1;
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: #e2f0e8;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.smoking-day-unconfirm {
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  color: #8f372e;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.smoking-day-unconfirm::after { border: 0; }
+
+.smoking-hero__count {
+  color: var(--forest-900);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.smoking-hero__count text {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.smoke-log-primary {
+  display: flex;
+  width: 100%;
+  min-height: 70px;
+  margin: 16px 0 0;
+  padding: 12px 18px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 16px;
+  color: white;
+  background: linear-gradient(145deg, #bd4a3d, #a8382d);
+  box-shadow: 0 8px 20px rgba(182, 63, 50, 0.2);
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.smoke-log-primary::after { border: 0; }
+
+.smoke-log-action {
+  margin-top: 56px;
+}
+
+.smoke-log-action .smoke-log-primary {
+  margin-top: 0;
+}
+
+.smoke-log-primary__plus {
+  font-size: 27px;
+  font-weight: 400;
+}
+
+.recent-log-actions {
+  display: flex;
+  min-height: 44px;
+  margin-top: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.recent-log-actions__label {
+  margin-right: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.recent-log-action {
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #bdd2c9;
+  border-radius: 10px;
+  color: var(--forest-700);
+  background: white;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.recent-log-action--undo {
+  color: #9c3c31;
+  border-color: #edcbc5;
+}
+
+.recent-log-action::after { border: 0; }
+
+.smoking-hero__metrics {
+  display: grid;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #f0ded9;
+}
+
+.smoking-hero__metrics--1 { grid-template-columns: 1fr; }
+.smoking-hero__metrics--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.smoking-hero__metrics--3 { grid-template-columns: 0.9fr 1.1fr 1.35fr; }
+
+.smoking-hero__metric {
+  min-width: 0;
+  padding: 0 8px;
+  border-right: 1px solid #f0ded9;
+  text-align: center;
+}
+
+.smoking-hero__metric:first-child { padding-left: 0; }
+.smoking-hero__metric:last-child { padding-right: 0; border-right: 0; }
+
+.smoking-hero__metric-value {
+  min-height: 2.6em;
+  color: var(--forest-900);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.smoking-hero__metric-value--reason {
+  font-size: 12px;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.smoking-hero__metric-label {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.progress-summary {
+  margin-top: 10px;
+  padding: 14px 16px;
+}
+
+.progress-summary__main {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.progress-summary__number,
+.progress-summary__unit {
+  display: block;
+}
+
+.progress-summary__number {
+  color: var(--forest-700);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.progress-summary__unit {
+  color: var(--forest-900);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.progress-summary__limit {
+  display: flex;
+  margin-top: 12px;
+  padding-top: 10px;
+  align-items: center;
+  gap: 9px;
+  border-top: 1px solid #d9e8e1;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.progress-summary__limit-value {
+  color: var(--forest-700);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.today-section-head .section-title {
+  margin-bottom: 0;
+}
+
+.lesson-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.lesson-card__marker {
+  display: flex;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  color: var(--forest-700);
+  background: var(--forest-100);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.lesson-card__title {
+  display: block;
+}
+
+.lesson-card__title {
+  color: var(--forest-900);
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.lesson-card .button {
+  margin-top: 14px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quick-card {
+  display: flex;
+  min-height: 78px;
+  margin: 0;
+  padding: 12px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: white;
+  text-align: left;
+  line-height: 1.45;
+}
+
+.quick-card::after {
+  border: 0;
+}
+
+.quick-card__icon,
+.quick-card__title {
+  display: block;
+}
+
+.quick-card__icon {
+  display: flex;
+  flex: 0 0 36px;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: var(--forest-050);
+  font-size: 21px;
+}
+
+.quick-card__title {
+  color: var(--forest-900);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.schedule-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #d9e8e1;
+}
+
+.schedule-row__title,
+.schedule-row__limit {
+  display: block;
+}
+
+.schedule-row__title {
+  color: var(--forest-900);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.schedule-row__limit {
+  color: var(--forest-700);
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.schedule-row__adjust {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.schedule-adjust {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b8d5ca;
+  border-radius: 12px;
+  color: var(--forest-700);
+  background: white;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.schedule-adjust::after { border: 0; }
+
+.schedule-adjust[disabled='true'] {
+  color: #77837d;
+  border-color: #dce3df;
+  background: #eef1ef;
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .today-page {
+    padding-top: calc(10px + var(--safe-top));
+    /* Includes the optional "刚刚记录 / 编辑 / 撤销" row below the fixed CTA. */
+    padding-bottom: calc(204px + var(--safe-bottom));
+  }
+
+  .today-page .page-header__compact-row {
+    min-height: 42px;
+  }
+
+  .smoking-hero {
+    margin-top: 8px;
+    padding: 11px 16px;
+  }
+
+  .smoking-hero__count {
+    font-size: 30px;
+  }
+
+  .smoking-hero__metrics {
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+
+  .progress-summary {
+    margin-top: 7px;
+    padding: 9px 14px;
+  }
+
+  .progress-summary__number {
+    font-size: 28px;
+  }
+
+  .smoke-log-action {
+    position: fixed;
+    z-index: 40;
+    bottom: calc(var(--tabbar-height) + 10px + var(--safe-bottom));
+    left: 50%;
+    width: min(520px, calc(100vw - 48px - var(--safe-left) - var(--safe-right)));
+    margin: 0;
+    transform: translateX(-50%);
+  }
+
+  .smoke-log-primary {
+    min-height: 56px;
+    margin-top: 0;
+  }
+}

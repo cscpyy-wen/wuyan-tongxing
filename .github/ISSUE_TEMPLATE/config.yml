@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞与敏感信息（私密报告）
+    url: https://github.com/cscpyy-wen/wuyan-tongxing/security/advisories/new
+    about: 请勿公开提交漏洞细节、真实健康记录、凭证或密钥。

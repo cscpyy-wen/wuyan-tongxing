@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="无烟同行">
+  <rect width="64" height="64" rx="16" fill="#176b55"/>
+  <path d="M18 37c0-10 6-18 16-21-2 7 0 12 6 16 5 4 7 9 6 16-4-6-9-9-15-9-5 0-9 2-13 6 0-3 0-5 0-8Z" fill="#f7f4ec"/>
+  <path d="M18 48c8-8 18-10 29-5" fill="none" stroke="#e7a94e" stroke-linecap="round" stroke-width="5"/>
+</svg>

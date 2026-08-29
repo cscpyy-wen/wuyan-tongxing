@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-29T04:39:24.153Z",
+  "source": "OSV querybatch API",
+  "endpoint": "https://api.osv.dev/v1/querybatch",
+  "sbomPath": "docs/sbom.cdx.json",
+  "sbomSha256": "c7d24286db1719b83fff630aaa4305bdeb4d4b6f18bb469acf6b3a3e4674114e",
+  "componentCount": 773,
+  "ecosystems": {
+    "npm": 722,
+    "maven": 51
+  },
+  "findingCount": 0,
+  "findings": []
+}

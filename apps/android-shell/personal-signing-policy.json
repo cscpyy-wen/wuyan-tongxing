@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "packageName": "cn.wuyantongxing.personal",
+  "allowedCertificateSha256": "b0fdad152952a3c3c7c97fb214ac1a9b392cfaf7c160c55b40cf6eaa680bf1d7",
+  "firstPublishedVersion": "0.1.0-personal.1",
+  "policy": "fail-closed-upgrade-signing"
+}

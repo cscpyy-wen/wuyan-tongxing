@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["vitest/globals"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "paths": {
+      "@wuyan/contracts": ["../../packages/contracts/src/index.ts"],
+      "@wuyan/domain": ["../../packages/domain/src/index.ts"],
+      "@wuyan/rules": ["../../packages/rules/src/index.ts"],
+      "@wuyan/content": ["../../packages/content/src/index.ts"]
+    }
+  },
+  "include": ["src", "config", "vitest.config.ts"]
+}

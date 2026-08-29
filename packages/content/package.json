@@ -1,0 +1,29 @@
+{
+  "name": "@wuyan/content",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./today": {
+      "types": "./src/today.ts",
+      "default": "./src/today.ts"
+    },
+    "./data/content-items.json": "./src/data/content-items.json",
+    "./data/evidence-sources.json": "./src/data/evidence-sources.json",
+    "./data/claim-matrix.json": "./src/data/claim-matrix.json",
+    "./data/today-content-summaries.json": "./src/data/today-content-summaries.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "verify": "node scripts/verify-content.mjs",
+    "test": "node --test tests/content.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "appId": "cn.wuyantongxing.personal",
+  "appName": "无烟同行",
+  "webDir": "www",
+  "backgroundColor": "#F7F4EC",
+  "loggingBehavior": "none",
+  "appendUserAgent": " WuyanTongxingAndroid/0.1.0",
+  "zoomEnabled": false,
+  "initialFocus": true,
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false,
+    "loggingBehavior": "none",
+    "minWebViewVersion": 120,
+    "useLegacyBridge": false,
+    "resolveServiceWorkerRequests": false
+  },
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "https",
+    "cleartext": false,
+    "allowNavigation": []
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "style": "LIGHT",
+      "hidden": false,
+      "animation": "NONE"
+    }
+  }
+}

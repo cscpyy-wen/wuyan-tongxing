@@ -1,0 +1,25 @@
+{
+  "name": "@wuyan/android-shell",
+  "version": "0.1.0-personal.31",
+  "private": true,
+  "type": "module",
+  "description": "无烟同行小米澎湃 OS 3 / Android 16 个人离线安装壳",
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.mjs && node scripts/verify-web.mjs",
+    "verify:web": "node scripts/verify-web.mjs",
+    "sync:android": "pnpm prepare:web && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.0",
+    "@capacitor/app": "8.1.1",
+    "@capacitor/core": "8.5.0",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/share": "8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.0"
+  },
+  "engines": {
+    "node": ">=24.14.1 <25"
+  }
+}

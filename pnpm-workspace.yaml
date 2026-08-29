@@ -1,0 +1,46 @@
+packages:
+  - apps/*
+  - packages/*
+
+overrides:
+  # The original decompress/html-minifier packages are unmaintained and have
+  # no fixed release. Their maintained API-compatible successors are used.
+  decompress@4.2.1: npm:@xhmikosr/decompress@11.1.4
+  html-minifier@4.0.0: npm:html-minifier-terser@7.2.0
+  adm-zip@0.5.18: 0.6.0
+  glob@10.2.6: 10.5.0
+  got@8.3.2: 11.8.6
+  got@9.6.0: 11.8.6
+  http-cache-semantics@3.8.1: 4.1.1
+  postcss@7.0.39: 8.5.26
+  serialize-javascript@6.0.2: 7.0.5
+  esbuild@0.21.5: 0.25.12
+  esbuild@0.27.7: 0.28.2
+  lodash-es@4.17.21: 4.18.1
+  swiper@11.1.15: 12.1.2
+  uuid@8.3.2: 11.1.1
+  uuid@7.0.3: 11.1.1
+  webpack-dev-server@4.15.2: 5.2.6
+  # Upstream has no patched release. Route Taro's development-only template
+  # clone helper through the audited local drop-in that rejects git helpers
+  # such as ext:: and terminates option parsing for checkout refs.
+  git-clone@0.1.0: link:packages/git-clone-safe
+  image-size@0.5.5: 2.0.3
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  '@tarojs/binding': true
+  '@tarojs/cli': true
+  core-js: true
+  core-js-pure: true
+  esbuild: true
+
+peerDependencyRules:
+  allowedVersions:
+    # Taro's patched esbuild 0.21.5 is overridden to a maintained version;
+    # bundle-require accepts >=0.18 but pnpm compares the override target.
+    esbuild: ">=0.25.12"
+    # Taro 4.2.1 pins vulnerable webpack 5.91.0 exactly. The patched 5.104.1
+    # passes both target builds and is tracked as a narrow compatibility waiver.
+    webpack: ">=5.104.1 <6"

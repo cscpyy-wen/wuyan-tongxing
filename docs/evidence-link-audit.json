@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-28T04:05:04.454Z",
+  "policy": "404/410 is a release failure; access restrictions and transport timeouts require manual browser review, not automatic deletion.",
+  "sourceCount": 22,
+  "counts": {
+    "access-restricted": 7,
+    "reachable": 12,
+    "unverified-network": 3
+  },
+  "results": [
+    {
+      "id": "BCT-TAXONOMY-V1-2013",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3609782/",
+      "status": 200,
+      "finalUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3609782/",
+      "verdict": "reachable",
+      "elapsedMs": 1281
+    },
+    {
+      "id": "CHINA-CDC-QUIT-PLATFORM-2022",
+      "url": "https://www.chinacdc.cn/jkyj/yckz/gzdt/202203/t20220310_296389.html",
+      "status": 200,
+      "finalUrl": "https://www.chinacdc.cn/jkyj/yckz/gzdt/202203/t20220310_296389.html",
+      "verdict": "reachable",
+      "elapsedMs": 61
+    },
+    {
+      "id": "CHINA-HAPPY-QUIT-RCT-2019",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0140673618326357",
+      "status": 403,
+      "finalUrl": "https://www.sciencedirect.com/science/article/pii/S0140673618326357",
+      "verdict": "access-restricted",
+      "elapsedMs": 908
+    },
+    {
+      "id": "CHINA-INTERNET-DIAGNOSIS-2022",
+      "url": "https://www.nhc.gov.cn/yzygj/c100068/202203/2072f0e8988249e59d942e1b2a933916.shtml",
+      "status": 412,
+      "finalUrl": "https://www.nhc.gov.cn/yzygj/c100068/202203/2072f0e8988249e59d942e1b2a933916.shtml",
+      "verdict": "access-restricted",
+      "elapsedMs": 17
+    },
+    {
+      "id": "CHINA-NHC-12356-2025",
+      "url": "https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml",
+      "status": 412,
+      "finalUrl": "https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml",
+      "verdict": "access-restricted",
+      "elapsedMs": 41
+    },
+    {
+      "id": "CHINA-NHC-SMOKING-REPORT-2020",
+      "url": "https://www.nhc.gov.cn/guihuaxxs/c100133/202105/60eefbe50e3b4426b2e83ae8d2f62835.shtml",
+      "status": 412,
+      "finalUrl": "https://www.nhc.gov.cn/guihuaxxs/c100133/202105/60eefbe50e3b4426b2e83ae8d2f62835.shtml",
+      "verdict": "access-restricted",
+      "elapsedMs": 51
+    },
+    {
+      "id": "CHINA-PERSONALIZED-SMS-RCT-2023",
+      "url": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2801838",
+      "status": 403,
+      "finalUrl": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2801838",
+      "verdict": "access-restricted",
+      "elapsedMs": 866
+    },
+    {
+      "id": "CHINA-PIPL-2021",
+      "url": "https://www.npc.gov.cn/npc/c2/c30834/202108/t20210820_313088.html",
+      "status": null,
+      "verdict": "unverified-network",
+      "error": "TypeError",
+      "elapsedMs": 19
+    },
+    {
+      "id": "CHINA-WAY-TO-QUIT-RCT-2026",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13130533/",
+      "status": 200,
+      "finalUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13130533/",
+      "verdict": "reachable",
+      "elapsedMs": 1194
+    },
+    {
+      "id": "COCHRANE-INDIVIDUAL-COUNSELLING-2017",
+      "url": "https://www.cochrane.org/evidence/CD001292_does-individually-delivered-counselling-help-people-stop-smoking",
+      "status": 200,
+      "finalUrl": "https://www.cochrane.org/evidence/CD001292_does-individually-delivered-counselling-help-people-stop-smoking",
+      "verdict": "reachable",
+      "elapsedMs": 1734
+    },
+    {
+      "id": "COCHRANE-MOBILE-2019",
+      "url": "https://www.cochrane.org/evidence/CD006611_can-programmes-delivered-mobile-phones-help-people-stop-smoking",
+      "status": 200,
+      "finalUrl": "https://www.cochrane.org/evidence/CD006611_can-programmes-delivered-mobile-phones-help-people-stop-smoking",
+      "verdict": "reachable",
+      "elapsedMs": 1805
+    },
+    {
+      "id": "COCHRANE-NRT-2023",
+      "url": "https://www.cochrane.org/evidence/CD013308_what-best-way-use-nicotine-replacement-therapy-quit-smoking",
+      "status": null,
+      "verdict": "unverified-network",
+      "error": "TypeError",
+      "elapsedMs": 10442
+    },
+    {
+      "id": "COCHRANE-PARTIAL-AGONISTS-2023",
+      "url": "https://www.cochrane.org/evidence/CD006103_can-medications-varenicline-and-cytisine-nicotine-receptor-partial-agonists-help-people-stop-smoking",
+      "status": 200,
+      "finalUrl": "https://www.cochrane.org/evidence/CD006103_can-medications-varenicline-and-cytisine-nicotine-receptor-partial-agonists-help-people-stop-smoking",
+      "verdict": "reachable",
+      "elapsedMs": 1762
+    },
+    {
+      "id": "COMB-BCW-2011",
+      "url": "https://implementationscience.biomedcentral.com/articles/10.1186/1748-5908-6-42",
+      "status": 200,
+      "finalUrl": "https://idp.springer.com/transit?redirect_uri=https%3A%2F%2Flink.springer.com%2Farticle%2F10.1186%2F1748-5908-6-42&code=e6985b8c-b893-4e4e-af69-9d85035caff1",
+      "verdict": "reachable",
+      "elapsedMs": 5569
+    },
+    {
+      "id": "ICANQUIT-ACT-RCT-2020",
+      "url": "https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2770816",
+      "status": 403,
+      "finalUrl": "https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2770816",
+      "verdict": "access-restricted",
+      "elapsedMs": 836
+    },
+    {
+      "id": "IMPLEMENTATION-INTENTIONS-2020",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/33220048/",
+      "status": 203,
+      "finalUrl": "https://pubmed.ncbi.nlm.nih.gov/33220048/",
+      "verdict": "reachable",
+      "elapsedMs": 1226
+    },
+    {
+      "id": "NCI-LAPSE-RECOVERY",
+      "url": "https://smokefree.gov/challenges-when-quitting/stick-with-it/get-back-on-track",
+      "status": 200,
+      "finalUrl": "https://smokefree.gov/challenges-when-quitting/stick-with-it/get-back-on-track",
+      "verdict": "reachable",
+      "elapsedMs": 1179
+    },
+    {
+      "id": "NCI-QUITSTART",
+      "url": "https://smokefree.gov/tools-tips/quitstart",
+      "status": null,
+      "verdict": "unverified-network",
+      "error": "TypeError",
+      "elapsedMs": 10694
+    },
+    {
+      "id": "NCI-WITHDRAWAL",
+      "url": "https://smokefree.gov/challenges-when-quitting/withdrawal/managing-nicotine-withdrawal",
+      "status": 200,
+      "finalUrl": "https://smokefree.gov/challenges-when-quitting/withdrawal/managing-nicotine-withdrawal",
+      "verdict": "reachable",
+      "elapsedMs": 1159
+    },
+    {
+      "id": "SMARTT-JITAI-RCT-2025",
+      "url": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2837640",
+      "status": 403,
+      "finalUrl": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2837640",
+      "verdict": "access-restricted",
+      "elapsedMs": 831
+    },
+    {
+      "id": "WHO-5A5R-2014",
+      "url": "https://www.who.int/publications/i/item/toolkit-for-delivering-5as-and-5rs-brief-tobacco-interventions-in-primary-care",
+      "status": 200,
+      "finalUrl": "https://www.who.int/publications/i/item/toolkit-for-delivering-5as-and-5rs-brief-tobacco-interventions-in-primary-care",
+      "verdict": "reachable",
+      "elapsedMs": 942
+    },
+    {
+      "id": "WHO-TOBACCO-CESSATION-2024",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK604665/",
+      "status": 200,
+      "finalUrl": "https://www.ncbi.nlm.nih.gov/books/NBK604665/",
+      "verdict": "reachable",
+      "elapsedMs": 1826
+    }
+  ]
+}

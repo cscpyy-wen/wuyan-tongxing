@@ -1,0 +1,82 @@
+.province-card {
+  margin-top: 22px;
+}
+
+.province-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  text-align: left;
+  line-height: 1.55;
+}
+
+.province-picker-trigger::after,
+.province-option::after {
+  border: 0;
+}
+
+.province-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+
+.province-option {
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  background: white;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.province-option--selected {
+  color: var(--forest-900);
+  border-color: var(--forest-600);
+  background: var(--forest-100);
+  font-weight: 700;
+}
+
+.referral-item__tag {
+  display: inline-flex;
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: var(--forest-700);
+  background: var(--forest-100);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.referral-item__title,
+.referral-item__text {
+  display: block;
+}
+
+.referral-item__title {
+  margin-top: 10px;
+  color: var(--forest-900);
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.referral-item__text {
+  margin: 7px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.urgent-card {
+  margin-top: 24px;
+}
+
+.referral-check {
+  display: block;
+  margin-top: 13px;
+  text-align: center;
+}
