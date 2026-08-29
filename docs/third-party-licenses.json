@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "scope": "pnpm production dependency graph and resolved Android releaseRuntimeClasspath POM declarations",
   "sources": [
     "pnpm licenses list --prod --json",
-    "same-version upstream package metadata for optional platform packages",
+    "reviewed exact npm version metadata for allowlisted optional platform package identities",
     "installed npm package.json fallback",
-    "reviewed exact-version overrides for platform packages not materialized on this host",
+    "reviewed exact-version overrides for other packages not materialized on this host",
     "resolved Maven POM files"
   ],
   "componentIdentity": "purl",
@@ -952,7 +952,7 @@
     {
       "purl": "pkg:npm/%40esbuild/aix-ppc64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/aix-ppc64@0.25.12",
       "name": "@esbuild/aix-ppc64",
       "version": "0.25.12",
       "licenses": [
@@ -964,7 +964,7 @@
     {
       "purl": "pkg:npm/%40esbuild/android-arm@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/android-arm@0.25.12",
       "name": "@esbuild/android-arm",
       "version": "0.25.12",
       "licenses": [
@@ -976,7 +976,7 @@
     {
       "purl": "pkg:npm/%40esbuild/android-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/android-arm64@0.25.12",
       "name": "@esbuild/android-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -988,7 +988,7 @@
     {
       "purl": "pkg:npm/%40esbuild/android-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/android-x64@0.25.12",
       "name": "@esbuild/android-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1000,7 +1000,7 @@
     {
       "purl": "pkg:npm/%40esbuild/darwin-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/darwin-arm64@0.25.12",
       "name": "@esbuild/darwin-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1012,7 +1012,7 @@
     {
       "purl": "pkg:npm/%40esbuild/darwin-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/darwin-x64@0.25.12",
       "name": "@esbuild/darwin-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1024,7 +1024,7 @@
     {
       "purl": "pkg:npm/%40esbuild/freebsd-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/freebsd-arm64@0.25.12",
       "name": "@esbuild/freebsd-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1036,7 +1036,7 @@
     {
       "purl": "pkg:npm/%40esbuild/freebsd-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/freebsd-x64@0.25.12",
       "name": "@esbuild/freebsd-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1048,7 +1048,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-arm@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-arm@0.25.12",
       "name": "@esbuild/linux-arm",
       "version": "0.25.12",
       "licenses": [
@@ -1060,7 +1060,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-arm64@0.25.12",
       "name": "@esbuild/linux-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1072,7 +1072,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-ia32@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-ia32@0.25.12",
       "name": "@esbuild/linux-ia32",
       "version": "0.25.12",
       "licenses": [
@@ -1084,7 +1084,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-loong64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-loong64@0.25.12",
       "name": "@esbuild/linux-loong64",
       "version": "0.25.12",
       "licenses": [
@@ -1096,7 +1096,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-mips64el@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-mips64el@0.25.12",
       "name": "@esbuild/linux-mips64el",
       "version": "0.25.12",
       "licenses": [
@@ -1108,7 +1108,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-ppc64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-ppc64@0.25.12",
       "name": "@esbuild/linux-ppc64",
       "version": "0.25.12",
       "licenses": [
@@ -1120,7 +1120,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-riscv64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-riscv64@0.25.12",
       "name": "@esbuild/linux-riscv64",
       "version": "0.25.12",
       "licenses": [
@@ -1132,7 +1132,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-s390x@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-s390x@0.25.12",
       "name": "@esbuild/linux-s390x",
       "version": "0.25.12",
       "licenses": [
@@ -1144,7 +1144,7 @@
     {
       "purl": "pkg:npm/%40esbuild/linux-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/linux-x64@0.25.12",
       "name": "@esbuild/linux-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1156,7 +1156,7 @@
     {
       "purl": "pkg:npm/%40esbuild/netbsd-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/netbsd-arm64@0.25.12",
       "name": "@esbuild/netbsd-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1168,7 +1168,7 @@
     {
       "purl": "pkg:npm/%40esbuild/netbsd-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/netbsd-x64@0.25.12",
       "name": "@esbuild/netbsd-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1180,7 +1180,7 @@
     {
       "purl": "pkg:npm/%40esbuild/openbsd-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/openbsd-arm64@0.25.12",
       "name": "@esbuild/openbsd-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1192,7 +1192,7 @@
     {
       "purl": "pkg:npm/%40esbuild/openbsd-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/openbsd-x64@0.25.12",
       "name": "@esbuild/openbsd-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1204,7 +1204,7 @@
     {
       "purl": "pkg:npm/%40esbuild/openharmony-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/openharmony-arm64@0.25.12",
       "name": "@esbuild/openharmony-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1216,7 +1216,7 @@
     {
       "purl": "pkg:npm/%40esbuild/sunos-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/sunos-x64@0.25.12",
       "name": "@esbuild/sunos-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1228,7 +1228,7 @@
     {
       "purl": "pkg:npm/%40esbuild/win32-arm64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/win32-arm64@0.25.12",
       "name": "@esbuild/win32-arm64",
       "version": "0.25.12",
       "licenses": [
@@ -1240,7 +1240,7 @@
     {
       "purl": "pkg:npm/%40esbuild/win32-ia32@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:esbuild@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/win32-ia32@0.25.12",
       "name": "@esbuild/win32-ia32",
       "version": "0.25.12",
       "licenses": [
@@ -1252,7 +1252,7 @@
     {
       "purl": "pkg:npm/%40esbuild/win32-x64@0.25.12",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:@esbuild/win32-x64@0.25.12",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@esbuild/win32-x64@0.25.12",
       "name": "@esbuild/win32-x64",
       "version": "0.25.12",
       "licenses": [
@@ -1756,7 +1756,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-android-arm64@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-android-arm64@2.6.0",
       "name": "@parcel/watcher-android-arm64",
       "version": "2.6.0",
       "licenses": [
@@ -1768,7 +1768,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-darwin-arm64@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-darwin-arm64@2.6.0",
       "name": "@parcel/watcher-darwin-arm64",
       "version": "2.6.0",
       "licenses": [
@@ -1780,7 +1780,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-darwin-x64@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-darwin-x64@2.6.0",
       "name": "@parcel/watcher-darwin-x64",
       "version": "2.6.0",
       "licenses": [
@@ -1792,7 +1792,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-freebsd-x64@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-freebsd-x64@2.6.0",
       "name": "@parcel/watcher-freebsd-x64",
       "version": "2.6.0",
       "licenses": [
@@ -1804,7 +1804,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-linux-arm-glibc@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm-glibc@2.6.0",
       "name": "@parcel/watcher-linux-arm-glibc",
       "version": "2.6.0",
       "licenses": [
@@ -1816,7 +1816,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-linux-arm-musl@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm-musl@2.6.0",
       "name": "@parcel/watcher-linux-arm-musl",
       "version": "2.6.0",
       "licenses": [
@@ -1828,7 +1828,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-linux-arm64-glibc@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm64-glibc@2.6.0",
       "name": "@parcel/watcher-linux-arm64-glibc",
       "version": "2.6.0",
       "licenses": [
@@ -1840,7 +1840,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-linux-arm64-musl@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm64-musl@2.6.0",
       "name": "@parcel/watcher-linux-arm64-musl",
       "version": "2.6.0",
       "licenses": [
@@ -1852,7 +1852,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-linux-x64-glibc@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-x64-glibc@2.6.0",
       "name": "@parcel/watcher-linux-x64-glibc",
       "version": "2.6.0",
       "licenses": [
@@ -1864,7 +1864,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-linux-x64-musl@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-x64-musl@2.6.0",
       "name": "@parcel/watcher-linux-x64-musl",
       "version": "2.6.0",
       "licenses": [
@@ -1876,7 +1876,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-win32-arm64@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@parcel/watcher@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-win32-arm64@2.6.0",
       "name": "@parcel/watcher-win32-arm64",
       "version": "2.6.0",
       "licenses": [
@@ -1888,7 +1888,7 @@
     {
       "purl": "pkg:npm/%40parcel/watcher-win32-x64@2.6.0",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:@parcel/watcher-win32-x64@2.6.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@parcel/watcher-win32-x64@2.6.0",
       "name": "@parcel/watcher-win32-x64",
       "version": "2.6.0",
       "licenses": [
@@ -2128,115 +2128,115 @@
     {
       "purl": "pkg:npm/%40swc/core-darwin-arm64@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-darwin-arm64@1.3.96",
       "name": "@swc/core-darwin-arm64",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-darwin-x64@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-darwin-x64@1.3.96",
       "name": "@swc/core-darwin-x64",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-linux-arm-gnueabihf@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-linux-arm-gnueabihf@1.3.96",
       "name": "@swc/core-linux-arm-gnueabihf",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-linux-arm64-gnu@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-linux-arm64-gnu@1.3.96",
       "name": "@swc/core-linux-arm64-gnu",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-linux-arm64-musl@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-linux-arm64-musl@1.3.96",
       "name": "@swc/core-linux-arm64-musl",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-linux-x64-gnu@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-linux-x64-gnu@1.3.96",
       "name": "@swc/core-linux-x64-gnu",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-linux-x64-musl@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-linux-x64-musl@1.3.96",
       "name": "@swc/core-linux-x64-musl",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-win32-arm64-msvc@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-win32-arm64-msvc@1.3.96",
       "name": "@swc/core-win32-arm64-msvc",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-win32-ia32-msvc@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:@swc/core@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-win32-ia32-msvc@1.3.96",
       "name": "@swc/core-win32-ia32-msvc",
       "version": "1.3.96",
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ]
     },
     {
       "purl": "pkg:npm/%40swc/core-win32-x64-msvc@1.3.96",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:@swc/core-win32-x64-msvc@1.3.96",
+      "licenseSource": "reviewed-exact-npm-version-metadata:@swc/core-win32-x64-msvc@1.3.96",
       "name": "@swc/core-win32-x64-msvc",
       "version": "1.3.96",
       "licenses": [
@@ -6088,7 +6088,7 @@
     {
       "purl": "pkg:npm/lightningcss-android-arm64@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-android-arm64@1.33.0",
       "name": "lightningcss-android-arm64",
       "version": "1.33.0",
       "licenses": [
@@ -6100,7 +6100,7 @@
     {
       "purl": "pkg:npm/lightningcss-darwin-arm64@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-darwin-arm64@1.33.0",
       "name": "lightningcss-darwin-arm64",
       "version": "1.33.0",
       "licenses": [
@@ -6112,7 +6112,7 @@
     {
       "purl": "pkg:npm/lightningcss-darwin-x64@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-darwin-x64@1.33.0",
       "name": "lightningcss-darwin-x64",
       "version": "1.33.0",
       "licenses": [
@@ -6124,7 +6124,7 @@
     {
       "purl": "pkg:npm/lightningcss-freebsd-x64@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-freebsd-x64@1.33.0",
       "name": "lightningcss-freebsd-x64",
       "version": "1.33.0",
       "licenses": [
@@ -6136,7 +6136,7 @@
     {
       "purl": "pkg:npm/lightningcss-linux-arm-gnueabihf@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-linux-arm-gnueabihf@1.33.0",
       "name": "lightningcss-linux-arm-gnueabihf",
       "version": "1.33.0",
       "licenses": [
@@ -6148,7 +6148,7 @@
     {
       "purl": "pkg:npm/lightningcss-linux-arm64-gnu@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-linux-arm64-gnu@1.33.0",
       "name": "lightningcss-linux-arm64-gnu",
       "version": "1.33.0",
       "licenses": [
@@ -6160,7 +6160,7 @@
     {
       "purl": "pkg:npm/lightningcss-linux-arm64-musl@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-linux-arm64-musl@1.33.0",
       "name": "lightningcss-linux-arm64-musl",
       "version": "1.33.0",
       "licenses": [
@@ -6172,7 +6172,7 @@
     {
       "purl": "pkg:npm/lightningcss-linux-x64-gnu@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-linux-x64-gnu@1.33.0",
       "name": "lightningcss-linux-x64-gnu",
       "version": "1.33.0",
       "licenses": [
@@ -6184,7 +6184,7 @@
     {
       "purl": "pkg:npm/lightningcss-linux-x64-musl@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-linux-x64-musl@1.33.0",
       "name": "lightningcss-linux-x64-musl",
       "version": "1.33.0",
       "licenses": [
@@ -6196,7 +6196,7 @@
     {
       "purl": "pkg:npm/lightningcss-win32-arm64-msvc@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "upstream-platform-package:lightningcss@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-win32-arm64-msvc@1.33.0",
       "name": "lightningcss-win32-arm64-msvc",
       "version": "1.33.0",
       "licenses": [
@@ -6208,7 +6208,7 @@
     {
       "purl": "pkg:npm/lightningcss-win32-x64-msvc@1.33.0",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:lightningcss-win32-x64-msvc@1.33.0",
+      "licenseSource": "reviewed-exact-npm-version-metadata:lightningcss-win32-x64-msvc@1.33.0",
       "name": "lightningcss-win32-x64-msvc",
       "version": "1.33.0",
       "licenses": [

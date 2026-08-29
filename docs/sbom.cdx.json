@@ -1,7 +1,7 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:2908d945-048e-50a6-93df-81b3dc6435ab",
+  "serialNumber": "urn:uuid:c8fa78a8-c297-5c8c-ab7d-8e6c23027273",
   "version": 1,
   "metadata": {
     "component": {
@@ -2335,7 +2335,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/aix-ppc64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2369,7 +2369,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/android-arm@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2403,7 +2403,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/android-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2437,7 +2437,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/android-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2471,7 +2471,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/darwin-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2505,7 +2505,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/darwin-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2539,7 +2539,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/freebsd-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2573,7 +2573,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/freebsd-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2607,7 +2607,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-arm@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2641,7 +2641,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2675,7 +2675,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-ia32@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2709,7 +2709,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-loong64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2743,7 +2743,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-mips64el@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2777,7 +2777,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-ppc64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2811,7 +2811,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-riscv64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2845,7 +2845,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-s390x@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2879,7 +2879,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/linux-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2913,7 +2913,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/netbsd-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2947,7 +2947,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/netbsd-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -2981,7 +2981,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/openbsd-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -3015,7 +3015,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/openbsd-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -3049,7 +3049,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/openharmony-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -3083,7 +3083,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/sunos-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -3117,7 +3117,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/win32-arm64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -3151,7 +3151,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:esbuild@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/win32-ia32@0.25.12"
         }
       ],
       "externalReferences": [
@@ -3185,7 +3185,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:@esbuild/win32-x64@0.25.12"
+          "value": "reviewed-exact-npm-version-metadata:@esbuild/win32-x64@0.25.12"
         }
       ],
       "externalReferences": [
@@ -4613,7 +4613,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-android-arm64@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4647,7 +4647,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-darwin-arm64@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4681,7 +4681,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-darwin-x64@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4715,7 +4715,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-freebsd-x64@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4749,7 +4749,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm-glibc@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4783,7 +4783,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm-musl@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4817,7 +4817,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm64-glibc@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4851,7 +4851,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-arm64-musl@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4885,7 +4885,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-x64-glibc@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4919,7 +4919,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-linux-x64-musl@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4953,7 +4953,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@parcel/watcher@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-win32-arm64@2.6.0"
         }
       ],
       "externalReferences": [
@@ -4987,7 +4987,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:@parcel/watcher-win32-x64@2.6.0"
+          "value": "reviewed-exact-npm-version-metadata:@parcel/watcher-win32-x64@2.6.0"
         }
       ],
       "externalReferences": [
@@ -5657,7 +5657,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5667,7 +5667,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-darwin-arm64@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5691,7 +5691,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5701,7 +5701,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-darwin-x64@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5725,7 +5725,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5735,7 +5735,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-linux-arm-gnueabihf@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5759,7 +5759,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5769,7 +5769,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-linux-arm64-gnu@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5793,7 +5793,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5803,7 +5803,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-linux-arm64-musl@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5827,7 +5827,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5837,7 +5837,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-linux-x64-gnu@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5861,7 +5861,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5871,7 +5871,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-linux-x64-musl@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5895,7 +5895,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5905,7 +5905,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-win32-arm64-msvc@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5929,7 +5929,7 @@
       ],
       "licenses": [
         {
-          "expression": "Apache-2.0"
+          "expression": "Apache-2.0 AND MIT"
         }
       ],
       "properties": [
@@ -5939,7 +5939,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:@swc/core@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-win32-ia32-msvc@1.3.96"
         }
       ],
       "externalReferences": [
@@ -5973,7 +5973,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:@swc/core-win32-x64-msvc@1.3.96"
+          "value": "reviewed-exact-npm-version-metadata:@swc/core-win32-x64-msvc@1.3.96"
         }
       ],
       "externalReferences": [
@@ -16887,7 +16887,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-android-arm64@1.33.0"
         }
       ],
       "externalReferences": [
@@ -16921,7 +16921,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-darwin-arm64@1.33.0"
         }
       ],
       "externalReferences": [
@@ -16955,7 +16955,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-darwin-x64@1.33.0"
         }
       ],
       "externalReferences": [
@@ -16989,7 +16989,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-freebsd-x64@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17023,7 +17023,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-linux-arm-gnueabihf@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17057,7 +17057,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-linux-arm64-gnu@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17091,7 +17091,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-linux-arm64-musl@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17125,7 +17125,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-linux-x64-gnu@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17159,7 +17159,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-linux-x64-musl@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17193,7 +17193,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "upstream-platform-package:lightningcss@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-win32-arm64-msvc@1.33.0"
         }
       ],
       "externalReferences": [
@@ -17227,7 +17227,7 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:lightningcss-win32-x64-msvc@1.33.0"
+          "value": "reviewed-exact-npm-version-metadata:lightningcss-win32-x64-msvc@1.33.0"
         }
       ],
       "externalReferences": [

@@ -16,8 +16,8 @@
 | `(Apache-2.0 OR MPL-1.1)` | 1 |
 | `(MIT OR CC0-1.0)` | 2 |
 | `0BSD` | 2 |
-| `Apache-2.0` | 99 |
-| `Apache-2.0 AND MIT` | 1 |
+| `Apache-2.0` | 90 |
+| `Apache-2.0 AND MIT` | 10 |
 | `BlueOak-1.0.0` | 2 |
 | `BSD-2-Clause` | 20 |
 | `BSD-3-Clause` | 20 |

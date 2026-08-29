@@ -27,7 +27,7 @@
     "qa:screenshots": "node scripts/capture-h5.mjs",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r --if-present test",
-    "test:release": "node --test scripts/build-android-public.test.mjs scripts/android-signing-policy.test.mjs scripts/gradle-wrapper.test.mjs scripts/verified-gradle-distribution.test.mjs scripts/android-apk-security-policy.test.mjs scripts/android-release-root-inventory.test.mjs scripts/osv-audit.test.mjs scripts/android-release-store.test.mjs scripts/source-snapshot-policy.test.mjs scripts/verify-zero-vulnerabilities.test.mjs scripts/android-device-test-results.test.mjs scripts/release-gate.test.mjs scripts/android-bootstrap-runtime.test.mjs scripts/spdx-license-expression.test.mjs scripts/verify-license-inventory.test.mjs scripts/generate-public-license-assets.test.mjs",
+    "test:release": "node --test scripts/build-android-public.test.mjs scripts/android-signing-policy.test.mjs scripts/gradle-wrapper.test.mjs scripts/verified-gradle-distribution.test.mjs scripts/android-apk-security-policy.test.mjs scripts/android-release-root-inventory.test.mjs scripts/osv-audit.test.mjs scripts/android-release-store.test.mjs scripts/source-snapshot-policy.test.mjs scripts/verify-zero-vulnerabilities.test.mjs scripts/android-device-test-results.test.mjs scripts/release-gate.test.mjs scripts/android-bootstrap-runtime.test.mjs scripts/spdx-license-expression.test.mjs scripts/verify-license-inventory.test.mjs scripts/generate-public-license-assets.test.mjs scripts/supply-chain-license-policy.test.mjs",
     "test:coverage": "pnpm -r --if-present test:coverage",
     "test:e2e": "playwright test",
     "test:e2e:cn-preview": "node scripts/run-cn-preview-e2e.mjs",

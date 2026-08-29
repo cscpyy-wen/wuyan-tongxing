@@ -5,6 +5,7 @@ import { homedir } from 'node:os'
 import path from 'node:path'
 import { parse as parseYaml } from 'yaml'
 import { cyclonedxLicense } from './spdx-license-expression.mjs'
+import { reviewedOptionalPlatformLicense } from './supply-chain-license-policy.mjs'
 import { validateLicenseInventory } from './verify-license-inventory.mjs'
 import { verifyGradleWrapper } from './verify-gradle-wrapper.mjs'
 
@@ -232,14 +233,6 @@ for (const [license, entries] of Object.entries(normalizedLicenses)) {
   }
 }
 
-function optionalPlatformLicenseSource(name, componentVersion) {
-  if (name.startsWith('@esbuild/')) return `esbuild@${componentVersion}`
-  if (/^@parcel\/watcher-/.test(name)) return `@parcel/watcher@${componentVersion}`
-  if (/^@swc\/core-/.test(name)) return `@swc/core@${componentVersion}`
-  if (/^lightningcss-/.test(name)) return `lightningcss@${componentVersion}`
-  return null
-}
-
 const reviewedExactLicenseOverrides = new Map([
   // fsevents is a Darwin-only optional package and is not materialized by pnpm on Windows.
   // The exact npm version document at https://registry.npmjs.org/fsevents/2.3.3 declares MIT.
@@ -257,20 +250,23 @@ async function collectNpm(dependencies = {}) {
       const key = `${name}@${componentVersion}`
       if (!components.has(`npm:${key}`)) {
         const purl = `pkg:npm/${purlName(name)}@${encodeURIComponent(componentVersion)}`
-        const upstreamLicenseSource = optionalPlatformLicenseSource(name, componentVersion)
         const declaredLicense = licenseByComponent.get(key)
-        const inheritedLicense = upstreamLicenseSource ? licenseByComponent.get(upstreamLicenseSource) : undefined
+        const reviewedPlatformLicense = reviewedOptionalPlatformLicense({
+          name,
+          version: componentVersion,
+          declaredLicense,
+        })
         const reviewedLicense = reviewedExactLicenseOverrides.get(key)
-        const packageLicense = declaredLicense || inheritedLicense || reviewedLicense
+        const packageLicense = reviewedPlatformLicense?.license || declaredLicense || reviewedLicense
           ? null
           : await packageJsonLicense(dependency.path)
-        const license = declaredLicense || inheritedLicense || reviewedLicense
-          ? cyclonedxLicense(declaredLicense ?? inheritedLicense ?? reviewedLicense)
+        const license = reviewedPlatformLicense?.license || declaredLicense || reviewedLicense
+          ? cyclonedxLicense(reviewedPlatformLicense?.license ?? declaredLicense ?? reviewedLicense)
           : packageLicense
-        const licenseSource = declaredLicense
-          ? `pnpm-license-report:${key}`
-          : inheritedLicense
-            ? `upstream-platform-package:${upstreamLicenseSource}`
+        const licenseSource = reviewedPlatformLicense
+          ? reviewedPlatformLicense.source
+          : declaredLicense
+            ? `pnpm-license-report:${key}`
             : reviewedLicense
               ? `reviewed-exact-version-override:${key}`
               : packageLicense
@@ -377,13 +373,13 @@ const sbom = {
 }
 
 const licenseInventory = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   scope: 'pnpm production dependency graph and resolved Android releaseRuntimeClasspath POM declarations',
   sources: [
     'pnpm licenses list --prod --json',
-    'same-version upstream package metadata for optional platform packages',
+    'reviewed exact npm version metadata for allowlisted optional platform package identities',
     'installed npm package.json fallback',
-    'reviewed exact-version overrides for platform packages not materialized on this host',
+    'reviewed exact-version overrides for other packages not materialized on this host',
     'resolved Maven POM files',
   ],
   componentIdentity: 'purl',
