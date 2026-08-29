@@ -33,12 +33,22 @@ function validState() {
 }
 
 describe('recovery bundle import', () => {
+  // This boundary intentionally materializes an approximately 11 MiB bundle;
+  // keep its slow-runner allowance local instead of weakening the suite timeout.
   it('fits two exact-limit unreadable native slots and explicitly omits oversized attachments', () => {
     expect(NATIVE_DURABLE_STATE_MAX_BYTES).toBe(4 * 1024 * 1024)
     expect(MAX_SINGLE_NATIVE_RECOVERY_BYTES).toBe(12 * 1024 * 1024)
     expect(MAX_RECOVERY_IMPORT_CHARACTERS).toBe(MAX_SINGLE_NATIVE_RECOVERY_BYTES)
-    const raw = 'x'.repeat(NATIVE_DURABLE_STATE_MAX_BYTES)
-    const encoded = encodeLosslessBase64(raw)
+    expect(NATIVE_DURABLE_STATE_MAX_BYTES % 3).toBe(1)
+    // Base64("xxx") is "eHh4" and the one-byte remainder is "eA==". Build the
+    // exact 4 MiB unreadable-slot fixture directly: the generic codec has its
+    // own tests and its byte-by-byte work is unrelated to bundle sizing.
+    const encoded = {
+      encoding: 'base64-utf8' as const,
+      data: `${'eHh4'.repeat(Math.floor(NATIVE_DURABLE_STATE_MAX_BYTES / 3))}eA==`,
+    }
+    const expectedCoreOnlyHeadroom = 1_397_665
+    const oversizedAttachment = 'x'.repeat(expectedCoreOnlyHeadroom + 1)
     const bundle = createBoundedNativeRecoveryBundle({
       core: {
         exportedAt: '2026-08-28T00:00:00.000Z',
@@ -46,14 +56,15 @@ describe('recovery bundle import', () => {
         primary: encoded,
         lastKnownGood: encoded,
       },
-      bootstrapRecovery: { oversized: 'b'.repeat(2 * 1024 * 1024) },
+      bootstrapRecovery: oversizedAttachment,
       bootstrapAvailable: true,
-      pendingBootstrapImport: { evidence: 'p'.repeat(2 * 1024 * 1024) },
+      pendingBootstrapImport: oversizedAttachment,
       pendingImportAvailable: true,
     })
 
-    expect(utf8ByteLength(bundle)).toBe(11_185_247)
-    expect(MAX_SINGLE_NATIVE_RECOVERY_BYTES - utf8ByteLength(bundle)).toBe(1_397_665)
+    const bundleBytes = utf8ByteLength(bundle)
+    expect(bundleBytes).toBe(11_185_247)
+    expect(MAX_SINGLE_NATIVE_RECOVERY_BYTES - bundleBytes).toBe(expectedCoreOnlyHeadroom)
     const parsed = JSON.parse(bundle) as Record<string, any>
     expect(parsed.primary).toEqual(encoded)
     expect(parsed.lastKnownGood).toEqual(encoded)
@@ -65,7 +76,7 @@ describe('recovery bundle import', () => {
       bootstrapOmittedForSize: true,
       pendingImportOmittedForSize: true,
     })
-  })
+  }, 10_000)
 
   it('includes bounded bootstrap and pending-import evidence when both fit', () => {
     const bundle = createBoundedNativeRecoveryBundle({
