@@ -103,8 +103,8 @@ importers:
   apps/api:
     dependencies:
       '@electric-sql/pglite':
-        specifier: ^0.3.14
-        version: 0.3.16
+        specifier: ^0.5.7
+        version: 0.5.7
       '@fastify/cors':
         specifier: ^11.1.0
         version: 11.3.0
@@ -131,7 +131,7 @@ importers:
         version: link:../../packages/rules
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@electric-sql/pglite@0.3.16)
+        version: 0.45.2(@electric-sql/pglite@0.5.7)
       fastify:
         specifier: ^5.5.0
         version: 5.12.1
@@ -273,8 +273,8 @@ importers:
   apps/worker:
     dependencies:
       '@electric-sql/pglite':
-        specifier: ^0.3.14
-        version: 0.3.16
+        specifier: ^0.5.7
+        version: 0.5.7
       '@wuyan/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -1036,8 +1036,8 @@ packages:
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
 
-  '@electric-sql/pglite@0.3.16':
-    resolution: {integrity: sha512-mZkZfOd9OqTMHsK+1cje8OSzfAQcpD7JmILXTl5ahdempjUDdmg4euf1biDex5/LfQIDJ3gvCu6qDgdnDxfJmA==}
+  '@electric-sql/pglite@0.5.7':
+    resolution: {integrity: sha512-6WBks0NFO6YUhGP03mCNkbJuVFWwrZPrzZ/vsnAPnsCD28pybdZ+yoTrlLlWFoZst3kdaju5pxIslV/jrr36nQ==}
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -7953,7 +7953,7 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@electric-sql/pglite@0.3.16': {}
+  '@electric-sql/pglite@0.5.7': {}
 
   '@esbuild/aix-ppc64@0.25.12':
     optional: true
@@ -10732,9 +10732,9 @@ snapshots:
       - react-native-b4a
       - supports-color
 
-  drizzle-orm@0.45.2(@electric-sql/pglite@0.3.16):
+  drizzle-orm@0.45.2(@electric-sql/pglite@0.5.7):
     optionalDependencies:
-      '@electric-sql/pglite': 0.3.16
+      '@electric-sql/pglite': 0.5.7
 
   dunder-proto@1.0.1:
     dependencies:
