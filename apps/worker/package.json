@@ -17,7 +17,7 @@
     "@wuyan/persistence": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^24.3.0",
+    "@types/node": "^26.3.0",
     "tsx": "^4.20.5",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
