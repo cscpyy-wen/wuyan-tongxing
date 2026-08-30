@@ -19,7 +19,6 @@ const androidRoot = resolve(repositoryRoot, 'apps', 'android-shell', 'android')
 const gradleWrapper = resolve(androidRoot, process.platform === 'win32' ? 'gradlew.bat' : 'gradlew')
 const localJdk = resolve(repositoryRoot, '.toolchains', 'jdk-21')
 const localSdk = resolve(repositoryRoot, '.toolchains', 'android-sdk')
-const adb = resolve(localSdk, 'platform-tools', process.platform === 'win32' ? 'adb.exe' : 'adb')
 const androidTestResults = resolve(androidRoot, 'app', 'build', 'outputs', 'androidTest-results', 'connected')
 const version = JSON.parse(readFileSync(resolve(repositoryRoot, 'apps', 'android-shell', 'personal-version.json'), 'utf8'))
 const wrapperIntegrity = await verifyGradleWrapper(repositoryRoot)
@@ -59,6 +58,7 @@ function run(executable, args, options = {}) {
 
 const javaHome = process.env.JAVA_HOME?.trim() || localJdk
 const androidHome = process.env.ANDROID_HOME?.trim() || process.env.ANDROID_SDK_ROOT?.trim() || localSdk
+const adb = resolve(androidHome, 'platform-tools', process.platform === 'win32' ? 'adb.exe' : 'adb')
 if (!existsSync(resolve(javaHome, 'bin', process.platform === 'win32' ? 'java.exe' : 'java'))) {
   throw new Error(`未找到 JDK 21：${javaHome}`)
 }
@@ -107,7 +107,7 @@ if (runDeviceTests) {
   if (!serial || !/^[A-Za-z0-9._:-]+$/.test(serial)) {
     throw new Error('设备测试必须显式设置合法的 ANDROID_SERIAL；禁止自动选择模拟器或真机。')
   }
-  if (!existsSync(adb)) throw new Error(`未找到项目内 ADB：${adb}`)
+  if (!existsSync(adb)) throw new Error(`ANDROID_HOME 缺少 ADB：${adb}`)
   const devices = run(adb, ['devices'], { env: environment, quiet: true }).stdout
   if (!new RegExp(`^${serial.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+device$`, 'm').test(devices)) {
     throw new Error(`目标设备未处于 device 状态：${serial}`)

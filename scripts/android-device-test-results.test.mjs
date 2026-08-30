@@ -5,6 +5,13 @@ import path from 'node:path'
 import test from 'node:test'
 import { verifyAndroidDeviceTestResults } from './android-device-test-results.mjs'
 
+test('device gate resolves ADB from the selected external Android SDK', async () => {
+  const script = await fs.readFile(path.resolve(import.meta.dirname, 'test-android-native.mjs'), 'utf8')
+  assert.match(script, /const adb = resolve\(androidHome, 'platform-tools'/)
+  assert.doesNotMatch(script, /const adb = resolve\(localSdk, 'platform-tools'/)
+  assert.match(script, /ANDROID_HOME 缺少 ADB/)
+})
+
 async function fixture(attributes, serial = 'device-123') {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'android-device-results-'))
   const device = path.join(root, 'debug', 'device')
