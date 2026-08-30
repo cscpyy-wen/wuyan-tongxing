@@ -81,6 +81,7 @@ const androidBootstrap = [
   '<div class="wuyan-bootstrap-grid" role="group" aria-labelledby="wuyan-bootstrap-trigger-label">',
   '<button class="wuyan-bootstrap-choice" type="button" data-wuyan-trigger="work" aria-pressed="false">工作疲惫</button>',
   '<button class="wuyan-bootstrap-choice" type="button" data-wuyan-trigger="meal" aria-pressed="false">饭后</button>',
+  '<button class="wuyan-bootstrap-choice" type="button" data-wuyan-trigger="toilet" aria-pressed="false">拉屎</button>',
   '<button class="wuyan-bootstrap-choice" type="button" data-wuyan-trigger="stress" aria-pressed="false">压力</button>',
   '<button class="wuyan-bootstrap-choice" type="button" data-wuyan-trigger="social" aria-pressed="false">社交</button>',
   '<button class="wuyan-bootstrap-choice" type="button" data-wuyan-trigger="alcohol" aria-pressed="false">饮酒</button>',

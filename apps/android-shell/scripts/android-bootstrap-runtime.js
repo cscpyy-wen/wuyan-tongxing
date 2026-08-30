@@ -16,7 +16,7 @@
   const RELEASE_EVENT = 'wuyan:bootstrap-release'
   const CANCEL_EVENT = 'wuyan:bootstrap-cancel'
   const allowedTriggers = new Set([
-    'work', 'meal', 'stress', 'social', 'alcohol',
+    'work', 'meal', 'toilet', 'stress', 'social', 'alcohol',
     'exercise', 'boredom', 'morning', 'coffee', 'habit',
   ])
   const SHANGHAI_OFFSET_MS = 8 * 60 * 60 * 1000

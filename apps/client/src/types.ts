@@ -29,6 +29,7 @@ export type QuitPath = 'abrupt' | 'reduction'
 export type Trigger =
   | 'work'
   | 'meal'
+  | 'toilet'
   | 'stress'
   | 'social'
   | 'alcohol'

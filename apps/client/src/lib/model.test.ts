@@ -528,6 +528,45 @@ describe('本地状态恢复', () => {
     expect(recovered).toEqual(createInitialState())
   })
 
+  it('严格恢复完整保留拉屎原因', () => {
+    const valid = plannedState()
+    const triggerAt = '2026-08-03T09:30:00+08:00'
+    const recovered = parseStoredStateStrict({
+      ...valid,
+      baseline: { ...valid.baseline!, triggers: ['toilet'] },
+      cravings: [{
+        id: 'toilet-craving',
+        createdAt: triggerAt,
+        level: 4,
+        trigger: 'toilet',
+        attemptId: valid.plan!.id,
+      }],
+      cigarettes: [{
+        id: 'toilet-cigarette',
+        createdAt: triggerAt,
+        count: 1,
+        trigger: 'toilet',
+        cravingIntensity: 4,
+        attemptId: valid.plan!.id,
+        source: 'QUICK_LOG',
+      }],
+      lapses: [{
+        id: 'toilet-lapse',
+        createdAt: triggerAt,
+        cigarettes: 1,
+        trigger: 'toilet',
+        cravingIntensity: 4,
+        recoveryAction: '重新开始',
+        attemptId: valid.plan!.id,
+      }],
+    })
+
+    expect(recovered.baseline?.triggers).toEqual(['toilet'])
+    expect(recovered.cravings[0]?.trigger).toBe('toilet')
+    expect(recovered.cigarettes[0]?.trigger).toBe('toilet')
+    expect(recovered.lapses[0]?.trigger).toBe('toilet')
+  })
+
   it('丢弃损坏事件并规范化派生字段，不让单条坏记录拖垮客户端', () => {
     const valid = plannedState()
     const recovered = parseStoredState({

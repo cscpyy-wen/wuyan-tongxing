@@ -4,6 +4,7 @@ import {
   formatSmokingInterval,
   formatSmokingTime,
   shanghaiDateTimeToIso,
+  SMOKING_TRIGGER_OPTIONS,
   summarizeSmokingLogs,
   toShanghaiDate,
   toShanghaiTime,
@@ -14,6 +15,14 @@ function log(id: string, createdAt: string, trigger: NonNullable<ClientCigarette
 }
 
 describe('逐支吸烟统计', () => {
+  it('将拉屎作为可记录和统计的独立原因', () => {
+    expect(SMOKING_TRIGGER_OPTIONS).toContainEqual({ value: 'toilet', label: '拉屎', shortLabel: '拉屎' })
+    const summary = summarizeSmokingLogs([
+      log('toilet', '2026-08-24T09:30:00+08:00', 'toilet', 4),
+    ], '2026-08-24')
+    expect(summary.topReason).toMatchObject({ trigger: 'toilet', label: '拉屎', count: 1, percentage: 100 })
+  })
+
   it('按时间排序后计算次数、频率、原因与烟瘾强度', () => {
     const summary = summarizeSmokingLogs([
       log('three', '2026-08-24T12:30:00+08:00', 'work', 5),

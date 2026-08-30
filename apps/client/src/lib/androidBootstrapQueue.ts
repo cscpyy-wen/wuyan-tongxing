@@ -11,7 +11,7 @@ export const ANDROID_BACKUP_RESTORE_INTENT_KEY = 'wuyan-tongxing/android-backup-
 export const ANDROID_BOOTSTRAP_QUEUE_EVENT = 'wuyan:bootstrap-cigarette'
 
 const triggers = new Set<Trigger>([
-  'work', 'meal', 'stress', 'social', 'alcohol',
+  'work', 'meal', 'toilet', 'stress', 'social', 'alcohol',
   'exercise', 'boredom', 'morning', 'coffee', 'habit',
 ])
 const MAX_PENDING_EVENTS = 20

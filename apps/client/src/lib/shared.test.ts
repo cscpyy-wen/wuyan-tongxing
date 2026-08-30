@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ClientQuitPlan } from '../types'
-import { getTodayContent, toShanghaiRuleTimeBucket } from './shared'
+import { getTodayContent, toShanghaiRuleTimeBucket, toSharedTrigger } from './shared'
 
 const plan = (quitDate: string): ClientQuitPlan => ({
   id: '11111111-1111-4111-8111-111111111111',
@@ -13,6 +13,10 @@ const plan = (quitDate: string): ClientQuitPlan => ({
 })
 
 describe('日期课程', () => {
+  it('将拉屎映射为结构化其他诱因', () => {
+    expect(toSharedTrigger('toilet')).toBe('OTHER_STRUCTURED')
+  })
+
   it('按日期提供准备期7模块、28天课程和第5至8周巩固模块', () => {
     const quitDate = '2026-08-08'
     const cases = [

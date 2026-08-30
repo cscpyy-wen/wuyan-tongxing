@@ -853,7 +853,7 @@ export function parseStoredState(value: unknown): ClientState {
 }
 
 const TRIGGER_VALUES: readonly Trigger[] = [
-  'work', 'meal', 'stress', 'social', 'alcohol', 'exercise', 'boredom', 'morning', 'coffee', 'habit',
+  'work', 'meal', 'toilet', 'stress', 'social', 'alcohol', 'exercise', 'boredom', 'morning', 'coffee', 'habit',
 ]
 
 function recordValue(value: unknown): Record<string, unknown> | undefined {

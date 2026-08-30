@@ -27,6 +27,7 @@ interface RecommendationInput {
 const TRIGGER_MAP: Record<Trigger, SharedTrigger> = {
   work: 'WORK_BREAK',
   meal: 'AFTER_MEAL',
+  toilet: 'OTHER_STRUCTURED',
   stress: 'STRESS',
   social: 'SOCIAL_OFFER',
   alcohol: 'ALCOHOL',
@@ -43,6 +44,10 @@ function toSharedPhase(phase: string): QuitPhase {
   if (phase === 'quit-day') return 'QUIT_DAY'
   if (phase === 'active') return 'ACTIVE_28'
   return 'MAINTENANCE'
+}
+
+export function toSharedTrigger(trigger: Trigger): SharedTrigger {
+  return TRIGGER_MAP[trigger]
 }
 
 export function toShanghaiRuleTimeBucket(at: Date): RuleInput['localTimeBucket'] {
@@ -68,7 +73,7 @@ function recommendedByRules(input: RecommendationInput): { contentId: string; ac
     dependenceBand: input.firstCigaretteMinutes <= 30 ? 'HIGHER' : 'LOWER',
     recentCraving: input.recentCravingLevel ? input.recentCravingLevel * 2 : null,
     recentLapse: input.hasRecentLapse,
-    selectedTriggers: input.selectedTriggers.map((trigger) => TRIGGER_MAP[trigger]),
+    selectedTriggers: input.selectedTriggers.map(toSharedTrigger),
     completedTaskIds: input.completedTaskIds,
     localTimeBucket: toShanghaiRuleTimeBucket(input.at),
   }, defaultRules)

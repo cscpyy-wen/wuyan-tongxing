@@ -21,7 +21,7 @@ test.describe('逐支吸烟记录', () => {
     await expect(dialog).toBeVisible()
     const confirm = taroButton(page, '保存')
     await expect(confirm).toBeDisabled()
-    await page.getByRole('radio', { name: '吸烟原因：工作疲惫', exact: true }).click()
+    await page.getByRole('radio', { name: '吸烟原因：拉屎', exact: true }).click()
     await expect(confirm).toBeDisabled()
     await page.getByRole('radio', { name: '烟瘾强度 4，很强', exact: true }).click()
     await expect(confirm).toBeEnabled()
@@ -30,7 +30,7 @@ test.describe('逐支吸烟记录', () => {
 
     await expect.poll(async () => (await readStoredState(page))?.cigarettes.length).toBe(1)
     const saved = (await readStoredState(page))!.cigarettes[0]!
-    expect(saved).toMatchObject({ count: 1, trigger: 'work', cravingIntensity: 4, source: 'QUICK_LOG' })
+    expect(saved).toMatchObject({ count: 1, trigger: 'toilet', cravingIntensity: 4, source: 'QUICK_LOG' })
     expect(new Date(saved.createdAt).getTime()).toBeGreaterThanOrEqual(before)
     expect(new Date(saved.createdAt).getTime()).toBeLessThanOrEqual(after)
     await expect(page.locator('.smoking-hero__count')).toContainText('1 支')
@@ -43,7 +43,7 @@ test.describe('逐支吸烟记录', () => {
     await tabLink(page, '记录').click()
     await expect(page.locator('.records-summary__count')).toContainText('1 支')
     const recordsPage = page.locator('.records-page:visible')
-    await expect(recordsPage.getByText('工作疲惫', { exact: true }).first()).toBeVisible()
+    await expect(recordsPage.getByText('拉屎', { exact: true }).first()).toBeVisible()
     await expect(recordsPage.getByText('烟瘾 4/5', { exact: true })).toBeVisible()
     await expect(recordsPage.getByText('北京时间', { exact: true })).toBeVisible()
     await expect(page.getByText('今天共吸了多少支？', { exact: true })).toHaveCount(0)

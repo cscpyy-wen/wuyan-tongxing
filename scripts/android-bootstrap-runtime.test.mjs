@@ -30,7 +30,7 @@ function bootstrapDom() {
         <section role="dialog">
           <button id="wuyan-bootstrap-cancel"></button>
           <span id="wuyan-bootstrap-trigger-label">原因</span>
-          <div role="group" aria-labelledby="wuyan-bootstrap-trigger-label"><button data-wuyan-trigger="work" aria-pressed="false"></button></div>
+          <div role="group" aria-labelledby="wuyan-bootstrap-trigger-label"><button data-wuyan-trigger="work" aria-pressed="false"></button><button data-wuyan-trigger="toilet" aria-pressed="false"></button></div>
           <span id="wuyan-bootstrap-intensity-label">烟瘾强度</span>
           <div role="group" aria-labelledby="wuyan-bootstrap-intensity-label"><button data-wuyan-intensity="4" aria-pressed="false"></button></div>
           <button id="wuyan-bootstrap-save" disabled></button>
@@ -84,12 +84,13 @@ test('Android static bootstrap appends to the durable queue and never forks a le
 
   dom.window.eval(runtime)
   dom.window.document.getElementById('wuyan-bootstrap-begin').click()
-  dom.window.document.querySelector('[data-wuyan-trigger="work"]').click()
+  dom.window.document.querySelector('[data-wuyan-trigger="toilet"]').click()
   dom.window.document.querySelector('[data-wuyan-intensity="4"]').click()
   dom.window.document.getElementById('wuyan-bootstrap-save').click()
 
   const queue = JSON.parse(values.get('wuyan-tongxing/android-bootstrap-cigarettes/v1'))
   assert.equal(queue.data.length, 2)
+  assert.equal(queue.data[1].trigger, 'toilet')
   assert.equal(dom.window.localStorage.getItem('wuyan-tongxing/android-bootstrap-cigarettes/v1'), null)
   dom.window.close()
 })

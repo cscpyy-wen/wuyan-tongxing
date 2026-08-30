@@ -5,6 +5,7 @@ export const SMOKING_TIMEZONE_LABEL = '北京时间'
 export const SMOKING_TRIGGER_OPTIONS: ReadonlyArray<{ value: Trigger; label: string; shortLabel: string }> = [
   { value: 'work', label: '工作疲惫', shortLabel: '工作' },
   { value: 'meal', label: '刚吃完饭', shortLabel: '饭后' },
+  { value: 'toilet', label: '拉屎', shortLabel: '拉屎' },
   { value: 'stress', label: '压力或烦躁', shortLabel: '压力' },
   { value: 'social', label: '社交需要', shortLabel: '社交' },
   { value: 'alcohol', label: '饮酒后', shortLabel: '饮酒' },

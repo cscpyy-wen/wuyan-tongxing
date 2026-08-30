@@ -256,7 +256,7 @@ describe('AppState onboarding transaction', () => {
       id: '33333333-3333-4333-8333-333333333333',
       smokedAt: '2026-08-28T10:15:00.000Z',
       attemptId: stored.plan!.id,
-      trigger: 'work',
+      trigger: 'toilet',
       cravingIntensity: 4,
     }
     window.localStorage.setItem(ANDROID_BOOTSTRAP_QUEUE_KEY, JSON.stringify({ data: [queued] }))
@@ -273,6 +273,8 @@ describe('AppState onboarding transaction', () => {
       id: queued.id,
       createdAt: queued.smokedAt,
       attemptId: stored.plan?.id,
+      trigger: 'toilet',
+      cravingIntensity: 4,
       source: 'QUICK_LOG',
     })
     expect((taroMocks.values.get(STORAGE_KEY) as ClientState).cigarettes).toHaveLength(1)
