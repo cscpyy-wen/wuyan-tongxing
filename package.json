@@ -2,7 +2,7 @@
   "name": "wuyan-tongxing",
   "version": "0.1.0-rc.1",
   "private": true,
-  "description": "无烟同行：循证、离线优先的戒烟行为支持 H5 与微信小程序工程候选版",
+  "description": "无烟同行：免登录、离线优先的 Android 戒烟记录与行为支持 App",
   "packageManager": "pnpm@11.19.0",
   "engines": {
     "node": ">=24.14.1 <25"

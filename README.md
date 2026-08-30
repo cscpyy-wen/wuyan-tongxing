@@ -2,171 +2,150 @@
 
 [![CI](https://github.com/cscpyy-wen/wuyan-tongxing/actions/workflows/ci.yml/badge.svg)](https://github.com/cscpyy-wen/wuyan-tongxing/actions/workflows/ci.yml)
 
-无烟同行是一款面向中国大陆成年纸烟用户的开源、离线优先戒烟行为支持工具。项目包含 H5、微信小程序源码、Android 客户端、共享领域包和本地开发用 API/管理后台。
+无烟同行是一款面向 Android 15 及以上设备的开源、离线优先戒烟记录与行为支持 App。无需注册或登录，逐支记录、统计分析、烟瘾急救、戒烟计划和数据备份均可在本机完成。
 
-> **重要医疗边界**
->
-> 本项目不是医疗器械，不提供诊断、处方、个体化用药剂量或疗效保证。医学内容是带来源的工程草案，尚未完成具名医学审核，不能替代医生、戒烟门诊或紧急医疗服务。急性胸痛、严重呼吸困难或自伤风险应立即联系当地急救和人工专业服务。
+[下载最新版 Android APK](https://github.com/cscpyy-wen/wuyan-tongxing/releases/download/v0.1.0-personal.32/wuyan-tongxing-personal-0.1.0-personal.32.apk) · [查看 v32 发布说明](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.32)
 
-## 当前版本
+> `v0.1.0-personal.32` 已在 Xiaomi 15 Pro（Xiaomi HyperOS 3）真机完成个人安装与日常使用实测，未发现影响使用的问题。该结果只代表已测试的设备和系统组合，不等同于所有 Android 手机的兼容性保证。
 
-- 公开源码快照：`0.1.0-personal.32`
-- Android 包名：`cn.wuyantongxing.personal`
-- Android 最低版本：Android 15（API 35）
-- Android 目标版本：Android 16（API 36）
-- 当前验收边界：Android 16（API 36）模拟器；尚未声称通过小米实体机或 HyperOS 3 真机验收
+## 日常怎么用
 
-官方签名 APK 发布在 [GitHub Releases](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.32)，不提交进源码主分支。
+1. 首次打开时选择直接戒断或限期减量，设定戒烟日、戒烟理由和常见诱因。
+2. 每次吸烟时点击首页中央的“我吸了一支烟”，选择原因和 1–5 级烟瘾强度；时间会自动记录。
+3. 烟瘾上来但还没吸烟时，点击 SOS，立即开始呼吸、烟瘾冲浪、换场景或查看戒烟理由。
+4. 在“记录”查看当天支数、时间、间隔和原因；在“进展”查看连续无烟、少吸支数和阶段任务。
 
-| 校验项 | `v0.1.0-personal.32` |
+## 主要功能
+
+### 一键记录每一支烟
+
+- 首页中央的大按钮单手即可触达。
+- 自动保存北京时间，不需要再手工填写全天支数。
+- 提供 11 种结构化原因：工作疲惫、刚吃完饭、拉屎、压力或烦躁、社交需要、饮酒后、健身后、无聊或独处、早晨习惯、咖啡或茶、下意识习惯。
+- 同时记录 1–5 级烟瘾强度；误记后可以编辑或撤销。
+
+### 自动分析吸烟规律
+
+- 汇总每日支数、吸烟时间、相邻间隔和烟瘾均值。
+- 统计高频时段、主要原因及各原因占比。
+- 所有统计都来自逐支事件，避免用户凭记忆估算当天总量。
+
+### 戒烟计划与进展
+
+- 支持直接戒断和限期减量两条路径。
+- 包含准备任务、28 天日程、第 5–8 周巩固和长期随访。
+- 滑倒后重新计算当前连续无烟时间，但不会清空累计进展、任务和历史尝试。
+- 省钱、少吸支数和戒烟尝试次数会随记录自动更新。
+
+### SOS 烟瘾急救
+
+- 呼吸练习。
+- ACT 烟瘾冲浪。
+- 立即换场景。
+- 查看自己的戒烟理由。
+- 主动联系可信伙伴。
+
+SOS 使用本地内容，未登录、离线或拒绝通知权限时仍可使用。
+
+### 本机工具
+
+- 可选的本机提醒。
+- 用户主动触发的系统分享。
+- JSON 数据导出与恢复。
+- 大字号、横屏、读屏标签和至少 44px 触控目标适配。
+
+## 下载、安装与更新
+
+| 项目 | 当前官方版本 |
 | --- | --- |
-| APK SHA-256 | 以同一 Release 中的 `SHA256SUMS.txt` 为准 |
+| 版本 | `0.1.0-personal.32`（versionCode 32） |
+| 包名 | `cn.wuyantongxing.personal` |
+| 最低系统 | Android 15（API 35） |
+| 目标系统 | Android 16（API 36） |
+| APK SHA-256 | `842612389777dd99672388cbf5904a9ccf4922789427c61ed180ec314ceb8a16` |
 | 签名证书 SHA-256 | `b0fdad152952a3c3c7c97fb214ac1a9b392cfaf7c160c55b40cf6eaa680bf1d7` |
 
-## 主要能力
+安装步骤：
 
-- 首页一键记录“我吸了一支烟”，选择原因和烟瘾强度，自动保存时间。
-- 按天统计支数、间隔、时段和诱因，不要求用户再次手工填写全天支数。
-- 中央 SOS 急救入口，提供呼吸、烟瘾冲浪、换场景、戒烟理由和伙伴支持。
-- 直接戒断和限期减量两条路径，包含准备、28 天日程、巩固和长期随访。
-- 滑倒后重算当前连续无烟时间，但不清空累计进展和历史尝试。
-- Android 版无需账号，首次启动可离线；运行时不声明 `INTERNET` 权限。
-- 本机提醒、系统分享、JSON 导出与恢复均由用户主动触发。
+1. 从[官方 GitHub Release](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.32)下载 APK；如手机无法直接访问，可先在电脑下载，再通过数据线或小米互传发送到手机。
+2. 用系统文件管理器打开 APK，只为当前文件来源临时允许“安装未知应用”。
+3. 安装完成后可关闭该来源的安装授权。
 
-## 隐私设计
+从旧版更新时：
 
-Android 个人版的核心记录默认只保存在应用私有目录：
+1. 建议先在 App 内导出一份数据备份。
+2. 直接安装新版覆盖旧版，**不要先卸载，也不要清除应用数据**。
+3. 如果 Android 提示签名冲突，请停止安装；不要通过卸载旧版来绕过，否则本机记录会丢失。
 
-- 不要求 OpenAI、微信、手机号或小米账号登录。
+v31→v32 的正式同签名覆盖升级和数据保留已在 Android 16 模拟器完成验证。v32 新增了 `toilet`（“拉屎”）结构化原因；写入该值后，不支持强制降级到 v31 再读取同一份状态。
+
+## 真机与工程验证
+
+| 环境 | 验证方式 | 结果 |
+| --- | --- | --- |
+| Xiaomi 15 Pro / Xiaomi HyperOS 3 | 个人真机安装与日常使用实测 | 未发现影响使用的问题 |
+| Android 16（API 36）模拟器 | 完整 Android 回归、冷启动、编辑、统计、离线和覆盖升级 | 通过 |
+| Android instrumentation | 指定模拟器原生测试 | 26/26 通过 |
+| GitHub Actions | 公开工业验证 | [全部成功](https://github.com/cscpyy-wen/wuyan-tongxing/actions/runs/33294086593) |
+
+v32 还完成了 11 个吸烟原因逐项触控、保存、编辑、撤销、SOS、记录、进展、冷启动持久化和大字号/横屏回归。自动化验证和单台真机实测都不能保证所有厂商、系统版本与电量策略下绝无兼容性问题；如遇问题，请提交[缺陷报告](https://github.com/cscpyy-wen/wuyan-tongxing/issues/new?template=bug.yml)。
+
+## 隐私与本地数据
+
+- 无需注册或登录，也不索取手机号、头像或昵称。
+- 官方 Android 包不声明 `INTERNET` 权限，核心流程不需要联网。
 - 不申请通讯录、精确位置、相机、麦克风或广域存储权限。
-- 不包含真实广告、支付、社区、私信或生成式 AI。
-- 导出与恢复使用 Android 系统文件选择器；卸载或清除应用数据会删除本机记录。
-- 仓库不包含真实戒烟记录、用户导出文件、云端密钥或 Android 私钥。
+- 戒烟计划和逐支吸烟记录保存在 Android 应用私有目录。
+- 导出与恢复使用 Android 系统文件选择器；App 不会自动上传导出文件。
+- JSON 导出文件可能包含敏感健康信息，应由用户自行妥善保管。
+- 卸载 App、系统“清除数据”或在 App 内确认删除都会移除本机记录；系统备份与设备迁移默认关闭。
+- 不包含广告、支付、社区、私信或生成式 AI。
 
-完整数据边界见 [隐私数据地图](docs/privacy-data-map.md) 和 [威胁模型](docs/threat-model.md)。
+完整边界见[隐私数据地图](docs/privacy-data-map.md)和[威胁模型](docs/threat-model.md)。
 
-## 开始开发
+## 医疗与循证边界
 
-要求：
+本项目提供戒烟行为支持、自我记录和一般性教育信息，不是医疗器械，不提供诊断、处方、个体化用药剂量、药品购买或疗效保证。医学内容保留证据来源，但尚未完成具名医学审核，不能替代医生、戒烟门诊或紧急医疗服务。
 
-- Node.js `>=24.14.1 <25`
-- pnpm `11.19.0`
-- Android 构建需要 JDK 21 和 Android SDK 36
+急性胸痛、严重呼吸困难、自伤风险或其他紧急情况应立即联系当地急救和人工专业服务。引用指南或研究不表示其作者、机构或发布者认可本项目。
+
+- [内容主张与证据矩阵](docs/content-claims-matrix.md)
+- [证据目录](docs/content-evidence-catalog.md)
+- [医学审核清单](docs/medical-review-checklist.md)
+
+## 构建 Android 调试包
+
+开发环境：Node.js `>=24.14.1 <25`、pnpm `11.19.0`、JDK 21、Android SDK 36。
 
 ```powershell
 corepack enable
 pnpm install --frozen-lockfile
-```
-
-### H5
-
-```powershell
-pnpm build:h5
-pnpm serve:h5
-```
-
-浏览器打开 `http://127.0.0.1:4173/#/pages/onboarding/index`。
-
-### Android 社区调试包
-
-```powershell
 pnpm build:android
 ```
 
-该命令生成带 `.debug` application ID 后缀的调试 APK，不需要维护者私钥，也不能覆盖官方签名安装包。默认输出位于：
+默认输出：
 
 ```text
 apps/android-shell/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-维护者的正式签名链使用：
+社区调试包使用 `cn.wuyantongxing.personal.debug` 和 Android Debug 证书，不能覆盖官方安装包，也不能冒充官方发布。维护者签名流程、APK 核验方法和更新边界见 [Android 构建与安装文档](docs/android-personal-app.md)。
+
+Android 相关检查：
 
 ```powershell
-$env:WUYAN_ANDROID_SIGNING_ROOT = 'D:\path\outside-the-repository\android-signing'
-pnpm build:android:maintainer-release
-```
-
-外部目录必须包含固定的 `personal-release.p12`、`signing.properties` 与 `certificate.sha256`。脚本会在目录位于仓库内、文件缺失、密钥库路径越界或证书不匹配时失败关闭。私钥、口令和签名配置永远不属于公开仓库。
-
-### 微信小程序
-
-```powershell
-pnpm build:weapp
-```
-
-将 `apps/client` 导入微信开发者工具。源码默认使用公开测试占位 AppID；真实 AppID、主体、订阅模板和服务器域名需要由部署者自行配置并完成相应审核。
-
-### 国内 H5 包装
-
-```powershell
-pnpm build:cn-preview
-```
-
-该命令只生成通用静态包，不包含本项目维护者的 CloudBase 环境 ID、域名或部署凭据。部署者必须使用自己的境内环境、域名和合规配置。
-
-## 验证
-
-```powershell
-pnpm typecheck
-pnpm test
-pnpm test:release
-pnpm verify:content
 pnpm verify:repo
-pnpm build
-pnpm test:e2e
-pnpm audit:all
-pnpm supply-chain
+pnpm test:release
+pnpm test:android:native
 ```
 
-首次运行 Playwright 前执行：
+连接专用模拟器或测试设备后，设备 instrumentation 需要显式设置 `ANDROID_SERIAL` 并运行 `pnpm test:android:native:device`。
 
-```powershell
-pnpm test:e2e:install
-```
+## 开源、贡献与许可证
 
-正式 Android 签名、真实设备 instrumentation、真实微信能力和生产部署属于独立门禁，不能由普通 CI 或 H5 测试替代。
+- 问题和建议：[GitHub Issues](https://github.com/cscpyy-wen/wuyan-tongxing/issues)。
+- 贡献流程：[CONTRIBUTING.md](CONTRIBUTING.md)。
+- 安全漏洞：[SECURITY.md](SECURITY.md)。
+- 发布构件、SBOM 与第三方许可证：[v0.1.0-personal.32 Release](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.32)。
 
-## 仓库结构
-
-| 路径 | 用途 |
-| --- | --- |
-| `apps/client` | Taro + React 客户端，生成 H5 和微信小程序 |
-| `apps/android-shell` | Capacitor Android 壳层与原生桥 |
-| `apps/api` | Fastify + Zod/OpenAPI 本地契约服务 |
-| `apps/admin` | 轻量内容管理后台 |
-| `apps/worker` | 本地持久任务 Worker |
-| `packages/domain` | 戒烟状态、日期和统计核心逻辑 |
-| `packages/content` | 版本化教育内容和证据引用 |
-| `packages/contracts` | 公共接口类型与校验 |
-| `packages/persistence` | PGlite/Drizzle 本地持久化 |
-| `packages/platform` | 微信、H5 和本地模拟适配器 |
-| `packages/rules` | 声明式白名单规则引擎 |
-| `deploy/tencent-cloudbase` | 去身份化的国内静态托管包装 |
-| `docs` | 架构、隐私、证据和医学审核边界 |
-
-## 内容与循证边界
-
-内容采用行为支持、诱因识别、烟瘾应对、滑倒恢复和专业转介等循证原则。每条关键主张应在内容证据目录中保留来源、版本和复核状态。
-
-- [内容主张与证据矩阵](docs/content-claims-matrix.md)
-- [证据目录](docs/content-evidence-catalog.md)
-- [医学审核清单](docs/medical-review-checklist.md)
-- [内容覆盖清单](docs/content-coverage.md)
-
-引用外部指南或论文不表示其作者、机构或发布者认可本项目。本仓库只许可项目贡献者拥有权利的原创表达；外部来源仍受各自版权和使用条款约束。
-
-## 参与贡献与安全报告
-
-- 贡献流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-- 社区行为规范见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
-- 安全问题请按 [SECURITY.md](SECURITY.md) 使用 GitHub 私密漏洞报告，不要在公开 Issue 中提交 token、健康记录或导出文件。
-
-## 许可证
-
-- 原创源代码、配置和测试，以及 `apps/android-shell/android/app/src/main/res/drawable/ic_launcher_foreground.xml` 与 `deploy/tencent-cloudbase/assets/favicon.svg` 两个项目原创视觉资源：[Apache License 2.0](LICENSE)
-- `packages/content/src/data` 中的原创教育内容及 `docs` 中的原创叙述性文档：[Creative Commons Attribution 4.0](LICENSE-CONTENT.md)
-- `apps/android-shell/android` 中源自 Capacitor Android template 的部分：[MIT License，Copyright (c) 2017-present Drifty Co.](apps/android-shell/android/LICENSE-CAPACITOR)
-- `packages/git-clone-safe`：该目录内声明的 ISC License
-- 第三方组件和素材：仍适用各自许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[第三方许可证清单](docs/third-party-licenses.json) 和 [CycloneDX SBOM](docs/sbom.cdx.json)
-
-许可证不改变上述医疗边界，也不构成任何机构认可、医学保证或商标授权；视觉资源的版权许可不允许以暗示本项目或贡献者认可的方式使用名称或标识。
+原创软件源码、配置和测试采用 [Apache License 2.0](LICENSE)；原创戒烟教育内容与叙述性文档采用 [CC BY 4.0](LICENSE-CONTENT.md)；派生模板和第三方组件继续适用各自许可证，详见 [NOTICE](NOTICE) 与 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
