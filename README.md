@@ -10,17 +10,17 @@
 
 ## 当前版本
 
-- 公开源码快照：`0.1.0-personal.31`
+- 公开源码快照：`0.1.0-personal.32`
 - Android 包名：`cn.wuyantongxing.personal`
 - Android 最低版本：Android 15（API 35）
 - Android 目标版本：Android 16（API 36）
-- 当前验收边界：Android 模拟器 `emulator-5554`；尚未声称通过小米实体机或 HyperOS 3 真机验收
+- 当前验收边界：Android 16（API 36）模拟器；尚未声称通过小米实体机或 HyperOS 3 真机验收
 
-官方签名 APK 发布在 [GitHub Releases](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.31)，不提交进源码主分支。
+官方签名 APK 发布在 [GitHub Releases](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.32)，不提交进源码主分支。
 
-| 校验项 | `v0.1.0-personal.31` |
+| 校验项 | `v0.1.0-personal.32` |
 | --- | --- |
-| APK SHA-256 | `e7da2a22397be89e05048acf2b022f2028cb9447d6e9e011eab6c6e25571c7a0` |
+| APK SHA-256 | 以同一 Release 中的 `SHA256SUMS.txt` 为准 |
 | 签名证书 SHA-256 | `b0fdad152952a3c3c7c97fb214ac1a9b392cfaf7c160c55b40cf6eaa680bf1d7` |
 
 ## 主要能力
@@ -82,10 +82,11 @@ apps/android-shell/android/app/build/outputs/apk/debug/app-debug.apk
 维护者的正式签名链使用：
 
 ```powershell
+$env:WUYAN_ANDROID_SIGNING_ROOT = 'D:\path\outside-the-repository\android-signing'
 pnpm build:android:maintainer-release
 ```
 
-它会在缺少本机私钥或证书不匹配时失败关闭。私钥、口令和签名配置永远不属于公开仓库。
+外部目录必须包含固定的 `personal-release.p12`、`signing.properties` 与 `certificate.sha256`。脚本会在目录位于仓库内、文件缺失、密钥库路径越界或证书不匹配时失败关闭。私钥、口令和签名配置永远不属于公开仓库。
 
 ### 微信小程序
 

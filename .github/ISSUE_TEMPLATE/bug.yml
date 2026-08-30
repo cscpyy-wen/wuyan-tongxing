@@ -25,7 +25,7 @@ body:
     attributes:
       label: 版本与环境
       description: 请提供版本或提交、操作系统、浏览器或运行时；不要包含设备标识符。
-      placeholder: 例如：v0.1.0-personal.31，Android 16；或提交 SHA，Windows 11，Chrome 版本号
+      placeholder: 例如：v0.1.0-personal.32，Android 16；或提交 SHA，Windows 11，Chrome 版本号
     validations:
       required: true
   - type: textarea

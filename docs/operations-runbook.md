@@ -29,7 +29,7 @@
 5. 公开 H5 只能发布草案工程预览；正式微信包还必须取得发布清单中的医学、法律、主体、备案、真机和生产基础设施签署。
 6. 国内 H5 部署后先检查根页面、JS/CSS/chunk 和 `/sw.js` 的 200/MIME、无登录跳转、CSP/防嵌入/最小权限响应头、`noindex`、`robots.txt`、Service Worker 作用域和离线重载；再以微信 iOS/Android 及中国移动、联通、电信网络完成真实访问验收。
 
-社区贡献者使用 `pnpm build:android` 生成隔离的 debug APK。该命令不读取维护者私钥，也不生成可冒充官方包名和签名的产物。`pnpm build:android:maintainer-release` 与 `pnpm release:gate` 是维护者的严格签名链；缺少本机私钥、证书策略或 Android 工具链时必须失败关闭。设备验收还必须显式设置目标 `ANDROID_SERIAL` 后运行 `pnpm release:gate:device`，不能把桌面 CI 或模拟器结果写成实体机验收。
+社区贡献者使用 `pnpm build:android` 生成隔离的 debug APK。该命令不读取维护者私钥，也不生成可冒充官方包名和签名的产物。`pnpm build:android:maintainer-release` 与 `pnpm release:gate` 是维护者的严格签名链；运行前必须把 `WUYAN_ANDROID_SIGNING_ROOT` 设置为仓库外的绝对目录，目录内固定放置密钥库、签名配置与证书指纹。缺少本机私钥、证书策略或 Android 工具链时必须失败关闭。设备验收还必须显式设置目标 `ANDROID_SERIAL` 后运行 `pnpm release:gate:device`，不能把桌面 CI 或模拟器结果写成实体机验收。
 
 ## 回滚
 

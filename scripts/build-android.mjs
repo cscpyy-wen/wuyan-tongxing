@@ -15,6 +15,10 @@ import { tmpdir } from 'node:os'
 import { basename, dirname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
+  resolveConfiguredSigningStore,
+  resolveExternalAndroidSigningMaterial,
+} from './android-signing-material.mjs'
+import {
   ANDROID_RELEASE_PROTOCOL,
   androidReleaseId,
   createAndroidReleaseStaging,
@@ -71,10 +75,12 @@ const expectedVersionCode = String(versionConfig.versionCode)
 const expectedVersionName = versionConfig.versionName
 const expectedMinSdk = versionConfig.minSdk
 const expectedTargetSdk = versionConfig.targetSdk
-const signingRoot = resolve(repositoryRoot, '.private', 'android-signing')
-const signingStorePath = resolve(signingRoot, 'personal-release.p12')
-const signingPropertiesPath = resolve(signingRoot, 'signing.properties')
-const signingFingerprintPath = resolve(signingRoot, 'certificate.sha256')
+const signingMaterial = await resolveExternalAndroidSigningMaterial({
+  repositoryRoot,
+  expectedCertificateSha256: signingPolicy.allowedCertificateSha256,
+})
+const signingStorePath = signingMaterial.storePath
+const signingPropertiesPath = signingMaterial.propertiesPath
 await verifyGradleWrapper(repositoryRoot)
 
 const executableSuffix = process.platform === 'win32' ? '.exe' : ''
@@ -339,27 +345,14 @@ async function apkPayloadSummary(jdk, apkPath, environment) {
   }
 }
 
-async function ensurePersonalSigning() {
-  const storeExists = await exists(signingStorePath)
-  const propertiesExist = await exists(signingPropertiesPath)
-  if (!storeExists || !propertiesExist) {
-    throw new Error(
-      `个人签名材料缺失或不完整；为保护已安装应用的升级链，构建已终止。请从离线备份恢复整个目录：${relative(repositoryRoot, signingRoot)}`,
-    )
-  }
-}
-
 async function pinSigningFingerprint(actualFingerprint) {
   if (!/^[a-f0-9]{64}$/.test(actualFingerprint)) throw new Error('无法读取有效的签名证书 SHA-256')
   const policyFingerprint = signingPolicy.allowedCertificateSha256.toLowerCase()
   if (actualFingerprint !== policyFingerprint) {
     throw new Error(`签名证书违反升级策略：期望 ${policyFingerprint}，实际 ${actualFingerprint}`)
   }
-  if (await exists(signingFingerprintPath)) {
-    const expectedFingerprint = (await readFile(signingFingerprintPath, 'utf8')).trim().toLowerCase()
-    if (expectedFingerprint !== actualFingerprint) {
-      throw new Error(`签名证书发生变化：期望 ${expectedFingerprint}，实际 ${actualFingerprint}`)
-    }
+  if (signingMaterial.fingerprint !== actualFingerprint) {
+    throw new Error(`签名证书发生变化：期望 ${signingMaterial.fingerprint}，实际 ${actualFingerprint}`)
   }
 }
 
@@ -434,8 +427,11 @@ async function readSigningConfiguration() {
     if (!properties.get(key)) throw new Error(`个人签名配置缺少 ${key}`)
   }
   const configuredStore = properties.get('storeFile')
-  const storeFile = resolve(dirname(signingPropertiesPath), configuredStore)
-  if (!await exists(storeFile)) throw new Error('个人签名配置指向的密钥库不存在')
+  const storeFile = await resolveConfiguredSigningStore({
+    propertiesPath: signingPropertiesPath,
+    configuredStore,
+    expectedStorePath: signingStorePath,
+  })
   return {
     storeFile,
     storePassword: properties.get('storePassword'),
@@ -451,6 +447,7 @@ async function createSignedSourceArchive(
   inventoryContents,
   expectedCertificate,
   environment,
+  signing,
 ) {
   const stagingRoot = await mkdtemp(resolve(tmpdir(), 'wuyan-source-archive-'))
   const publicationArchive = resolve(publicationRoot, sourceArchiveName)
@@ -477,7 +474,6 @@ async function createSignedSourceArchive(
       maxBuffer: 64 * 1024 * 1024,
     })
 
-    const signing = await readSigningConfiguration()
     const signingEnvironment = {
       ...environment,
       WUYAN_SOURCE_STORE_PASSWORD: signing.storePassword,
@@ -562,7 +558,7 @@ if (startupRecovery.removed.length > 0) {
 
 const jdk = await discoverJdk21()
 const androidSdk = await discoverAndroidSdk()
-await ensurePersonalSigning()
+const signingConfiguration = await readSigningConfiguration()
 const buildEnvironment = {
   ...process.env,
   JAVA_HOME: jdk.home,
@@ -701,6 +697,7 @@ const sourceArchive = await createSignedSourceArchive(
   sourceInventoryContents,
   signingCertificate.sha256,
   buildEnvironment,
+  signingConfiguration,
 )
 const git = {
   commit: gitSnapshot.commit,

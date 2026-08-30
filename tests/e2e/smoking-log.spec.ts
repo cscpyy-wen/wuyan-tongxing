@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { SMOKING_TRIGGER_OPTIONS } from '../../apps/client/src/lib/smokingLogs'
 import { completeOnboarding, readStoredState, sosButton, tabLink, taroButton } from './support'
 
 test.describe('逐支吸烟记录', () => {
@@ -120,7 +121,7 @@ test.describe('逐支吸烟记录', () => {
 
       const reasons = page.locator('input[name="smoking-trigger"]')
       const intensities = page.locator('input[name="smoking-intensity"]')
-      await expect(reasons).toHaveCount(10)
+      await expect(reasons).toHaveCount(SMOKING_TRIGGER_OPTIONS.length)
       await expect(intensities).toHaveCount(5)
       for (let index = 0; index < await reasons.count(); index += 1) {
         await expect(reasons.nth(index)).not.toBeChecked()

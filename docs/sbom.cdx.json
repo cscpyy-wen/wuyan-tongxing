@@ -1,14 +1,14 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:c8fa78a8-c297-5c8c-ab7d-8e6c23027273",
+  "serialNumber": "urn:uuid:e9699779-69b1-5e10-818a-3840da995920",
   "version": 1,
   "metadata": {
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/wuyan-tongxing-android-personal@0.1.0-personal.31",
+      "bom-ref": "pkg:generic/wuyan-tongxing-android-personal@0.1.0-personal.32",
       "name": "wuyan-tongxing-android-personal",
-      "version": "0.1.0-personal.31",
+      "version": "0.1.0-personal.32",
       "properties": [
         {
           "name": "wuyan:inventory-scope",

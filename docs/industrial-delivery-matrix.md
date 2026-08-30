@@ -18,7 +18,7 @@
 | 生产数据库/KMS/备份 | BLOCKED | PGlite 仅限本机；生产 API/Worker 当前无条件失败关闭，PostgreSQL、KMS、PITR、恢复/删除演练未完成 |
 | 公开 H5 安全包装 | PASS | Worker-only 公网实测哈希 CSP、安全头、禁止嵌入、200/304/400/404/405、HEAD、压缩、noindex/robots 与 Worker 日志 |
 | 供应链 | PASS（范围限定的工程证据） | 根 pnpm 生产/完整图和两个部署 npm 锁均以 low 阈值失败关闭；Gradle 运行时/构建脚本锁定、8.14.3 distribution 与 wrapper JAR 固定校验和、严格依赖校验、安装脚本白名单、固定 CI action。CycloneDX 是无依赖边图的 773 个去重组件集合，773/773 具有哈希和声明许可证；OSV 对 722 个 npm 与 51 个 Maven PURL 的 0 个发现仅是查询时点结果。Gradle metadata 为 checksum pinning 且 `verify-signatures=false`，未独立证明上游发布者身份；许可证字段未经法律审查 |
-| Android 个人签名与本地来源清单 | PASS（个人侧载） | 构建缺少密钥时失败关闭；版本化证书指纹策略，私钥/口令只在 Git 忽略的 `.private/`。CURRENT manifest 记录当前源码 JAR 条目/签名数、自签名无 TSA 及 dirty 实际快照，验证器逐文件核对，不沿用历史版本数字。新发布使用工具级不覆盖的版本目录和 append-only CURRENT 指针日志，完整验证后才提交；协议为 crash-recoverable，不宣称 Windows 目录 crash-atomic 或文件系统 ACL 只读。构建/JVM 总门禁默认不运行设备，只有显式 `ANDROID_SERIAL` 的设备门禁精确确认 26/26 时才算设备阶段通过 |
+| Android 个人签名与本地来源清单 | PASS（个人侧载） | 维护者构建必须通过 `WUYAN_ANDROID_SIGNING_ROOT` 使用仓库外的固定三文件目录；真实路径、固定密钥库和版本化证书指纹任一不符均失败关闭。CURRENT manifest 记录当前源码 JAR 条目/签名数、自签名无 TSA 及 dirty 实际快照，验证器逐文件核对，不沿用历史版本数字。新发布使用工具级不覆盖的版本目录和 append-only CURRENT 指针日志，完整验证后才提交；协议为 crash-recoverable，不宣称 Windows 目录 crash-atomic 或文件系统 ACL 只读。构建/JVM 总门禁默认不运行设备，只有显式 `ANDROID_SERIAL` 的设备门禁精确确认 26/26 时才算设备阶段通过 |
 | SLSA provenance | BLOCKED | 尚未由受控远端构建器生成并签名；本地 Android manifest 不等同于 SLSA provenance，不得自报 SLSA 等级 |
 | 可恢复构建源码 | PASS（签名快照） | 当前 APK 随附同证书签名的精确源码归档，验证器逐文件检查路径、大小和 SHA-256；固定 Node/pnpm 与 Gradle 锁/校验元数据支持重建。尚未证明不同机器可逐字节复现 APK，也没有受控远端构建记录，故不称“可复现构建” |
 

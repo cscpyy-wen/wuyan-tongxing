@@ -28,6 +28,11 @@ if (signingPropertiesPath != null && !signingPropertiesPath.isBlank()) {
             throw new GradleException("个人签名配置缺少 ${key}")
         }
     }
+    def configuredStoreFile = new File(signingProperties.getProperty('storeFile'))
+    def resolvedStoreFile = configuredStoreFile.isAbsolute()
+        ? configuredStoreFile
+        : new File(signingPropertiesFile.parentFile, signingProperties.getProperty('storeFile'))
+    signingProperties.setProperty('storeFile', resolvedStoreFile.canonicalPath)
 }
 
 android {

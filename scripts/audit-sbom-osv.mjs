@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url'
 
 const DEFAULT_ENDPOINT = 'https://api.osv.dev/v1/querybatch'
 const DEFAULT_BATCH_SIZE = 100
+const DEFAULT_MAX_REPORT_AGE_MS = 24 * 60 * 60 * 1_000
 
 function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex')
@@ -74,9 +75,11 @@ export async function runOsvAudit(options = {}) {
   const sbom = JSON.parse(sbomBytes.toString('utf8'))
   const entries = osvQueriesFromSbom(sbom)
   const findings = await queryOsvBatch(entries, options)
+  const now = options.now ? new Date(options.now()) : new Date()
+  if (!Number.isFinite(now.getTime())) throw new Error('OSV 审计时间无效')
   const report = {
     schemaVersion: 1,
-    generatedAt: new Date().toISOString(),
+    generatedAt: now.toISOString(),
     source: 'OSV querybatch API',
     endpoint: options.endpoint ?? DEFAULT_ENDPOINT,
     sbomPath: 'docs/sbom.cdx.json',
@@ -89,6 +92,54 @@ export async function runOsvAudit(options = {}) {
     findingCount: findings.length,
     findings,
   }
+  if (options.checkOnly) {
+    if (findings.length > 0) {
+      throw new Error(`OSV 实时复查发现 ${findings.length} 个受影响组件记录；发布已停止且未改写已提交报告`)
+    }
+    let stored
+    try {
+      stored = JSON.parse(await fs.readFile(reportPath, 'utf8'))
+    } catch {
+      throw new Error('缺少可解析的已提交 OSV 审计报告；请先运行 pnpm audit:sbom-osv 并提交结果')
+    }
+    const storedTime = new Date(stored.generatedAt).getTime()
+    const maximumAge = options.maxReportAgeMs ?? DEFAULT_MAX_REPORT_AGE_MS
+    if (
+      !Number.isFinite(storedTime)
+      || !Number.isFinite(maximumAge)
+      || maximumAge < 0
+      || storedTime > now.getTime() + 5 * 60 * 1_000
+      || now.getTime() - storedTime > maximumAge
+    ) {
+      throw new Error('已提交 OSV 审计报告已过期或时间无效；请刷新并提交报告')
+    }
+    const comparableStored = {
+      schemaVersion: stored.schemaVersion,
+      source: stored.source,
+      endpoint: stored.endpoint,
+      sbomPath: stored.sbomPath,
+      sbomSha256: stored.sbomSha256,
+      componentCount: stored.componentCount,
+      ecosystems: stored.ecosystems,
+      findingCount: stored.findingCount,
+      findings: stored.findings,
+    }
+    const comparableCurrent = {
+      schemaVersion: report.schemaVersion,
+      source: report.source,
+      endpoint: report.endpoint,
+      sbomPath: report.sbomPath,
+      sbomSha256: report.sbomSha256,
+      componentCount: report.componentCount,
+      ecosystems: report.ecosystems,
+      findingCount: report.findingCount,
+      findings: report.findings,
+    }
+    if (JSON.stringify(comparableStored) !== JSON.stringify(comparableCurrent)) {
+      throw new Error('已提交 OSV 审计报告与当前 SBOM 或实时查询结果不一致；请刷新并提交报告')
+    }
+    return stored
+  }
   await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8')
   if (findings.length > 0) {
     throw new Error(`OSV 发现 ${findings.length} 个受影响组件记录；详见 docs/osv-audit.json`)
@@ -98,6 +149,13 @@ export async function runOsvAudit(options = {}) {
 
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null
 if (invokedPath === import.meta.url) {
-  const report = await runOsvAudit()
-  console.log(`OSV 审计通过：npm ${report.ecosystems.npm} 个，Maven ${report.ecosystems.maven} 个，发现 0。`)
+  const argumentsList = process.argv.slice(2)
+  if (argumentsList.some((argument) => argument !== '--check')) {
+    throw new Error(`未知 OSV 审计参数：${argumentsList.join(', ')}`)
+  }
+  const checkOnly = argumentsList.includes('--check')
+  const report = await runOsvAudit({ checkOnly })
+  console.log(
+    `OSV 审计通过：npm ${report.ecosystems.npm} 个，Maven ${report.ecosystems.maven} 个，发现 0${checkOnly ? '；已提交报告匹配且未改写' : ''}。`,
+  )
 }
