@@ -77,7 +77,7 @@ test('external Android signing material rejects missing, relative, and repositor
 
   const common = { repositoryRoot: repository, expectedCertificateSha256: testFingerprint }
   await assert.rejects(
-    resolveExternalAndroidSigningMaterial(common),
+    resolveExternalAndroidSigningMaterial({ ...common, environment: {} }),
     /必须设置 WUYAN_ANDROID_SIGNING_ROOT/,
   )
   await assert.rejects(
