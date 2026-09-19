@@ -15,6 +15,6 @@
   },
   "devDependencies": {
     "@cloudbase/cli": "3.8.0",
-    "adm-zip": "0.6.0"
+    "adm-zip": "0.6.1"
   }
 }
