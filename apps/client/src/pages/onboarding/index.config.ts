@@ -1,5 +1,5 @@
 export default definePageConfig({
   navigationBarTitleText: '无烟同行',
-  navigationStyle: 'custom',
+  navigationStyle: process.env.TARO_ENV === 'harmony_cpp' ? 'default' : 'custom',
   disableScroll: false,
 })

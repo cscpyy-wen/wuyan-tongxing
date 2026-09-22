@@ -1,0 +1,36 @@
+.harmony-page-frame {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+.harmony-page-frame--tab {
+  /* Keep the internal Scroll viewport above the generated native Tabs bar.
+   * The generated taro_tabbar.ets uses barHeight(56). */
+  padding-bottom: 56px;
+}
+
+.screen.harmony-page-scroll {
+  display: block;
+  width: 100%;
+  height: 1px;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ArkUI Button keeps its platform default height when web CSS only supplies a
+ * minimum. Standard app buttons are 52vp, so fully bound them inside the
+ * Harmony-only scroll wrapper. Components with deliberate custom sizes use
+ * their more-specific Harmony selectors. */
+.harmony-page-scroll .button {
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}

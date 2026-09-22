@@ -5,12 +5,14 @@ import {
   ANDROID_BOOTSTRAP_IMPORT_JOURNAL_KEY,
   ANDROID_BOOTSTRAP_QUARANTINE_KEY,
   ANDROID_BOOTSTRAP_QUEUE_KEY,
+  ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
   type AndroidBootstrapStorage,
 } from './androidBootstrapQueue'
 import { getNativeDurableStore, nativeDurableUtf8Fits } from './nativeDurableStore'
 
 const DURABLE_AUXILIARY_KEYS = new Set([
   ANDROID_BOOTSTRAP_QUEUE_KEY,
+  ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
   ANDROID_BOOTSTRAP_QUARANTINE_KEY,
   ANDROID_BOOTSTRAP_CORRUPT_KEY,
   ANDROID_BOOTSTRAP_IMPORT_JOURNAL_KEY,
@@ -33,6 +35,7 @@ export function getAndroidHealthStorage(): AndroidBootstrapStorage | undefined {
     getItem(key) {
       if (!DURABLE_AUXILIARY_KEYS.has(key)) return fallback.getItem(key)
       if (durable.hasValue(key)) return durable.readRawValue(key)
+      if (durable.authoritativeWhenMissing) return null
       return fallback.getItem(key)
     },
     setItem(key, value) {
@@ -50,6 +53,28 @@ export function getAndroidHealthStorage(): AndroidBootstrapStorage | undefined {
       }
       fallback.removeItem(key)
     },
+    acknowledgeSystemShortcutRecords(ids) {
+      if (typeof durable.acknowledgeSystemShortcutRecords === 'function') {
+        durable.acknowledgeSystemShortcutRecords(JSON.stringify(ids))
+        try { fallback.removeItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY) } catch { /* native value is authoritative */ }
+        return
+      }
+      const raw = durable.hasValue(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
+        ? durable.readRawValue(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
+        : fallback.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
+      if (raw === null) return
+      const parsed = JSON.parse(raw) as { data?: Array<{ id?: unknown }> }
+      if (!Array.isArray(parsed.data)) throw new Error('系统快捷记录暂存无法读取')
+      const acknowledged = new Set(ids)
+      const remaining = parsed.data.filter((event) => typeof event.id !== 'string' || !acknowledged.has(event.id))
+      if (remaining.length === 0) {
+        durable.removeValue(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
+        fallback.removeItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
+      } else {
+        durable.writeValue(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, JSON.stringify({ data: remaining }))
+        try { fallback.removeItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY) } catch { /* native value is authoritative */ }
+      }
+    },
   }
   return cachedAdapter
 }
@@ -66,7 +91,9 @@ export function migrateLegacyAndroidHealthStorage(): void {
         const native = durable.readRawValue(key)
         if (native === legacy) {
           try { window.localStorage.removeItem(key) } catch { /* retry next startup */ }
-        } else if (key === ANDROID_BOOTSTRAP_QUEUE_KEY || key === ANDROID_BOOTSTRAP_QUARANTINE_KEY) {
+        } else if (key === ANDROID_BOOTSTRAP_QUEUE_KEY
+          || key === ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY
+          || key === ANDROID_BOOTSTRAP_QUARANTINE_KEY) {
           const characterLimit = ANDROID_BOOTSTRAP_RAW_CHARACTER_LIMITS[key]
           if (characterLimit === undefined
             || typeof native !== 'string'

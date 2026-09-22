@@ -5,7 +5,10 @@ import { useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
+import { WithheldHealthContent } from '../../components/WithheldHealthContent'
 import { useRequireOnboarding } from '../../hooks/useRequireOnboarding'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
+import { openTodayAsRoot } from '../../lib/navigation'
 import { useAppState } from '../../state/AppState'
 import './index.scss'
 
@@ -16,9 +19,10 @@ export default function LessonPage() {
   const item = getContentItem(router.params.id ?? '')
   const [evidenceExpanded, setEvidenceExpanded] = useState(false)
   const returnToday = () => {
-    Taro.reLaunch({ url: '/pages/today/index' })
+    openTodayAsRoot()
   }
 
+  if (!HEALTH_CONTENT_ENABLED) return <WithheldHealthContent />
   if (!ready) return <LoadingScreen />
 
   if (!item) {

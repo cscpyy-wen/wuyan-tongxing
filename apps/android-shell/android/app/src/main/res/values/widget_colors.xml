@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="quick_record_widget_surface">#F4F8F3</color>
+    <color name="quick_record_widget_border">#DEE8DF</color>
+    <color name="quick_record_widget_number">#173F35</color>
+    <color name="quick_record_widget_timer">#526C61</color>
+    <color name="quick_record_widget_press">#183A6752</color>
+</resources>

@@ -34,6 +34,7 @@ public class MainActivity extends BridgeActivity {
         splashScreen.setKeepOnScreenCondition(() -> !nativeOverlayReady.get());
         splashScreen.setOnExitAnimationListener(provider -> provider.remove());
         registerPlugin(PersonalExportPlugin.class);
+        registerPlugin(QuickRecordPlugin.class);
         // Capacitor also reads this from capacitor.config.json. Enforce it at
         // runtime as defense in depth so a generated-config regression cannot
         // expose personal health state through WebView DevTools on user builds.
@@ -74,7 +75,7 @@ public class MainActivity extends BridgeActivity {
          * SECURITY BOUNDARY: addJavascriptInterface exposes annotated methods to every frame in
          * this WebView. It is safe here only because this APK loads trusted bundled content at its
          * Capacitor local origin, declares no INTERNET permission, and allows no remote navigation.
-         * The bridge additionally accepts only eight fixed keys mapped to app-private filenames.
+         * The bridge additionally accepts only nine fixed keys mapped to app-private filenames.
          * If untrusted or remote content is ever allowed, this interface must be removed or isolated
          * behind an origin-authenticated messaging design before that content can load.
          */

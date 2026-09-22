@@ -3,6 +3,7 @@ import { validTimestamp } from './model'
 import { decodeLosslessBase64, encodeLosslessBase64, type LosslessBase64String } from './recoveryCodec'
 
 export const ANDROID_BOOTSTRAP_QUEUE_KEY = 'wuyan-tongxing/android-bootstrap-cigarettes/v1'
+export const ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY = 'wuyan-tongxing/android-system-shortcut-cigarettes/v1'
 export const ANDROID_BOOTSTRAP_QUARANTINE_KEY = 'wuyan-tongxing/android-bootstrap-cigarettes-quarantine/v1'
 export const ANDROID_BOOTSTRAP_CORRUPT_KEY = 'wuyan-tongxing/android-bootstrap-cigarettes-corrupt/v1'
 export const ANDROID_BOOTSTRAP_IMPORT_JOURNAL_KEY = 'wuyan-tongxing/android-bootstrap-import-journal/v1'
@@ -15,16 +16,19 @@ const triggers = new Set<Trigger>([
   'exercise', 'boredom', 'morning', 'coffee', 'habit',
 ])
 const MAX_PENDING_EVENTS = 20
+const MAX_SYSTEM_SHORTCUT_EVENTS = 512
 const MAX_QUARANTINED_EVENTS = 100
 // One byte-for-byte snapshot is enough to preserve evidence until the user
 // exports/rotates it, and keeps the H5 origin's two core slots within quota.
 const MAX_CORRUPT_SNAPSHOTS = 1
 const MAX_CORRUPT_RAW_CHARACTERS = 65_536
-const MAX_CORRUPT_ARCHIVE_RAW_CHARACTERS = (MAX_CORRUPT_RAW_CHARACTERS * 6 + 512) * MAX_CORRUPT_SNAPSHOTS
+const MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS = 256 * 1024
+const MAX_CORRUPT_ARCHIVE_RAW_CHARACTERS = (MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS * 6 + 512) * MAX_CORRUPT_SNAPSHOTS
 const MAX_IMPORT_JOURNAL_RAW_CHARACTERS = 4 * 1024 * 1024
 const SAFE_DOM_STORAGE_OPERATIONAL_BYTES = 9 * 1024 * 1024
 export const ANDROID_BOOTSTRAP_RAW_CHARACTER_LIMITS: Readonly<Record<string, number>> = {
   [ANDROID_BOOTSTRAP_QUEUE_KEY]: MAX_CORRUPT_RAW_CHARACTERS,
+  [ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY]: MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS,
   [ANDROID_BOOTSTRAP_QUARANTINE_KEY]: MAX_CORRUPT_RAW_CHARACTERS,
   [ANDROID_BOOTSTRAP_CORRUPT_KEY]: MAX_CORRUPT_ARCHIVE_RAW_CHARACTERS,
   [ANDROID_BOOTSTRAP_IMPORT_JOURNAL_KEY]: MAX_IMPORT_JOURNAL_RAW_CHARACTERS,
@@ -32,12 +36,14 @@ export const ANDROID_BOOTSTRAP_RAW_CHARACTER_LIMITS: Readonly<Record<string, num
 }
 const ANDROID_BOOTSTRAP_DATA_KEYS = [
   ANDROID_BOOTSTRAP_QUEUE_KEY,
+  ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
   ANDROID_BOOTSTRAP_QUARANTINE_KEY,
   ANDROID_BOOTSTRAP_CORRUPT_KEY,
 ] as const
 
 const MAX_RECOVERY_RAW_CHARACTERS_BY_KEY: Record<(typeof ANDROID_BOOTSTRAP_DATA_KEYS)[number], number> = {
   [ANDROID_BOOTSTRAP_QUEUE_KEY]: MAX_CORRUPT_RAW_CHARACTERS,
+  [ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY]: MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS,
   [ANDROID_BOOTSTRAP_QUARANTINE_KEY]: MAX_CORRUPT_RAW_CHARACTERS,
   [ANDROID_BOOTSTRAP_CORRUPT_KEY]: MAX_CORRUPT_ARCHIVE_RAW_CHARACTERS,
 }
@@ -46,8 +52,9 @@ export interface AndroidBootstrapCigarette {
   id: string
   smokedAt: string
   attemptId?: string
-  trigger: Trigger
-  cravingIntensity: CravingLevel
+  trigger?: Trigger
+  cravingIntensity?: CravingLevel
+  entryPoint?: 'APP_WIDGET' | 'QUICK_SETTINGS_TILE'
 }
 
 export interface AndroidBootstrapStorage {
@@ -56,6 +63,7 @@ export interface AndroidBootstrapStorage {
   removeItem(key: string): void
   readonly length?: number
   key?(index: number): string | null
+  acknowledgeSystemShortcutRecords?(ids: readonly string[]): void
 }
 
 export type AndroidBootstrapRecoverySnapshot = Partial<Record<(typeof ANDROID_BOOTSTRAP_DATA_KEYS)[number], string>>
@@ -266,28 +274,42 @@ export function hasAndroidBackupRestoreIntent(storage: AndroidBootstrapStorage):
 function validEvent(value: unknown): value is AndroidBootstrapCigarette {
   if (!value || typeof value !== 'object') return false
   const event = value as Partial<AndroidBootstrapCigarette>
-  return typeof event.id === 'string'
+  const identityValid = typeof event.id === 'string'
     && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(event.id)
     && validTimestamp(event.smokedAt)
     && typeof event.attemptId === 'string'
     && event.attemptId.length > 0
     && event.attemptId.length <= 128
-    && triggers.has(event.trigger as Trigger)
+  if (!identityValid) return false
+  const detailed = triggers.has(event.trigger as Trigger)
     && Number.isInteger(event.cravingIntensity)
     && Number(event.cravingIntensity) >= 1
     && Number(event.cravingIntensity) <= 5
+    && event.entryPoint === undefined
+  const systemShortcut = event.trigger === undefined
+    && event.cravingIntensity === undefined
+    && (event.entryPoint === 'APP_WIDGET' || event.entryPoint === 'QUICK_SETTINGS_TILE')
+  return detailed || systemShortcut
 }
 
-function normalizeEvent(value: unknown): AndroidBootstrapCigarette | undefined {
+function normalizeEvent(
+  value: unknown,
+  schema: 'bootstrap' | 'system' | 'quarantine',
+): AndroidBootstrapCigarette | undefined {
   if (validEvent(value)) {
+    const eventIsSystemShortcut = value.entryPoint !== undefined
+    if ((schema === 'bootstrap' && eventIsSystemShortcut)
+      || (schema === 'system' && !eventIsSystemShortcut)) return undefined
     return {
       id: value.id,
       smokedAt: value.smokedAt,
       attemptId: value.attemptId as string,
-      trigger: value.trigger,
-      cravingIntensity: value.cravingIntensity,
+      ...(value.trigger ? { trigger: value.trigger } : {}),
+      ...(value.cravingIntensity ? { cravingIntensity: value.cravingIntensity } : {}),
+      ...(value.entryPoint ? { entryPoint: value.entryPoint } : {}),
     }
   }
+  if (schema === 'system') return undefined
   if (!value || typeof value !== 'object' || Object.prototype.hasOwnProperty.call(value, 'attemptId')) return undefined
   const legacy = value as Partial<Omit<AndroidBootstrapCigarette, 'attemptId'>>
   if (typeof legacy.id !== 'string'
@@ -309,13 +331,14 @@ function inspectQueue(
   storage: AndroidBootstrapStorage,
   key: string,
   maximumEvents: number,
+  maximumRawCharacters = MAX_CORRUPT_RAW_CHARACTERS,
 ): { events: AndroidBootstrapCigarette[]; raw: string | null; corrupted: boolean } {
   const raw = storage.getItem(key)
   if (raw === null) return { events: [], raw, corrupted: false }
   // Reject before JSON.parse: a damaged multi-megabyte value must not allocate
   // an equally large object graph on the WebView main thread during startup.
   // The untouched raw string remains available for the explicit export path.
-  if (raw.length > MAX_CORRUPT_RAW_CHARACTERS) {
+  if (raw.length > maximumRawCharacters) {
     return { events: [], raw, corrupted: true }
   }
   let wrapper: { data?: unknown }
@@ -331,20 +354,27 @@ function inspectQueue(
   const ids = new Set<string>()
   const events: AndroidBootstrapCigarette[] = []
   let corrupted = false
+  const schema = key === ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY
+    ? 'system'
+    : key === ANDROID_BOOTSTRAP_QUEUE_KEY
+      ? 'bootstrap'
+      : 'quarantine'
   for (const item of wrapper.data) {
-    const normalized = normalizeEvent(item)
+    const normalized = normalizeEvent(item, schema)
     if (!normalized || ids.has(normalized.id)) {
       corrupted = true
       continue
     }
     const expectedKeys = normalized.attemptId === undefined
       ? ['cravingIntensity', 'id', 'smokedAt', 'trigger']
-      : ['attemptId', 'cravingIntensity', 'id', 'smokedAt', 'trigger']
+      : normalized.entryPoint
+        ? ['attemptId', 'entryPoint', 'id', 'smokedAt']
+        : ['attemptId', 'cravingIntensity', 'id', 'smokedAt', 'trigger']
     const actualKeys = Object.keys(item as Record<string, unknown>).sort()
     if (actualKeys.length !== expectedKeys.length
       || actualKeys.some((key, index) => key !== expectedKeys[index])) {
       // Preserve the byte-for-byte source in the corruption archive, but only
-      // carry the five bounded fields into the live queue. This prevents a
+      // carry only the bounded schema fields into the live queue. This prevents a
       // parseable event from becoming an unbounded storage smuggling channel.
       corrupted = true
     }
@@ -358,18 +388,20 @@ function readQueue(
   storage: AndroidBootstrapStorage,
   key: string,
   maximumEvents: number,
+  maximumRawCharacters = MAX_CORRUPT_RAW_CHARACTERS,
 ): AndroidBootstrapCigarette[] {
-  return inspectQueue(storage, key, maximumEvents).events
+  return inspectQueue(storage, key, maximumEvents, maximumRawCharacters).events
 }
 
 function isolateQueueCorruption(
   storage: AndroidBootstrapStorage,
   key: string,
   maximumEvents: number,
+  maximumRawCharacters = MAX_CORRUPT_RAW_CHARACTERS,
 ): boolean {
-  const inspected = inspectQueue(storage, key, maximumEvents)
+  const inspected = inspectQueue(storage, key, maximumEvents, maximumRawCharacters)
   if (!inspected.corrupted || inspected.raw === null) return false
-  if (inspected.raw.length > MAX_CORRUPT_RAW_CHARACTERS) {
+  if (inspected.raw.length > maximumRawCharacters) {
     throw new AndroidBootstrapRecoveryBlockedError(
       'source-oversized',
       '快速记录异常数据过大，已保留原值等待导出恢复',
@@ -394,9 +426,12 @@ function isolateQueueCorruption(
         if (typeof snapshot.capturedAt !== 'string'
           || !validTimestamp(snapshot.capturedAt)
           || (snapshot.sourceKey !== ANDROID_BOOTSTRAP_QUEUE_KEY
+            && snapshot.sourceKey !== ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY
             && snapshot.sourceKey !== ANDROID_BOOTSTRAP_QUARANTINE_KEY)
           || typeof snapshot.raw !== 'string'
-          || snapshot.raw.length > MAX_CORRUPT_RAW_CHARACTERS) throw new Error('invalid archive item')
+          || snapshot.raw.length > (ANDROID_BOOTSTRAP_RAW_CHARACTER_LIMITS[String(snapshot.sourceKey)] ?? 0)) {
+          throw new Error('invalid archive item')
+        }
         return snapshot as { capturedAt: string; sourceKey: string; raw: string }
       })
     } catch {
@@ -442,7 +477,7 @@ function isolateQueueCorruption(
 
   if (inspected.events.length === 0) storage.removeItem(key)
   else storage.setItem(key, JSON.stringify({ data: inspected.events }))
-  const repaired = inspectQueue(storage, key, maximumEvents)
+  const repaired = inspectQueue(storage, key, maximumEvents, maximumRawCharacters)
   if (repaired.corrupted || repaired.events.length !== inspected.events.length) {
     throw new Error('快速记录异常数据隔离后校验失败')
   }
@@ -453,12 +488,30 @@ export function readAndroidBootstrapQueue(storage: AndroidBootstrapStorage): And
   return readQueue(storage, ANDROID_BOOTSTRAP_QUEUE_KEY, MAX_PENDING_EVENTS)
 }
 
+export function readAndroidSystemShortcutQueue(storage: AndroidBootstrapStorage): AndroidBootstrapCigarette[] {
+  return readQueue(
+    storage,
+    ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
+    MAX_SYSTEM_SHORTCUT_EVENTS,
+    MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS,
+  )
+}
+
 export function readAndroidBootstrapQuarantine(storage: AndroidBootstrapStorage): AndroidBootstrapCigarette[] {
   return readQueue(storage, ANDROID_BOOTSTRAP_QUARANTINE_KEY, MAX_QUARANTINED_EVENTS)
 }
 
 export function isolateAndroidBootstrapQueueCorruption(storage: AndroidBootstrapStorage): boolean {
   return isolateQueueCorruption(storage, ANDROID_BOOTSTRAP_QUEUE_KEY, MAX_PENDING_EVENTS)
+}
+
+export function isolateAndroidSystemShortcutQueueCorruption(storage: AndroidBootstrapStorage): boolean {
+  return isolateQueueCorruption(
+    storage,
+    ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
+    MAX_SYSTEM_SHORTCUT_EVENTS,
+    MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS,
+  )
 }
 
 export function isolateAndroidBootstrapQuarantineCorruption(storage: AndroidBootstrapStorage): boolean {
@@ -570,9 +623,12 @@ function validateRecoverySnapshot(value: unknown): AndroidBootstrapRecoverySnaps
         if (typeof candidate.capturedAt !== 'string'
           || !validTimestamp(candidate.capturedAt)
           || (candidate.sourceKey !== ANDROID_BOOTSTRAP_QUEUE_KEY
+            && candidate.sourceKey !== ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY
             && candidate.sourceKey !== ANDROID_BOOTSTRAP_QUARANTINE_KEY)
           || typeof candidate.raw !== 'string'
-          || candidate.raw.length > MAX_CORRUPT_RAW_CHARACTERS) throw new Error('invalid')
+          || candidate.raw.length > (ANDROID_BOOTSTRAP_RAW_CHARACTER_LIMITS[String(candidate.sourceKey)] ?? 0)) {
+          throw new Error('invalid')
+        }
       }
     } catch {
       throw new Error('快速记录异常恢复区格式无效')
@@ -777,6 +833,7 @@ export function replaceAndroidBootstrapData(
 export function rotateAndroidBootstrapCorruptArchiveAfterExport(storage: AndroidBootstrapStorage): void {
   const previousArchive = storage.getItem(ANDROID_BOOTSTRAP_CORRUPT_KEY)
   const previousQueue = storage.getItem(ANDROID_BOOTSTRAP_QUEUE_KEY)
+  const previousSystemShortcutQueue = storage.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
   const previousQuarantine = storage.getItem(ANDROID_BOOTSTRAP_QUARANTINE_KEY)
   if (!hasAndroidBootstrapRecoveryToRotate(storage)) return
   if (previousArchive !== null) {
@@ -790,15 +847,16 @@ export function rotateAndroidBootstrapCorruptArchiveAfterExport(storage: Android
     // Rotation is the user's explicit permission to normalize every damaged
     // source directly, including a small source that could not be archived
     // because storage quota was exhausted.
-    for (const [key, maximumEvents] of [
-      [ANDROID_BOOTSTRAP_QUEUE_KEY, MAX_PENDING_EVENTS],
-      [ANDROID_BOOTSTRAP_QUARANTINE_KEY, MAX_QUARANTINED_EVENTS],
+    for (const [key, maximumEvents, maximumRawCharacters] of [
+      [ANDROID_BOOTSTRAP_QUEUE_KEY, MAX_PENDING_EVENTS, MAX_CORRUPT_RAW_CHARACTERS],
+      [ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, MAX_SYSTEM_SHORTCUT_EVENTS, MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS],
+      [ANDROID_BOOTSTRAP_QUARANTINE_KEY, MAX_QUARANTINED_EVENTS, MAX_CORRUPT_RAW_CHARACTERS],
     ] as const) {
-      const inspected = inspectQueue(storage, key, maximumEvents)
+      const inspected = inspectQueue(storage, key, maximumEvents, maximumRawCharacters)
       if (inspected.corrupted && inspected.raw !== null) {
         if (inspected.events.length === 0) storage.removeItem(key)
         else storage.setItem(key, JSON.stringify({ data: inspected.events }))
-        const repaired = inspectQueue(storage, key, maximumEvents)
+        const repaired = inspectQueue(storage, key, maximumEvents, maximumRawCharacters)
         if (repaired.corrupted || repaired.events.length !== inspected.events.length) {
           throw new Error('超限快速记录恢复区无法释放')
         }
@@ -809,6 +867,7 @@ export function rotateAndroidBootstrapCorruptArchiveAfterExport(storage: Android
     else storage.setItem(ANDROID_BOOTSTRAP_CORRUPT_KEY, previousArchive)
     for (const [key, previous] of [
       [ANDROID_BOOTSTRAP_QUEUE_KEY, previousQueue],
+      [ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, previousSystemShortcutQueue],
       [ANDROID_BOOTSTRAP_QUARANTINE_KEY, previousQuarantine],
     ] as const) {
       if (previous === null) storage.removeItem(key)
@@ -816,6 +875,7 @@ export function rotateAndroidBootstrapCorruptArchiveAfterExport(storage: Android
     }
     if (storage.getItem(ANDROID_BOOTSTRAP_CORRUPT_KEY) !== previousArchive
       || storage.getItem(ANDROID_BOOTSTRAP_QUEUE_KEY) !== previousQueue
+      || storage.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY) !== previousSystemShortcutQueue
       || storage.getItem(ANDROID_BOOTSTRAP_QUARANTINE_KEY) !== previousQuarantine) {
       throw new Error('快速记录异常恢复区回滚失败')
     }
@@ -826,10 +886,11 @@ export function rotateAndroidBootstrapCorruptArchiveAfterExport(storage: Android
 export function hasAndroidBootstrapRecoveryToRotate(storage: AndroidBootstrapStorage): boolean {
   if (storage.getItem(ANDROID_BOOTSTRAP_CORRUPT_KEY) !== null) return true
   return ([
-    [ANDROID_BOOTSTRAP_QUEUE_KEY, MAX_PENDING_EVENTS],
-    [ANDROID_BOOTSTRAP_QUARANTINE_KEY, MAX_QUARANTINED_EVENTS],
-  ] as const).some(([key, maximumEvents]) => {
-    const inspected = inspectQueue(storage, key, maximumEvents)
+    [ANDROID_BOOTSTRAP_QUEUE_KEY, MAX_PENDING_EVENTS, MAX_CORRUPT_RAW_CHARACTERS],
+    [ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, MAX_SYSTEM_SHORTCUT_EVENTS, MAX_SYSTEM_SHORTCUT_RAW_CHARACTERS],
+    [ANDROID_BOOTSTRAP_QUARANTINE_KEY, MAX_QUARANTINED_EVENTS, MAX_CORRUPT_RAW_CHARACTERS],
+  ] as const).some(([key, maximumEvents, maximumRawCharacters]) => {
+    const inspected = inspectQueue(storage, key, maximumEvents, maximumRawCharacters)
     return inspected.corrupted && inspected.raw !== null
   })
 }
@@ -846,6 +907,27 @@ export function acknowledgeAndroidBootstrapQueue(
     return
   }
   storage.setItem(ANDROID_BOOTSTRAP_QUEUE_KEY, JSON.stringify({ data: remaining }))
+}
+
+export function acknowledgeAndroidSystemShortcutQueue(
+  storage: AndroidBootstrapStorage,
+  acknowledgedIds: ReadonlySet<string>,
+): void {
+  isolateAndroidSystemShortcutQueueCorruption(storage)
+  const ids = [...acknowledgedIds]
+  if (storage.acknowledgeSystemShortcutRecords) {
+    storage.acknowledgeSystemShortcutRecords(ids)
+    const remainingIds = new Set(readAndroidSystemShortcutQueue(storage).map((event) => event.id))
+    if (ids.some((id) => remainingIds.has(id))) throw new Error('系统快捷记录确认失败')
+    return
+  }
+  const current = readAndroidSystemShortcutQueue(storage)
+  const remaining = current.filter((event) => !acknowledgedIds.has(event.id))
+  if (remaining.length === 0) {
+    storage.removeItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)
+    return
+  }
+  storage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, JSON.stringify({ data: remaining }))
 }
 
 export function acknowledgeAndroidBootstrapQuarantine(
@@ -887,6 +969,33 @@ export function moveAndroidBootstrapEventsToQuarantine(
     throw new Error('快速记录隔离保存失败')
   }
   acknowledgeAndroidBootstrapQueue(storage, new Set(events.map((event) => event.id)))
+}
+
+export function moveAndroidSystemShortcutEventsToQuarantine(
+  storage: AndroidBootstrapStorage,
+  events: readonly AndroidBootstrapCigarette[],
+): void {
+  if (events.length === 0) return
+  isolateQueueCorruption(storage, ANDROID_BOOTSTRAP_QUARANTINE_KEY, MAX_QUARANTINED_EVENTS)
+  const existing = readAndroidBootstrapQuarantine(storage)
+  const byId = new Map(existing.map((event) => [event.id, event]))
+  for (const event of events) {
+    const prior = byId.get(event.id)
+    if (prior && JSON.stringify(prior) !== JSON.stringify(event)) {
+      throw new Error('系统快捷记录标识冲突，已保留原始记录')
+    }
+    if (!prior) byId.set(event.id, event)
+  }
+  const next = [...byId.values()]
+  if (next.length > MAX_QUARANTINED_EVENTS) {
+    throw new Error('待归类的快速记录过多，请先处理现有记录')
+  }
+  storage.setItem(ANDROID_BOOTSTRAP_QUARANTINE_KEY, JSON.stringify({ data: next }))
+  const writtenIds = new Set(readAndroidBootstrapQuarantine(storage).map((event) => event.id))
+  if (events.some((event) => !writtenIds.has(event.id))) {
+    throw new Error('系统快捷记录隔离保存失败')
+  }
+  acknowledgeAndroidSystemShortcutQueue(storage, new Set(events.map((event) => event.id)))
 }
 
 export function clearAndroidBootstrapData(storage: AndroidBootstrapStorage): void {

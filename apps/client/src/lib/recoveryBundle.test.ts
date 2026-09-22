@@ -15,6 +15,7 @@ import {
 
 function validState() {
   const initial = createInitialState()
+  const planCreatedAt = new Date('2026-08-28T00:00:00.000+08:00')
   const baseline = {
     cigarettesPerDay: 10,
     firstCigaretteMinutes: 30,
@@ -27,7 +28,7 @@ function validState() {
     ...initial,
     onboarded: true,
     baseline,
-    plan: createClientPlan({ baseline, path: 'abrupt' as const, quitDate: '2026-09-01' }),
+    plan: createClientPlan({ baseline, path: 'abrupt' as const, quitDate: '2026-09-01' }, planCreatedAt),
     settings: { ...initial.settings, sensitiveHealthData: true },
   }
 }

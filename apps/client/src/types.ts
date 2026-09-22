@@ -92,7 +92,7 @@ export interface ClientCigaretteLog {
   updatedAt?: string
   count: number
   trigger?: Trigger
-  /** Optional only for backwards compatibility; every new quick log includes it. */
+  /** Omitted by one-tap system shortcuts and some legacy records. */
   cravingIntensity?: CravingLevel
   attemptId?: string
   source?: 'QUICK_LOG' | 'DAILY_CHECKIN' | 'LAPSE_FLOW'

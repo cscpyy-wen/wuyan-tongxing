@@ -167,7 +167,7 @@ test.describe('核心戒烟旅程', () => {
     await page.evaluate((key) => {
       const raw = window.localStorage.getItem(key)
       if (!raw) throw new Error('缺少本地状态')
-      const wrapped = JSON.parse(raw) as { data: { plan?: { quitDate: string } } }
+      const wrapped = JSON.parse(raw) as { data: { plan?: { quitDate: string; createdAt: string } } }
       if (!wrapped.data.plan) throw new Error('缺少戒烟计划')
       const duePlanDate = new Date()
       duePlanDate.setHours(12, 0, 0, 0)
@@ -177,6 +177,7 @@ test.describe('核心戒烟旅程', () => {
         String(duePlanDate.getMonth() + 1).padStart(2, '0'),
         String(duePlanDate.getDate()).padStart(2, '0'),
       ].join('-')
+      wrapped.data.plan.createdAt = new Date(`${wrapped.data.plan.quitDate}T12:00:00+08:00`).toISOString()
       window.localStorage.setItem(key, JSON.stringify(wrapped))
     }, 'wuyan-tongxing/client-state/v1')
     await page.reload()

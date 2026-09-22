@@ -1,6 +1,6 @@
-import Taro from '@tarojs/taro'
 import { useEffect } from 'react'
 import { dismissAndroidBootstrap } from '../lib/androidBootstrap'
+import { openOnboardingAsRoot } from '../lib/navigation'
 import { useAppState } from '../state/AppState'
 
 export function useRequireOnboarding() {
@@ -12,8 +12,7 @@ export function useRequireOnboarding() {
     }
     if (!ready) return
     if (!state.onboarded) {
-      void Taro.reLaunch({ url: '/pages/onboarding/index' })
-        .finally(() => dismissAndroidBootstrap())
+      void openOnboardingAsRoot().finally(() => dismissAndroidBootstrap())
       return
     }
     dismissAndroidBootstrap()

@@ -3,8 +3,10 @@ import Taro, { useDidHide, useDidShow } from '@tarojs/taro'
 import { useEffect, useRef, useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { AccessibleRadio } from '../../components/AccessibleRadio'
+import { HarmonyScrollablePage } from '../../components/HarmonyScrollablePage'
 import { dismissAndroidBootstrap } from '../../lib/androidBootstrap'
 import { leaveSosPage } from '../../lib/navigation'
+import { EMERGENCY_SUPPORT_COPY } from '../../lib/releaseCopy'
 import { registerNativeBackHandler } from '../../lib/runtime'
 import { useAppState } from '../../state/AppState'
 import type { CravingLevel } from '../../types'
@@ -128,7 +130,7 @@ export default function SosPage() {
   }
 
   return (
-    <View className='screen screen--detail sos-page'>
+    <HarmonyScrollablePage className='screen screen--detail sos-page' viewport='full'>
       <View className='row row--between sos-head'>
         <Text className='page-title'>这一阵会过去</Text>
         <Button
@@ -227,9 +229,9 @@ export default function SosPage() {
       <View className='sos-footer stack'>
         <View className='card card--warning'>
           <Text className='field-label'>需要紧急人工帮助？</Text>
-          <Text className='fine-print'>本产品不会监测危机。突发胸痛或严重呼吸困难请立即拨打 120；存在自伤危险时请联系 120、110、心理援助热线 12356 或身边可信赖的人。</Text>
+          <Text className='fine-print'>{EMERGENCY_SUPPORT_COPY}</Text>
         </View>
       </View>
-    </View>
+    </HarmonyScrollablePage>
   )
 }

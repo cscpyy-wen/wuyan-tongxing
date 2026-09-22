@@ -3,6 +3,9 @@ import Taro from '@tarojs/taro'
 import { useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { PageHeader } from '../../components/PageHeader'
+import { WithheldHealthContent } from '../../components/WithheldHealthContent'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
+import { isHarmonyApp } from '../../lib/platformCapabilities'
 import './index.scss'
 
 const PROVINCES = ['北京', '天津', '河北', '山西', '内蒙古', '辽宁', '吉林', '黑龙江', '上海', '江苏', '浙江', '安徽', '福建', '江西', '山东', '河南', '湖北', '湖南', '广东', '广西', '海南', '重庆', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆']
@@ -11,12 +14,17 @@ const CHINA_QUIT_PLATFORM = 'https://www.chinacdc.cn/jkyj/yckz/gzdt/202203/t2022
 export default function ReferralPage() {
   const [province, setProvince] = useState('北京')
   const [selectorOpen, setSelectorOpen] = useState(false)
+  const harmony = isHarmonyApp()
+
+  if (!HEALTH_CONTENT_ENABLED) return <WithheldHealthContent />
 
   const copyPlatform = async () => {
     await Taro.setClipboardData({ data: CHINA_QUIT_PLATFORM })
     Taro.showModal({
       title: '官方入口已复制',
-      content: '当前版本未配置外部业务域名，暂不能在小程序内直接打开网页。请在浏览器粘贴访问中国疾控中心发布的“中国戒烟平台”入口。',
+      content: harmony
+        ? 'HarmonyOS 首版不在应用内直接打开外部网页。请在浏览器粘贴访问中国疾控中心发布的“中国戒烟平台”入口。'
+        : '当前版本未配置外部业务域名，暂不能在小程序内直接打开网页。请在浏览器粘贴访问中国疾控中心发布的“中国戒烟平台”入口。',
       showCancel: false,
       confirmText: '知道了',
     })

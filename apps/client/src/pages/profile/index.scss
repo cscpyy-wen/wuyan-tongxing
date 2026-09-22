@@ -1,3 +1,7 @@
+.profile-page {
+  height: 100vh;
+}
+
 .profile-plan__title,
 .setting-row__title {
   display: block;
@@ -32,6 +36,21 @@
 }
 
 .profile-link::after { border: 0; }
+
+.profile-widget-help {
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--forest-700);
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+}
+
+.profile-widget-help::after { border: 0; }
 
 .settings-list {
   padding-top: 3px;
@@ -107,4 +126,55 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+/* Harmony native Buttons otherwise retain a roughly 92vp platform height,
+ * and the C-API style bridge does not implement CSS Grid. */
+.profile-page.harmony-page-scroll .profile-link {
+  height: 50px;
+  min-height: 50px;
+  max-height: 50px;
+}
+
+.profile-page.harmony-page-scroll .button {
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}
+
+.profile-page.harmony-page-scroll .new-attempt .choice-grid,
+.profile-page.harmony-page-scroll .new-attempt-baseline,
+.profile-page.harmony-page-scroll .profile-data-actions {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.profile-page.harmony-page-scroll .new-attempt-baseline,
+.profile-page.harmony-page-scroll .new-attempt-baseline__field {
+  height: 78px;
+  min-height: 78px;
+  max-height: 78px;
+}
+
+.profile-page.harmony-page-scroll .new-attempt .choice {
+  flex: 1 1 47%;
+  width: 47%;
+  min-width: 47%;
+  max-width: 48%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}
+
+.profile-page.harmony-page-scroll .new-attempt-baseline__field {
+  flex: 1 1 47%;
+  width: 47%;
+  min-width: 47%;
+  max-width: 48%;
+}
+
+.profile-page.harmony-page-scroll .profile-danger-action {
+  width: 100%;
 }

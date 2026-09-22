@@ -17,6 +17,9 @@ import {
   createClientPlan,
   createId,
   createInitialState,
+  isDailyCheckInConfirmationCurrent,
+  type DailyCheckInConfirmation,
+  type CigaretteLogUpdate,
   STORAGE_KEY,
   parseStoredStateStrict,
   resolveCravingEvent,
@@ -35,6 +38,7 @@ import {
   MAX_CLIENT_STATE_BYTES,
   MAX_TARO_STORAGE_WRAPPER_CHARACTERS,
 } from '../lib/localRepository'
+import { openOnboardingAsRoot } from '../lib/navigation'
 import {
   encodeLosslessBase64,
   MAX_SINGLE_NATIVE_RECOVERY_BYTES,
@@ -43,6 +47,7 @@ import {
 import {
   acknowledgeAndroidBootstrapQuarantine,
   acknowledgeAndroidBootstrapQueue,
+  acknowledgeAndroidSystemShortcutQueue,
   applyAndroidBootstrapImportJournal,
   ANDROID_BOOTSTRAP_QUARANTINE_KEY,
   ANDROID_BOOTSTRAP_QUEUE_KEY,
@@ -54,13 +59,16 @@ import {
   clearAndroidBootstrapData,
   isolateAndroidBootstrapQuarantineCorruption,
   isolateAndroidBootstrapQueueCorruption,
+  isolateAndroidSystemShortcutQueueCorruption,
   hasAndroidBootstrapRecoveryToRotate,
   hasAndroidBackupRestoreIntent,
   markAndroidBackupRestoreResultCommitted,
   moveAndroidBootstrapEventsToQuarantine,
+  moveAndroidSystemShortcutEventsToQuarantine,
   readAndroidBackupRestoreIntentState,
   readAndroidBootstrapQuarantine,
   readAndroidBootstrapQueue,
+  readAndroidSystemShortcutQueue,
   readAndroidBootstrapImportJournal,
   readAndroidBootstrapImportMarker,
   rotateAndroidBootstrapCorruptArchiveAfterExport,
@@ -84,6 +92,7 @@ import {
   nativeExportCleanupIssue,
   nativeExportCleanupFilename,
   isNativeAndroidApp,
+  isNativeMobileApp,
   purgeNativeAppPrivatePendingExports,
   saveNativeRecoveryJsonFile,
 } from '../lib/runtime'
@@ -124,13 +133,13 @@ interface AppStateActions {
     baselineUpdate?: Pick<ClientBaseline, 'cigarettesPerDay' | 'pricePerPack'>,
   ): boolean
   adjustReductionLimit(ratio: 0.75 | 0.5 | 0.25, delta: -1 | 1): boolean
-  recordCheckIn(cigarettesSmoked: number, cravingPeak: CravingLevel): boolean
+  recordCheckIn(confirmation: DailyCheckInConfirmation): boolean
   removeTodayCheckIn(): boolean
   recordCraving(level: CravingLevel, trigger?: Trigger, technique?: string): string | undefined
   updateCravingLevel(id: string, level: CravingLevel): boolean
   resolveCraving(id: string, technique: string, level: CravingLevel): boolean
   recordCigarette(input: { smokedAt: string; trigger: Trigger; cravingIntensity: CravingLevel }): string | undefined
-  editCigarette(id: string, input: { smokedAt: string; trigger: Trigger; cravingIntensity: CravingLevel }): boolean
+  editCigarette(id: string, input: CigaretteLogUpdate): boolean
   deleteCigaretteLog(id: string): boolean
   recordLapse(
     cigarettes: number,
@@ -211,7 +220,10 @@ function readLegacyTaroStorageSafely(key: string): unknown {
 
 function readCoreStorageSafely(key: string): unknown {
   const durable = getNativeDurableStore()
-  if (durable?.hasValue(key)) return parseNativeDurableValue(durable.readValue(key))
+  if (durable) {
+    if (durable.hasValue(key)) return parseNativeDurableValue(durable.readValue(key))
+    if (durable.authoritativeWhenMissing) return undefined
+  }
   return readLegacyTaroStorageSafely(key)
 }
 
@@ -228,7 +240,9 @@ const localRepository = createLocalStateRepository({
       // failed if that verification call alone were interrupted.
       // Durable state is authoritative after its atomic write completes. The
       // legacy WebView copy is removed only afterwards for one-way migration.
-      try { Taro.removeStorageSync(key) } catch { /* retried on next startup */ }
+      if (!durable.authoritativeWhenMissing) {
+        try { Taro.removeStorageSync(key) } catch { /* retried on next startup */ }
+      }
       return
     }
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -242,14 +256,24 @@ const localRepository = createLocalStateRepository({
     if (durable) {
       durable.removeValue(key)
       if (durable.hasValue(key)) throw new Error('本机持久数据删除后仍存在')
+      if (durable.authoritativeWhenMissing) return
     }
     Taro.removeStorageSync(key)
   },
-  exists: (key) => Boolean(getNativeDurableStore()?.hasValue(key))
-    || Taro.getStorageInfoSync().keys.includes(key),
+  exists: (key) => {
+    const durable = getNativeDurableStore()
+    if (durable) {
+      if (durable.hasValue(key)) return true
+      if (durable.authoritativeWhenMissing) return false
+    }
+    return Taro.getStorageInfoSync().keys.includes(key)
+  },
   readRaw: (key) => {
     const durable = getNativeDurableStore()
-    if (durable?.hasValue(key)) return durable.readRawValue(key)
+    if (durable) {
+      if (durable.hasValue(key)) return durable.readRawValue(key)
+      if (durable.authoritativeWhenMissing) return undefined
+    }
     if (typeof window !== 'undefined' && window.localStorage) {
       return window.localStorage.getItem(key)
     }
@@ -604,8 +628,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
         createdAt: event.smokedAt,
         loggedAt,
         count: 1,
-        trigger: event.trigger,
-        cravingIntensity: event.cravingIntensity,
+        ...(event.trigger ? { trigger: event.trigger } : {}),
+        ...(event.cravingIntensity ? { cravingIntensity: event.cravingIntensity } : {}),
         attemptId: current.plan!.id,
         source: 'QUICK_LOG',
         }), current)
@@ -662,14 +686,43 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     const storage = getAndroidHealthStorage()
     if (!storage) return
     try {
-      if (isolateAndroidBootstrapQueueCorruption(storage)) {
-        Taro.showToast({ title: '异常快速记录已保留在数据副本中', icon: 'none' })
-      }
+      const bootstrapIsolated = isolateAndroidBootstrapQueueCorruption(storage)
+      const systemShortcutIsolated = isolateAndroidSystemShortcutQueueCorruption(storage)
+      const isolated = bootstrapIsolated || systemShortcutIsolated
+      if (isolated) Taro.showToast({ title: '异常快速记录已保留在数据副本中', icon: 'none' })
     } catch (error) {
       showBootstrapIsolationFailure(error)
       return
     }
-    const pending = readAndroidBootstrapQueue(storage)
+    const bootstrapPending = readAndroidBootstrapQueue(storage)
+    let systemShortcutPending = readAndroidSystemShortcutQueue(storage)
+    const bootstrapIds = new Set(bootstrapPending.map((event) => event.id))
+    const crossQueueConflicts = systemShortcutPending.filter((event) => bootstrapIds.has(event.id))
+    if (crossQueueConflicts.length > 0) {
+      try {
+        moveAndroidSystemShortcutEventsToQuarantine(storage, crossQueueConflicts)
+        showToastBestEffort(`${crossQueueConflicts.length} 条冲突记录已保留`)
+        const conflictingIds = new Set(crossQueueConflicts.map((event) => event.id))
+        systemShortcutPending = systemShortcutPending.filter((event) => !conflictingIds.has(event.id))
+      } catch {
+        Taro.showToast({ title: '冲突记录尚未隔离，将自动重试', icon: 'none' })
+        return
+      }
+    }
+    const systemShortcutIds = new Set(systemShortcutPending.map((event) => event.id))
+    const pending = [...bootstrapPending, ...systemShortcutPending]
+    const acknowledgeQueues = (ids: ReadonlySet<string>) => {
+      const bootstrapAcknowledged = new Set([...ids].filter((id) => !systemShortcutIds.has(id)))
+      const systemAcknowledged = new Set([...ids].filter((id) => systemShortcutIds.has(id)))
+      if (bootstrapAcknowledged.size > 0) acknowledgeAndroidBootstrapQueue(storage, bootstrapAcknowledged)
+      if (systemAcknowledged.size > 0) acknowledgeAndroidSystemShortcutQueue(storage, systemAcknowledged)
+    }
+    const quarantineEvents = (events: readonly AndroidBootstrapCigarette[]) => {
+      const bootstrapEvents = events.filter((event) => !systemShortcutIds.has(event.id))
+      const systemEvents = events.filter((event) => systemShortcutIds.has(event.id))
+      if (bootstrapEvents.length > 0) moveAndroidBootstrapEventsToQuarantine(storage, bootstrapEvents)
+      if (systemEvents.length > 0) moveAndroidSystemShortcutEventsToQuarantine(storage, systemEvents)
+    }
     if (pending.length === 0) {
       void resolveAndroidBootstrapQuarantine()
       return
@@ -679,7 +732,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     const deletedPending = pending.filter((event) => deletedIds.has(event.id))
     if (deletedPending.length > 0) {
       try {
-        acknowledgeAndroidBootstrapQueue(storage, new Set(deletedPending.map((event) => event.id)))
+        acknowledgeQueues(new Set(deletedPending.map((event) => event.id)))
       } catch {
         Taro.showToast({ title: '已删除记录仍待清理，将自动重试', icon: 'none' })
         return
@@ -692,7 +745,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     }
     if (!current.onboarded || !current.plan || !current.settings.sensitiveHealthData) {
       try {
-        moveAndroidBootstrapEventsToQuarantine(storage, livePending)
+        quarantineEvents(livePending)
       } catch {
         Taro.showToast({ title: '快速记录尚未转存，将自动重试', icon: 'none' })
       }
@@ -715,14 +768,14 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     const acknowledgedIds = new Set(applicableWithoutConflicts.map((event) => event.id))
     if (unmatched.length > 0) {
       try {
-        moveAndroidBootstrapEventsToQuarantine(storage, unmatched)
+        quarantineEvents(unmatched)
       } catch {
         Taro.showToast({ title: '待归类记录尚未转存，将自动重试', icon: 'none' })
       }
     }
     if (conflicting.length > 0) {
       try {
-        moveAndroidBootstrapEventsToQuarantine(storage, conflicting)
+        quarantineEvents(conflicting)
         showToastBestEffort(`${conflicting.length} 条冲突记录已保留`)
       } catch {
         Taro.showToast({ title: '冲突记录尚未隔离，将自动重试', icon: 'none' })
@@ -742,8 +795,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       createdAt: event.smokedAt,
       loggedAt,
       count: 1,
-      trigger: event.trigger,
-      cravingIntensity: event.cravingIntensity,
+      ...(event.trigger ? { trigger: event.trigger } : {}),
+      ...(event.cravingIntensity ? { cravingIntensity: event.cravingIntensity } : {}),
       attemptId: event.attemptId,
       source: 'QUICK_LOG',
       }), current)
@@ -758,7 +811,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       }
       // A repeated queue after a successful state write is safe: event ids
       // deduplicate in applyCigaretteLog, then this acknowledgement removes it.
-      acknowledgeAndroidBootstrapQueue(storage, acknowledgedIds)
+      acknowledgeQueues(acknowledgedIds)
       void resolveAndroidBootstrapQuarantine()
     } catch {
       Taro.showToast({
@@ -827,18 +880,20 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       : previous, '减量上限保存失败')
   }, [commitState])
 
-  const recordCheckIn = useCallback((cigarettesSmoked: number, cravingPeak: CravingLevel) => {
+  const recordCheckIn = useCallback((confirmation: DailyCheckInConfirmation) => {
     const now = new Date()
-    const currentPlan = stateRef.current.plan
-    if (!currentPlan) return false
+    if (!isDailyCheckInConfirmationCurrent(stateRef.current, confirmation, now)) {
+      Taro.showToast({ title: '日期或记录已变化，请重新确认', icon: 'none' })
+      return false
+    }
     const next: ClientCheckIn = {
       id: createId('checkin'),
-      date: toLocalDate(now),
-      cigarettesSmoked,
-      cravingPeak,
-      smokeFree: cigarettesSmoked === 0,
+      date: confirmation.date,
+      cigarettesSmoked: confirmation.cigarettesSmoked,
+      cravingPeak: confirmation.cravingPeak,
+      smokeFree: confirmation.cigarettesSmoked === 0,
       createdAt: now.toISOString(),
-      attemptId: currentPlan.id,
+      attemptId: confirmation.attemptId,
     }
     return commitState((previous) => applyDailyCheckIn(previous, next), '今日记录确认失败')
   }, [commitState])
@@ -913,11 +968,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     return commitState((previous) => removeCigaretteLog(previous, id), '删除失败，原记录仍保留')
   }, [commitState])
 
-  const editCigarette = useCallback((id: string, input: {
-    smokedAt: string
-    trigger: Trigger
-    cravingIntensity: CravingLevel
-  }) => {
+  const editCigarette = useCallback((id: string, input: CigaretteLogUpdate) => {
     if (!Number.isFinite(new Date(input.smokedAt).getTime())) return false
     return commitState(
       (previous) => updateCigaretteLog(previous, id, input),
@@ -1028,7 +1079,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       // These cleanup steps are deliberately idempotent. If any one fails, the
       // local state and failure UI are not advanced; the same action can safely
       // retry from the beginning without claiming that deletion succeeded.
-      if (isNativeAndroidApp()) {
+      if (isNativeMobileApp()) {
         // A stale notification contains no health payload and must not retain
         // the actual local database when Android temporarily refuses the
         // cancellation request. It will be reconciled again after restart.
@@ -1042,10 +1093,12 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       // storage. It can contain the full export and therefore belongs to the
       // app-local deletion boundary even though the OS clipboard itself is
       // outside the application's reliable control.
-      Taro.removeStorageSync('taro_clipboard')
-      const clipboardCopy = Taro.getStorageSync('taro_clipboard')
-      if (clipboardCopy !== undefined && clipboardCopy !== null && clipboardCopy !== '') {
-        throw new Error('剪贴板兼容副本删除失败')
+      if (!getNativeDurableStore()?.authoritativeWhenMissing) {
+        Taro.removeStorageSync('taro_clipboard')
+        const clipboardCopy = Taro.getStorageSync('taro_clipboard')
+        if (clipboardCopy !== undefined && clipboardCopy !== null && clipboardCopy !== '') {
+          throw new Error('剪贴板兼容副本删除失败')
+        }
       }
       const androidStorage = getAndroidHealthStorage()
       if (androidStorage) clearAndroidBootstrapData(androidStorage)
@@ -1079,7 +1132,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     try {
       if (localRepository.hasPendingDeletion()) {
         void performCompleteDataDeletion('正在继续上次未完成的数据删除').then((completed) => {
-          if (completed) void Taro.reLaunch({ url: '/pages/onboarding/index' })
+          if (completed) void openOnboardingAsRoot()
         })
         return
       }
@@ -1355,7 +1408,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
         pendingBootstrapImport,
         pendingImportAvailable,
       })
-      if (isNativeAndroidApp()) {
+      if (isNativeMobileApp()) {
         const announceAndAcknowledge = async (title: string): Promise<boolean> => {
           try {
             await Taro.showToast({ title, icon: 'success' })
@@ -1436,7 +1489,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     try {
       if (localRepository.hasPendingDeletion()) {
         void performCompleteDataDeletion('正在继续上次未完成的数据删除').then((completed) => {
-          if (completed) void Taro.reLaunch({ url: '/pages/onboarding/index' })
+          if (completed) void openOnboardingAsRoot()
         })
         return
       }

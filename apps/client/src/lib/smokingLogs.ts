@@ -78,7 +78,14 @@ export function summarizeSmokingLogs(
     : []
   const intensityValues = dayLogs.flatMap((item) => item.cravingIntensity ? [item.cravingIntensity] : [])
   const reasonMap = new Map<Trigger | undefined, number>()
-  dayLogs.forEach((item) => reasonMap.set(item.trigger, (reasonMap.get(item.trigger) ?? 0) + item.count))
+  dayLogs.forEach((item) => {
+    const isSystemShortcut = item.count === 1
+      && item.source === 'QUICK_LOG'
+      && item.trigger === undefined
+      && item.cravingIntensity === undefined
+    if (isSystemShortcut) return
+    reasonMap.set(item.trigger, (reasonMap.get(item.trigger) ?? 0) + item.count)
+  })
   const reasons = [...reasonMap.entries()]
     .map(([trigger, count]) => ({
       ...(trigger ? { trigger } : {}),

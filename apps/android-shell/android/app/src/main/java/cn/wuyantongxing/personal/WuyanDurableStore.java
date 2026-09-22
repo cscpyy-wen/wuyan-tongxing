@@ -24,15 +24,26 @@ public final class WuyanDurableStore {
     private static final Object FILE_LOCK = new Object();
 
     private final File directory;
+    private final Context updateContext;
 
     public WuyanDurableStore(Context context) {
-        this(new File(context.getNoBackupFilesDir(), STORE_DIRECTORY));
+        this(new File(context.getNoBackupFilesDir(), STORE_DIRECTORY), context.getApplicationContext());
     }
 
     WuyanDurableStore(File directory) {
+        this(directory, null);
+    }
+
+    private WuyanDurableStore(File directory, Context updateContext) {
+        this.updateContext = updateContext;
         synchronized (FILE_LOCK) {
             this.directory = prepareDirectory(directory);
         }
+    }
+
+    /** Shared only with native quick-record transactions in this package. */
+    static Object processFileLock() {
+        return FILE_LOCK;
     }
 
     @JavascriptInterface
@@ -111,6 +122,7 @@ public final class WuyanDurableStore {
                 );
             }
         }
+        notifyWidgetChanged();
     }
 
     @JavascriptInterface
@@ -136,6 +148,25 @@ public final class WuyanDurableStore {
                 );
             }
         }
+        notifyWidgetChanged();
+    }
+
+    private void notifyWidgetChanged() {
+        if (updateContext == null) return;
+        try {
+            QuickRecordWidgetUpdater.schedule(updateContext);
+        } catch (RuntimeException ignored) {
+            // Widget refresh is best effort; it cannot change the durable commit outcome.
+        }
+    }
+
+    /**
+     * Removes only the system-shortcut UUIDs committed by React. The whole
+     * read/modify/write is atomic with widget/tile appends under FILE_LOCK.
+     */
+    @JavascriptInterface
+    public void acknowledgeSystemShortcutRecords(String idsJson) {
+        ExternalQuickRecordStore.acknowledge(this, idsJson);
     }
 
     private String readRawValueLocked(String key) {

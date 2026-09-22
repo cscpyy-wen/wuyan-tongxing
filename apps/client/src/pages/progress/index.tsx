@@ -1,9 +1,11 @@
 import { Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
+import { HarmonyScrollablePage } from '../../components/HarmonyScrollablePage'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
 import { useMinuteClock } from '../../hooks/useMinuteClock'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
 import { addDays, addMonths, computeClientProgress, daysBetween, toLocalDate } from '../../lib/model'
 import { useRequireOnboarding } from '../../hooks/useRequireOnboarding'
 import './index.scss'
@@ -38,7 +40,7 @@ export default function ProgressPage() {
   })
   const maxCigarettes = Math.max(state.baseline.cigarettesPerDay, ...recentDays.map((item) => item.cigarettes ?? 0), 1)
   const milestones = [
-    { value: progress.currentStreakHours >= 24, title: '24 小时' },
+    { value: progress.streakConfirmed && progress.currentStreakHours >= 24, title: '24 小时' },
     { value: progress.smokeFreeDays >= 7, title: '7 天' },
     { value: progress.smokeFreeDays >= 28, title: '28 天' },
     { value: progress.smokeFreeDays >= 90, title: '90 天' },
@@ -57,7 +59,7 @@ export default function ProgressPage() {
   const moneyText = Number.isInteger(progress.moneySaved)
     ? progress.moneySaved.toFixed(0)
     : progress.moneySaved.toFixed(1)
-  const followups = ([3, 6, 12] as const).map((month) => {
+  const followups = HEALTH_CONTENT_ENABLED ? ([3, 6, 12] as const).map((month) => {
     const dueDate = addMonths(state.plan!.quitDate, month)
     const saved = state.outcomes.find((item) => item.planId === state.plan!.id && item.dueMonth === month)
     return {
@@ -66,10 +68,10 @@ export default function ProgressPage() {
       due: daysBetween(dueDate, toLocalDate(now)) >= 0,
       saved,
     }
-  })
+  }) : []
 
   return (
-    <View className='screen progress-page'>
+    <HarmonyScrollablePage className='screen progress-page' viewport='tab'>
       <PageHeader title='进展' showSos compact />
 
       <View className='card card--forest progress-hero'>
@@ -109,23 +111,25 @@ export default function ProgressPage() {
         <Text className='chart__legend'>数字为逐支记录 · ✓ 已做日终确认</Text>
       </View>
 
-      <Text className='section-title'>随访</Text>
-      <View className='card followup-list'>
-        {followups.map((followup) => (
-          <Button
-            className='followup-row'
-            key={followup.month}
-            aria-label={`${followup.month} 个月随访，${followup.dueDate}，${followup.saved ? '已填写' : followup.due ? '可以填写' : '未到期'}`}
-            onClick={() => Taro.navigateTo({ url: `/pages/followup/index?month=${followup.month}` })}
-          >
-            <View className='followup-row__month'>{followup.month}<Text>月</Text></View>
-            <Text className='grow followup-row__date'>{followup.dueDate}</Text>
-            <Text className={`followup-row__action ${followup.due && !followup.saved ? 'followup-row__action--due' : ''}`}>
-              {followup.saved ? '已填' : followup.due ? '填写' : '›'}
-            </Text>
-          </Button>
-        ))}
-      </View>
+      {HEALTH_CONTENT_ENABLED ? <>
+        <Text className='section-title'>随访</Text>
+        <View className='card followup-list'>
+          {followups.map((followup) => (
+            <Button
+              className='followup-row'
+              key={followup.month}
+              aria-label={`${followup.month} 个月随访，${followup.dueDate}，${followup.saved ? '已填写' : followup.due ? '可以填写' : '未到期'}`}
+              onClick={() => Taro.navigateTo({ url: `/pages/followup/index?month=${followup.month}` })}
+            >
+              <View className='followup-row__month'>{followup.month}<Text>月</Text></View>
+              <Text className='grow followup-row__date'>{followup.dueDate}</Text>
+              <Text className={`followup-row__action ${followup.due && !followup.saved ? 'followup-row__action--due' : ''}`}>
+                {followup.saved ? '已填' : followup.due ? '填写' : '›'}
+              </Text>
+            </Button>
+          ))}
+        </View>
+      </> : null}
 
       <Text className='section-title'>里程碑</Text>
       <View className='card milestone-list'>
@@ -136,6 +140,6 @@ export default function ProgressPage() {
           </View>
         ))}
       </View>
-    </View>
+    </HarmonyScrollablePage>
   )
 }

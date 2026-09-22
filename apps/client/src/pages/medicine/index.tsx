@@ -3,9 +3,12 @@ import Taro from '@tarojs/taro'
 import { contentItemsByKind } from '@wuyan/content'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { PageHeader } from '../../components/PageHeader'
+import { WithheldHealthContent } from '../../components/WithheldHealthContent'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
 import './index.scss'
 
 export default function MedicinePage() {
+  if (!HEALTH_CONTENT_ENABLED) return <WithheldHealthContent />
   const topics = contentItemsByKind.medication_referral
   return (
     <View className='screen screen--detail medicine-page'>

@@ -1,7 +1,7 @@
 import type { ClientState } from '../types'
 import { parseStoredStateStrict, STORAGE_KEY, StoredStateCorruptionError } from './model'
 import { toShanghaiDate } from './smokingLogs'
-import { encodeLosslessBase64 } from './recoveryCodec'
+import { encodeLosslessBase64, utf8ByteLength } from './recoveryCodec'
 
 export const BACKUP_STORAGE_KEY = `${STORAGE_KEY}/last-known-good`
 export const DELETION_INTENT_STORAGE_KEY = `${STORAGE_KEY}/deletion-in-progress`
@@ -119,14 +119,14 @@ function serializedCanonicalState(
 ): { state: ClientState; serialized: string } {
   const parsed = parseStoredStateStrict(state)
   const serialized = JSON.stringify(parsed)
-  if (new TextEncoder().encode(serialized).byteLength > maxBytes) {
+  if (utf8ByteLength(serialized) > maxBytes) {
     throw new Error('本机记录已达到可安全备份的容量上限')
   }
   return { state: parsed, serialized }
 }
 
 function assertCanonicalStateFitsExportContract(state: ClientState, maxBytes: number): void {
-  if (new TextEncoder().encode(JSON.stringify(state)).byteLength > maxBytes) {
+  if (utf8ByteLength(JSON.stringify(state)) > maxBytes) {
     throw new Error('本机记录已达到可安全备份的容量上限')
   }
 }

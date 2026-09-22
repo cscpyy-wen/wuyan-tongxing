@@ -1,0 +1,30 @@
+.sos-header.sos-header--harmony {
+  position: relative;
+  z-index: 1;
+  right: auto;
+  bottom: auto;
+  display: flex;
+  flex: 0 0 76px;
+  width: 76px;
+  min-width: 76px;
+  max-width: 76px;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  margin: 0;
+  margin-left: auto;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #edc6c1;
+  border-radius: 16px;
+  color: #a8382d;
+  background: var(--coral-100);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.sos-header--harmony text {
+  display: block;
+}

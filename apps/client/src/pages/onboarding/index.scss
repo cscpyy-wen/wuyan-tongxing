@@ -1,5 +1,9 @@
 .onboarding {
+  box-sizing: border-box;
   display: flex;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
   flex-direction: column;
   padding-bottom: calc(108px + var(--safe-bottom));
 }
@@ -11,6 +15,10 @@
   margin-bottom: 10px;
 }
 
+.onboarding__top--native {
+  justify-content: flex-end;
+}
+
 .onboarding__brand {
   color: var(--forest-900);
   font-size: 16px;
@@ -18,9 +26,17 @@
   letter-spacing: 0.5px;
 }
 
-.onboarding__body {
+.onboarding__scroll {
+  display: block;
+  width: 100%;
+  height: 1px;
+  min-height: 0;
   flex: 1;
+}
+
+.onboarding__body {
   padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .onboarding-consent__row {
@@ -89,6 +105,12 @@
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 8px 28px rgba(15, 51, 40, 0.12);
   backdrop-filter: blur(12px);
+}
+
+.onboarding__actions .button {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
 }
 
 .range-value {
@@ -190,4 +212,141 @@
     width: 390px;
     transform: translateX(-50%);
   }
+}
+
+/* Harmony's C-API style bridge evaluates CSS media queries against the
+ * physical display width and does not implement CSS Grid. Keep the phone
+ * viewport at its real width, use an explicit two-column flex layout, and
+ * leave the action bar in the root flex flow instead of mapping `fixed` to
+ * the top of the native Stack. The row heights are explicit because a native
+ * View does not grow reliably around wrapped flex children. */
+.onboarding.screen.onboarding--harmony {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 12px 14px 10px;
+  box-shadow: none;
+}
+
+.onboarding--harmony .onboarding__body {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.onboarding--harmony .choice-grid {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 10px;
+}
+
+.onboarding--harmony .choice-grid--one-row {
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}
+
+.onboarding--harmony .choice-grid--three-rows {
+  height: 176px;
+  min-height: 176px;
+  max-height: 176px;
+}
+
+.onboarding--harmony .choice-grid--six-rows {
+  height: 362px;
+  min-height: 362px;
+  max-height: 362px;
+}
+
+.onboarding--harmony .choice {
+  flex: 1 1 47%;
+  width: 47%;
+  min-width: 47%;
+  max-width: 48%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  padding: 8px 10px;
+}
+
+.onboarding--harmony .number-stepper {
+  display: flex;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.onboarding--harmony .number-stepper__button {
+  width: 52px;
+  min-width: 52px;
+  max-width: 52px;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  padding: 0;
+  flex: 0 0 52px;
+}
+
+.onboarding--harmony .range-value {
+  width: 0;
+  min-width: 0;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+.onboarding--harmony .picker-field--trigger {
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  padding: 0 14px;
+}
+
+/* The native View backing a vertical flex stack does not reliably derive its
+ * height from Button children. Reserve the exact two-card stack height so the
+ * date card remains in normal flow instead of overlapping the second path. */
+.onboarding--harmony .path-list {
+  width: 100%;
+  height: 250px;
+  min-height: 250px;
+  max-height: 250px;
+}
+
+.onboarding--harmony .path-card {
+  height: 120px;
+  min-height: 120px;
+  max-height: 120px;
+}
+
+.onboarding--harmony .onboarding__actions {
+  position: relative;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  z-index: 1;
+  flex-direction: row;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 6px;
+  flex: 0 0 auto;
+  transform: translateX(0);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.onboarding--harmony .onboarding__actions .button {
+  width: auto;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  padding: 0 14px;
+  flex: 1 1 0;
 }

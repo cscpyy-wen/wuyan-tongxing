@@ -83,6 +83,21 @@ describe('离线本地仓库', () => {
     expect(values.has(BACKUP_STORAGE_KEY)).toBe(true)
   })
 
+  it('在 Harmony 无浏览器 TextEncoder 全局对象时仍可校验、保存并恢复状态', () => {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'TextEncoder')
+    Object.defineProperty(globalThis, 'TextEncoder', { configurable: true, value: undefined })
+    try {
+      const { values, repository } = memoryStorage()
+      const state = validState()
+      repository.save(state)
+      expect(repository.load().state.plan?.id).toBe(state.plan?.id)
+      expect(values.has(BACKUP_STORAGE_KEY)).toBe(true)
+    } finally {
+      if (descriptor) Object.defineProperty(globalThis, 'TextEncoder', descriptor)
+      else Reflect.deleteProperty(globalThis, 'TextEncoder')
+    }
+  })
+
   it('does not synchronously bridge-read the large backup when the primary is valid', () => {
     const state = validState()
     const values = new Map<string, unknown>([

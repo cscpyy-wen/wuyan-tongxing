@@ -2,6 +2,7 @@ import { Text, View } from '@tarojs/components'
 import Taro, { useDidHide } from '@tarojs/taro'
 import { useMemo, useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
+import { HarmonyScrollablePage } from '../../components/HarmonyScrollablePage'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
 import { SmokingEventSheet } from '../../components/SmokingEventSheet'
@@ -10,11 +11,13 @@ import { useMinuteClock } from '../../hooks/useMinuteClock'
 import {
   buildClientReductionSchedule,
   computeClientProgress,
+  createDailyCheckInConfirmation,
   daysBetween,
   getCurrentReductionLimit,
   getJourneyPhase,
   toLocalDate,
 } from '../../lib/model'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
 import { openSosPage } from '../../lib/navigation'
 import { getTodayContent } from '../../lib/shared'
 import { formatSmokingInterval, formatSmokingTime, summarizeSmokingLogs } from '../../lib/smokingLogs'
@@ -81,17 +84,16 @@ export default function TodayPage() {
       : progress.lastRecordedCigaretteAt ? '小时距已记录上支' : '尚未确认无烟'
 
   const confirmToday = async () => {
+    const confirmation = createDailyCheckInConfirmation(state, new Date())
+    if (!confirmation) return
     const result = await Taro.showModal({
       title: '确认今日记录？',
-      content: `今天记录了 ${todaySummary.recordedCount} 支。确认后仍可撤销。`,
+      content: `今天记录了 ${confirmation.cigarettesSmoked} 支。确认后仍可撤销。`,
       confirmText: '确认',
       cancelText: '再看看',
     })
     if (!result.confirm) return
-    const saved = actions.recordCheckIn(
-      todaySummary.recordedCount,
-      todaySummary.peakCravingIntensity ?? 1,
-    )
+    const saved = actions.recordCheckIn(confirmation)
     if (saved) Taro.showToast({ title: '今日记录已确认', icon: 'success' })
   }
 
@@ -135,6 +137,7 @@ export default function TodayPage() {
   }
 
   const finishTask = () => {
+    if (!HEALTH_CONTENT_ENABLED) return
     if (content.actionType === 'LAPSE_RECOVERY') {
       const suffix = recentPostQuitCigarette ? `?cigaretteLogId=${encodeURIComponent(recentPostQuitCigarette.id)}` : ''
       Taro.navigateTo({ url: `/pages/lapse/index${suffix}` })
@@ -148,7 +151,20 @@ export default function TodayPage() {
   }
 
   return (
-    <View className='screen today-page'>
+    <HarmonyScrollablePage
+      className='screen today-page'
+      viewport='tab'
+      overlay={(
+        <SmokingEventSheet
+          open={Boolean(smokeLogAt) || Boolean(editingLog)}
+          capturedAt={smokeLogAt}
+          editing={editingLog}
+          allowTimeEdit={Boolean(editingLog)}
+          onClose={closeSmokingSheet}
+          onSaved={(id) => setRecentSavedId(id)}
+        />
+      )}
+    >
       <PageHeader title='今天' showSos compact />
 
       <View className='card smoking-hero'>
@@ -201,7 +217,7 @@ export default function TodayPage() {
         ) : null}
       </View>
 
-      <View className='smoke-log-action'>
+      <View className={`smoke-log-action ${recentSavedLog ? 'smoke-log-action--recent' : ''}`}>
         <Button
           className='smoke-log-primary'
           aria-label='我吸了一支烟，开始记录原因和烟瘾强度'
@@ -222,19 +238,27 @@ export default function TodayPage() {
         ) : null}
       </View>
 
-      <View className='row row--between today-section-head'>
-        <Text className='section-title'>今日任务</Text>
-        <Text className='pill'>{content.durationMinutes} 分钟</Text>
-      </View>
-      <View className='card lesson-card'>
-        <View className='lesson-card__marker'>{taskDone ? '✓' : '01'}</View>
-        <View className='grow'>
-          <Text className='lesson-card__title'>{content.title}</Text>
-          <Button className={`button ${taskDone ? 'button--secondary' : ''}`} onClick={finishTask}>
-            {taskDone ? '再看' : content.actionType === 'LAPSE_RECOVERY' ? '开始恢复' : content.actionType === 'SOS' ? '烟瘾急救' : '开始'}
-          </Button>
+      {HEALTH_CONTENT_ENABLED ? <>
+        <View className='row row--between today-section-head'>
+          <Text className='section-title'>今日任务</Text>
+          <Text className='pill'>{content.durationMinutes} 分钟</Text>
         </View>
-      </View>
+        <View className='card lesson-card'>
+          <View className='lesson-card__marker'>{taskDone ? '✓' : '01'}</View>
+          <View className='grow'>
+            <Text className='lesson-card__title'>{content.title}</Text>
+            <Button className={`button ${taskDone ? 'button--secondary' : ''}`} onClick={finishTask}>
+              {taskDone ? '再看' : content.actionType === 'LAPSE_RECOVERY' ? '开始恢复' : content.actionType === 'SOS' ? '烟瘾急救' : '开始'}
+            </Button>
+          </View>
+        </View>
+      </> : <>
+        <Text className='section-title'>首发范围</Text>
+        <View className='card card--soft'>
+          <Text className='field-label'>专注本机记录</Text>
+          <Text className='muted'>HarmonyOS 首版暂不提供健康教育课程、用药科普、专业资源和长期随访。</Text>
+        </View>
+      </>}
 
       <Text className='section-title'>更多</Text>
       <View className='quick-grid'>
@@ -242,10 +266,10 @@ export default function TodayPage() {
           <Text className='quick-card__icon' aria-hidden='true'>↗</Text>
           <Text className='quick-card__title'>伙伴支持</Text>
         </Button>
-        <Button className='quick-card' onClick={() => Taro.navigateTo({ url: '/pages/medicine/index' })}>
+        {HEALTH_CONTENT_ENABLED ? <Button className='quick-card' onClick={() => Taro.navigateTo({ url: '/pages/medicine/index' })}>
           <Text className='quick-card__icon' aria-hidden='true'>＋</Text>
           <Text className='quick-card__title'>药物与支持</Text>
-        </Button>
+        </Button> : null}
       </View>
 
       {schedule.length > 0 && phase === 'reduce' ? (
@@ -284,15 +308,6 @@ export default function TodayPage() {
         </View>
       ) : null}
 
-      <SmokingEventSheet
-        open={Boolean(smokeLogAt) || Boolean(editingLog)}
-        capturedAt={smokeLogAt}
-        editing={editingLog}
-        allowTimeEdit={Boolean(editingLog)}
-        onClose={closeSmokingSheet}
-        onSaved={(id) => setRecentSavedId(id)}
-      />
-
-    </View>
+    </HarmonyScrollablePage>
   )
 }

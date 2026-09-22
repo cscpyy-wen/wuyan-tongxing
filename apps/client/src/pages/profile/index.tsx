@@ -5,16 +5,22 @@ import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { AccessibleSwitch } from '../../components/AccessibleSwitch'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
+import { HarmonyScrollablePage } from '../../components/HarmonyScrollablePage'
+import { HarmonyPrivacyPolicyEntry, PrivacyPolicyModal } from '../../components/PrivacyPolicyModal'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
 import { addDays, toLocalDate, validateQuitDate } from '../../lib/model'
+import { openOnboardingAsRoot } from '../../lib/navigation'
+import { getAppCapabilities } from '../../lib/platformCapabilities'
 import {
   acknowledgePendingNativeExportOutcome,
   cancelDailyReminder,
   isDailyReminderScheduled,
-  isNativeAndroidApp,
   nativeExportCleanupIssue,
   nativeExportCleanupFilename,
   openNativeNotificationSettings,
   reconcileDailyReminderAfterSystemChange,
+  requestNativeQuickRecordTile,
+  requestNativeQuickRecordWidget,
   rescheduleDailyReminderForLocalTime,
   saveNativeJsonFile,
   scheduleDailyReminder,
@@ -46,15 +52,21 @@ export default function ProfilePage() {
   const [newAttemptCigarettes, setNewAttemptCigarettes] = useState(10)
   const [newAttemptPrice, setNewAttemptPrice] = useState(25)
   const [reminderBusy, setReminderBusy] = useState(false)
+  const [quickAccessBusy, setQuickAccessBusy] = useState(false)
+  const [widgetHelpVisible, setWidgetHelpVisible] = useState(false)
+  const [privacyOpen, setPrivacyOpen] = useState(false)
   const reminderSettingsReturnPending = useRef(false)
   const resumeReminderIntentRef = useRef<() => void | Promise<void>>()
-  const nativeAndroid = isNativeAndroidApp()
+  const capabilities = getAppCapabilities()
+  const nativeAndroid = capabilities.platform === 'android'
+  const nativeMobile = nativeAndroid || capabilities.platform === 'ios'
+  const harmony = capabilities.platform === 'harmony'
   const {
     reminderActive,
     publishReminderActive,
     runReminderMutation: runReminderReconciliationMutation,
   } = useReminderReconciliation({
-    enabled: nativeAndroid,
+    enabled: nativeMobile,
     locallyEnabled: state.settings.inAppReminder,
     checkSystemState: isDailyReminderScheduled,
     onSystemDisabled: async () => {
@@ -146,6 +158,7 @@ export default function ProfilePage() {
   }
 
   const askCloudConsent = async (enabled: boolean) => {
+    if (!capabilities.cloudSyncControls) return
     if (!enabled) {
       if (actions.updateSettings({ cloudSync: false, syncConsentAt: undefined })) {
         Taro.showToast({ title: '云同步同意已撤回', icon: 'none' })
@@ -162,7 +175,7 @@ export default function ProfilePage() {
   }
 
   const restoreReminderSchedule = async (scheduled: boolean, hour: number) => {
-    if (!nativeAndroid) return
+    if (!nativeMobile) return
     if (!scheduled) {
       await cancelDailyReminder()
       publishReminderActive(false)
@@ -180,7 +193,9 @@ export default function ProfilePage() {
     }
     const result = await Taro.showModal({
       title: '撤回敏感健康信息处理同意？',
-      content: '撤回会清除 App 内计划、记录与设置，且无法在 App 内撤销。个人版没有云端副本；你另行导出的 JSON 不会被删除，仍可用于恢复。',
+      content: harmony
+        ? '撤回会清除 App 内计划、记录与设置，且无法在 App 内撤销。HarmonyOS 首版没有云端副本，也不提供数据导出或恢复。'
+        : '撤回会清除 App 内计划、记录与设置，且无法在 App 内撤销。个人版没有云端副本；你另行导出的 JSON 不会被删除，仍可用于恢复。',
       confirmText: '撤回删除',
       confirmColor: '#B34232',
       cancelText: '继续保留',
@@ -188,12 +203,13 @@ export default function ProfilePage() {
     if (result.confirm) {
       if (await actions.deleteAllData()) {
         publishReminderActive(false)
-        Taro.reLaunch({ url: '/pages/onboarding/index' })
+        openOnboardingAsRoot()
       }
     }
   }
 
   const askAnalyticsConsent = async (enabled: boolean) => {
+    if (!capabilities.outcomeAnalyticsControls) return
     if (!enabled) {
       if (actions.updateSettings({ outcomeAnalytics: false, analyticsConsentAt: undefined })) {
         Taro.showToast({ title: '成效统计同意已撤回', icon: 'none' })
@@ -210,6 +226,7 @@ export default function ProfilePage() {
   }
 
   const askSubscriptionConsent = async (enabled: boolean) => {
+    if (capabilities.reminder !== 'wechat-subscription') return
     if (!enabled) {
       if (actions.updateSettings({ subscriptionEnabled: false, subscriptionStatus: 'denied' })) {
         Taro.showToast({ title: '订阅消息同意已撤回', icon: 'none' })
@@ -228,7 +245,7 @@ export default function ProfilePage() {
   }
 
   const changeDailyReminder = async (enabled: boolean) => {
-    if (!nativeAndroid || reminderBusy) return
+    if (!nativeMobile || reminderBusy) return
     if (!enabled) reminderSettingsReturnPending.current = false
     setReminderBusy(true)
     try {
@@ -330,22 +347,70 @@ export default function ProfilePage() {
     }
   }
 
+  const showWidgetHelp = () => Taro.showModal({
+    title: '手动添加小组件',
+    content: '小米手机：回到桌面，双指捏合 → 添加小部件 → 搜索 → 安卓小部件 → 无烟同行 → 记录一支烟，添加到桌面。\n\n其他桌面：长按空白处 → 小部件 → 无烟同行。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
+
+  const addQuickRecordWidget = async () => {
+    if (!nativeAndroid || quickAccessBusy) return
+    setQuickAccessBusy(true)
+    setWidgetHelpVisible(true)
+    try {
+      const result = await requestNativeQuickRecordWidget()
+      // A true result only reports launcher support. It cannot prove that the
+      // launcher displayed a confirmation window or that the user added it.
+      if (result.requested) {
+        Taro.showToast({ title: '已发送添加请求', icon: 'none' })
+      } else {
+        await showWidgetHelp()
+      }
+    } catch {
+      await showWidgetHelp()
+    } finally {
+      setQuickAccessBusy(false)
+    }
+  }
+
+  const addQuickRecordTile = async () => {
+    if (!nativeAndroid || quickAccessBusy) return
+    setQuickAccessBusy(true)
+    try {
+      const result = await requestNativeQuickRecordTile()
+      const title = result === 'added'
+        ? '锁屏下拉入口已添加'
+        : result === 'already-added'
+          ? '锁屏下拉入口已存在'
+          : result === 'not-added'
+            ? '已取消添加'
+            : '请从控制中心编辑添加'
+      Taro.showToast({ title, icon: 'none' })
+    } catch {
+      Taro.showToast({ title: '无法添加快捷入口', icon: 'none' })
+    } finally {
+      setQuickAccessBusy(false)
+    }
+  }
+
   const exportData = async () => {
+    if (capabilities.backupExport === 'none') return
     const confirmation = await Taro.showModal({
       title: '导出敏感健康数据副本？',
-      content: nativeAndroid
+      content: nativeMobile
         ? '副本包含你的戒烟计划与记录。确认后会打开安卓系统“另存为”，由你选择文件名与保存位置；请只保存到你信任的位置。'
         : '副本包含你的戒烟计划与记录。复制到系统剪贴板后，可能被你允许访问剪贴板的其他应用读取；请只粘贴到你信任的位置并及时清除。',
       // Taro/WeChat showModal limits each action label to four Chinese
       // characters. Longer labels reject the call before any dialog appears.
-      confirmText: nativeAndroid ? '选择位置' : '确认复制',
+      confirmText: nativeMobile ? '选择位置' : '确认复制',
       cancelText: '取消',
     })
     if (!confirmation.confirm) return
     if (exporting) return
     setExporting(true)
     try {
-      if (nativeAndroid) {
+      if (nativeMobile) {
         const saved = await saveNativeJsonFile(actions.exportData())
         await Taro.showToast({ title: saved ? '数据副本已保存' : '已取消保存', icon: saved ? 'success' : 'none' })
         if (saved) {
@@ -369,7 +434,7 @@ export default function ProfilePage() {
           await acknowledgePendingNativeExportOutcome().catch(() => false)
         }
       } else {
-        Taro.showToast({ title: nativeAndroid ? '保存失败，请稍后再试' : '复制失败，请稍后再试', icon: 'none' })
+        Taro.showToast({ title: nativeMobile ? '保存失败，请稍后再试' : '复制失败，请稍后再试', icon: 'none' })
       }
     } finally {
       setExporting(false)
@@ -377,7 +442,7 @@ export default function ProfilePage() {
   }
 
   const importData = async () => {
-    if (!nativeAndroid || exporting) return
+    if (capabilities.backupRestore !== 'native-file' || !nativeMobile || exporting) return
     setExporting(true)
     try {
       await requestNativeBackupRestoreSelection()
@@ -393,7 +458,9 @@ export default function ProfilePage() {
     }
     const result = await Taro.showModal({
       title: '删除本机全部数据？',
-      content: '这会清除 App 内计划、记录和设置，且无法在 App 内撤销。个人版没有云端副本；你另行导出的 JSON 不会被删除，仍可用于恢复。',
+      content: harmony
+        ? '这会清除 App 内计划、记录和设置，且无法在 App 内撤销。HarmonyOS 首版没有云端副本，也不提供数据恢复。'
+        : '这会清除 App 内计划、记录和设置，且无法在 App 内撤销。个人版没有云端副本；你另行导出的 JSON 不会被删除，仍可用于恢复。',
       confirmText: '确认删除',
       confirmColor: '#B34232',
       cancelText: '保留数据',
@@ -401,13 +468,24 @@ export default function ProfilePage() {
     if (result.confirm) {
       if (await actions.deleteAllData()) {
         publishReminderActive(false)
-        Taro.reLaunch({ url: '/pages/onboarding/index' })
+        openOnboardingAsRoot()
       }
     }
   }
 
   return (
-    <View className='screen profile-page'>
+    <HarmonyScrollablePage
+      className='screen profile-page'
+      viewport='tab'
+      fallback='scroll'
+      overlay={(
+        <PrivacyPolicyModal
+          open={privacyOpen}
+          onClose={() => setPrivacyOpen(false)}
+          reserveNativeTabBar
+        />
+      )}
+    >
       <PageHeader title='我的' showSos compact />
 
       <Text className='section-title'>计划</Text>
@@ -422,9 +500,11 @@ export default function ProfilePage() {
         <View className='divider' />
         <View className='profile-links'>
           <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/partner/index' })}>伙伴支持 <Text>›</Text></Button>
-          <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/medicine/index' })}>戒烟药物 <Text>›</Text></Button>
-          <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/referral/index' })}>专业支持 <Text>›</Text></Button>
-          <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/faq/index' })}>常见问题 <Text>›</Text></Button>
+          {HEALTH_CONTENT_ENABLED ? <>
+            <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/medicine/index' })}>戒烟药物 <Text>›</Text></Button>
+            <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/referral/index' })}>专业支持 <Text>›</Text></Button>
+            <Button className='profile-link' onClick={() => Taro.navigateTo({ url: '/pages/faq/index' })}>常见问题 <Text>›</Text></Button>
+          </> : null}
         </View>
       </View>
 
@@ -452,7 +532,7 @@ export default function ProfilePage() {
               </Picker>
             </View>
             <View className='new-attempt-baseline'>
-              <View>
+              <View className='new-attempt-baseline__field'>
                 <Text className='field-label'>当前日均</Text>
                 <Input
                   className='input'
@@ -463,7 +543,7 @@ export default function ProfilePage() {
                   onInput={(event) => setNewAttemptCigarettes(Math.max(1, Math.min(100, Math.trunc(Number(event.detail.value) || 1))))}
                 />
               </View>
-              <View>
+              <View className='new-attempt-baseline__field'>
                 <Text className='field-label'>每包价格</Text>
                 <Input
                   className='input'
@@ -482,6 +562,15 @@ export default function ProfilePage() {
       </View>
 
       {nativeAndroid ? <>
+        <Text className='section-title'>快捷记录</Text>
+        <View className='card profile-links'>
+          <Button className='profile-link' disabled={quickAccessBusy} onClick={() => void addQuickRecordWidget()}>桌面小组件 <Text>›</Text></Button>
+          {widgetHelpVisible ? <Button className='profile-widget-help' onClick={() => void showWidgetHelp()}>没有弹窗？查看手动添加方法</Button> : null}
+          <Button className='profile-link' disabled={quickAccessBusy} onClick={() => void addQuickRecordTile()}>锁屏下拉入口 <Text>›</Text></Button>
+        </View>
+      </> : null}
+
+      {(capabilities.reminder === 'android-system' || capabilities.reminder === 'ios-system') ? <>
       <Text className='section-title'>提醒</Text>
       <View className='card settings-list'>
         <View className='setting-row'>
@@ -504,7 +593,7 @@ export default function ProfilePage() {
           </Picker>
         </View>
       </View>
-      </> : <>
+      </> : capabilities.reminder === 'wechat-subscription' ? <>
         <Text className='section-title'>提醒</Text>
         <View className='card settings-list'>
           <View className='setting-row'>
@@ -516,6 +605,16 @@ export default function ProfilePage() {
             />
           </View>
         </View>
+      </> : <>
+        <Text className='section-title'>提醒</Text>
+        <View className='card settings-list'>
+          <View className='setting-row'>
+            <View className='grow'>
+              <Text className='setting-row__title'>HarmonyOS 首版暂未启用系统通知</Text>
+              <Text className='muted'>今日任务仍可在应用内查看；本版本不会申请通知权限。</Text>
+            </View>
+          </View>
+        </View>
       </>}
 
       <Text className='section-title'>数据</Text>
@@ -523,7 +622,7 @@ export default function ProfilePage() {
         <View className='setting-row'>
           <View className='grow'>
             <Text className='setting-row__title'>健康记录</Text>
-            <Text className='muted'>{nativeAndroid ? '仅本机' : '本机处理'}</Text>
+            <Text className='muted'>{nativeMobile || harmony ? '仅本机' : '本机处理'}</Text>
           </View>
           <AccessibleSwitch
             checked={state.settings.sensitiveHealthData}
@@ -532,7 +631,7 @@ export default function ProfilePage() {
             onChange={(checked) => void revokeHealthConsent(checked)}
           />
         </View>
-        {!nativeAndroid ? <View className='setting-row'>
+        {capabilities.cloudSyncControls ? <View className='setting-row'>
           <View className='grow'>
             <Text className='setting-row__title'>云端同步</Text>
           </View>
@@ -542,7 +641,7 @@ export default function ProfilePage() {
             onChange={(checked) => void askCloudConsent(checked)}
           />
         </View> : null}
-        {!nativeAndroid ? <View className='setting-row'>
+        {capabilities.outcomeAnalyticsControls ? <View className='setting-row'>
           <View className='grow'>
             <Text className='setting-row__title'>成效统计</Text>
           </View>
@@ -553,13 +652,30 @@ export default function ProfilePage() {
           />
         </View> : null}
         <View className='profile-data-actions'>
-          <Button className='button button--secondary' disabled={exporting} onClick={exportData}>{exporting ? '处理中…' : '导出副本'}</Button>
-          {nativeAndroid ? <Button className='button button--secondary' disabled={exporting} onClick={() => void importData()}>恢复备份</Button> : null}
+          {capabilities.backupExport !== 'none' ? <Button className='button button--secondary' disabled={exporting} onClick={exportData}>{exporting ? '处理中…' : '导出副本'}</Button> : null}
+          {capabilities.backupRestore === 'native-file' ? <Button className='button button--secondary' disabled={exporting} onClick={() => void importData()}>恢复备份</Button> : null}
           <View className='profile-danger-action'>
             <Button className='button button--danger' disabled={exporting} onClick={deleteData}>删除所有数据</Button>
           </View>
         </View>
+        {nativeMobile ? <Button
+          className='profile-link'
+          aria-label='查看数据与隐私说明'
+          onClick={() => void Taro.showModal({
+            title: '数据与隐私',
+            content: '无需登录，健康记录只保存在本机，不自动上传。\n\n导出的 JSON 包含完整记录，未加密，请自行保管；分享给其他应用由你确认。\n\n删除所有数据或撤回健康记录同意会清除应用内数据，但不会删除你已导出的副本。\n\n系统通知仅在你开启后使用；桌面小组件上的数字可能被能查看你屏幕的人看到。',
+            showCancel: false,
+            confirmText: '关闭',
+          })}
+        >数据与隐私 <Text>›</Text></Button> : null}
       </View>
-    </View>
+
+      {harmony ? <>
+        <Text className='section-title'>关于与隐私</Text>
+        <View className='card'>
+          <HarmonyPrivacyPolicyEntry placement='profile' onOpen={() => setPrivacyOpen(true)} />
+        </View>
+      </> : null}
+    </HarmonyScrollablePage>
   )
 }

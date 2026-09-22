@@ -147,6 +147,9 @@ test.describe('逐支吸烟记录', () => {
     expect(tabbar).not.toBeNull()
     expect(action!.y).toBeGreaterThanOrEqual(0)
     expect(action!.y + action!.height).toBeLessThanOrEqual(tabbar!.y - 8)
+    const confirmation = await page.locator('.smoking-day-confirm').boundingBox()
+    expect(confirmation).not.toBeNull()
+    expect(confirmation!.x + confirmation!.width).toBeLessThanOrEqual(action!.x - 8)
     await expect(page.getByText('刚刚记录', { exact: true })).toBeVisible()
     await expect(taroButton(page, '编辑')).toBeVisible()
     await expect(taroButton(page, '撤销')).toBeVisible()
@@ -173,7 +176,7 @@ test.describe('逐支吸烟记录', () => {
       if (!raw) throw new Error('缺少本机状态')
       const wrapped = JSON.parse(raw) as {
         data: {
-          plan?: { id: string; quitDate: string }
+          plan?: { id: string; quitDate: string; createdAt: string }
           cigarettes: unknown[]
           checkIns: unknown[]
           lapses: unknown[]
@@ -188,6 +191,7 @@ test.describe('逐支吸烟记录', () => {
       }).format(new Date(now.getTime() - 3 * 86_400_000))
       const olderId = '22222222-2222-4222-8222-222222222222'
       wrapped.data.plan.quitDate = quitDate
+      wrapped.data.plan.createdAt = new Date(`${quitDate}T12:00:00+08:00`).toISOString()
       wrapped.data.cigarettes = [{
         id: olderId,
         createdAt: older.toISOString(),

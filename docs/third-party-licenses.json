@@ -3734,11 +3734,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/chokidar@5.0.0",
+      "purl": "pkg:npm/chokidar@4.0.3",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:chokidar@5.0.0",
+      "licenseSource": "pnpm-license-report:chokidar@4.0.3",
       "name": "chokidar",
-      "version": "5.0.0",
+      "version": "4.0.3",
       "licenses": [
         {
           "expression": "MIT"
@@ -4910,11 +4910,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/fast-uri@3.1.5",
+      "purl": "pkg:npm/fast-uri@3.1.6",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:fast-uri@3.1.5",
+      "licenseSource": "pnpm-license-report:fast-uri@3.1.6",
       "name": "fast-uri",
-      "version": "3.1.5",
+      "version": "3.1.6",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -4922,11 +4922,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/fast-uri@4.1.2",
+      "purl": "pkg:npm/fast-uri@4.1.3",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:fast-uri@4.1.2",
+      "licenseSource": "pnpm-license-report:fast-uri@4.1.3",
       "name": "fast-uri",
-      "version": "4.1.2",
+      "version": "4.1.3",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -7610,11 +7610,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/qs@6.15.3",
+      "purl": "pkg:npm/qs@6.16.0",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:qs@6.15.3",
+      "licenseSource": "pnpm-license-report:qs@6.16.0",
       "name": "qs",
-      "version": "6.15.3",
+      "version": "6.16.0",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -7790,11 +7790,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/readdirp@5.1.1",
+      "purl": "pkg:npm/readdirp@4.1.2",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:readdirp@5.1.1",
+      "licenseSource": "pnpm-license-report:readdirp@4.1.2",
       "name": "readdirp",
-      "version": "5.1.1",
+      "version": "4.1.2",
       "licenses": [
         {
           "expression": "MIT"
@@ -8066,11 +8066,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/sass@1.103.1",
+      "purl": "pkg:npm/sass@1.83.4",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:sass@1.103.1",
+      "licenseSource": "pnpm-license-report:sass@1.83.4",
       "name": "sass",
-      "version": "1.103.1",
+      "version": "1.83.4",
       "licenses": [
         {
           "expression": "MIT"
@@ -8678,11 +8678,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/svgo@3.3.4",
+      "purl": "pkg:npm/svgo@3.3.5",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:svgo@3.3.4",
+      "licenseSource": "pnpm-license-report:svgo@3.3.5",
       "name": "svgo",
-      "version": "3.3.4",
+      "version": "3.3.5",
       "licenses": [
         {
           "expression": "MIT"

@@ -1,9 +1,10 @@
-import { Picker, Text, View } from '@tarojs/components'
+import { Picker, ScrollView, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { addDays, toLocalDate } from '../lib/model'
 import { runAppModal } from '../lib/modalCoordinator'
 import { openSosPage } from '../lib/navigation'
+import { isHarmonyApp } from '../lib/platformCapabilities'
 import { registerNativeBackHandler } from '../lib/runtime'
 import {
   formatSmokingTime,
@@ -47,12 +48,18 @@ interface SmokingEventSheetProps {
 
 export function SmokingEventSheet({ open, capturedAt, editing, allowTimeEdit = false, onClose, onSaved }: SmokingEventSheetProps) {
   const { state, actions } = useAppState()
+  const harmony = isHarmonyApp()
+  const SheetPanel = harmony ? ScrollView : View
   const [trigger, setTrigger] = useState<Trigger>()
   const [intensity, setIntensity] = useState<CravingLevel>()
   const [submitting, setSubmitting] = useState(false)
   const [interactionReady, setInteractionReady] = useState(false)
   const interactionTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const initialTime = editing?.createdAt ?? capturedAt
+  const canKeepDetailsEmpty = Boolean(editing
+    && editing.trigger === undefined && editing.cravingIntensity === undefined)
+  const detailsValid = Boolean(trigger && intensity)
+    || (canKeepDetailsEmpty && trigger === undefined && intensity === undefined)
   const [smokedDate, setSmokedDate] = useState(() => initialTime ? toLocalDate(initialTime) : toLocalDate(new Date()))
   const [smokedTime, setSmokedTime] = useState(() => initialTime ? toShanghaiTime(initialTime) : toShanghaiTime(new Date()))
   const effectiveAt = useMemo(() => {
@@ -101,16 +108,25 @@ export function SmokingEventSheet({ open, capturedAt, editing, allowTimeEdit = f
 
   useEffect(() => {
     if (!open) return
-    void Taro.hideTabBar({ animation: false }).catch(() => undefined)
+    // Harmony's native tab-bar bridge currently replaces the active TARO-PAGE
+    // when hideTabBar is called from an overlay. The sheet nodes are created,
+    // then the page is detached and the user sees an empty route. Keep the
+    // tab bar mounted on Harmony; the sheet itself provides the modal layer.
+    const toggleTabBar = !harmony
+    if (toggleTabBar) void Taro.hideTabBar({ animation: false }).catch(() => undefined)
     const unregisterBackHandler = registerNativeBackHandler(onClose)
     return () => {
       unregisterBackHandler()
-      void Taro.showTabBar({ animation: false }).catch(() => undefined)
+      if (toggleTabBar) void Taro.showTabBar({ animation: false }).catch(() => undefined)
     }
-  }, [onClose, open])
+  }, [harmony, onClose, open])
 
   useEffect(() => {
-    if (!open || typeof document === 'undefined') return
+    // The Harmony C-API renderer exposes a lightweight Taro document, but it
+    // does not provide browser DOM constructors such as HTMLElement. Focus
+    // isolation is an H5-only enhancement; touching those browser globals in
+    // Harmony tears down the page as soon as this sheet opens.
+    if (!open || process.env.TARO_ENV !== 'h5' || typeof document === 'undefined') return
     const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : undefined
     const hiddenSiblings: Array<{
       element: HTMLElement
@@ -148,7 +164,7 @@ export function SmokingEventSheet({ open, capturedAt, editing, allowTimeEdit = f
   if (!open || !initialTime || !effectiveAt) return null
 
   const save = async () => {
-    if (!trigger || !intensity || submitting) return
+    if (!detailsValid || submitting) return
     if (
       editing
       && effectiveAt === editing.createdAt
@@ -188,8 +204,13 @@ export function SmokingEventSheet({ open, capturedAt, editing, allowTimeEdit = f
         }
       }
       const saved = editing
-        ? actions.editCigarette(editing.id, { smokedAt: effectiveAt, trigger, cravingIntensity: intensity })
-        : actions.recordCigarette({ smokedAt: effectiveAt, trigger, cravingIntensity: intensity })
+        ? actions.editCigarette(editing.id, {
+            smokedAt: effectiveAt,
+            ...(trigger && intensity ? { trigger, cravingIntensity: intensity } : {}),
+          })
+        : trigger && intensity
+          ? actions.recordCigarette({ smokedAt: effectiveAt, trigger, cravingIntensity: intensity })
+          : undefined
       const id = typeof saved === 'string' ? saved : editing?.id
       if (!saved || !id) return
       onSaved?.(id, effectiveAt)
@@ -211,12 +232,22 @@ export function SmokingEventSheet({ open, capturedAt, editing, allowTimeEdit = f
 
   return (
       <View
-        className='smoking-sheet'
+        className={`smoking-sheet ${harmony ? 'smoking-sheet--harmony' : ''}`}
         onClick={(event) => {
-          if (event.target === event.currentTarget) onClose()
+          // Harmony's synthetic event currently reports the overlay as both
+          // target and currentTarget for clicks originating on child buttons.
+          // Keep the explicit close button there instead of treating every
+          // option selection as a backdrop dismissal.
+          if (!harmony && event.target === event.currentTarget) onClose()
         }}
       >
-        <View className='smoking-sheet__panel' role='dialog' aria-modal='true' aria-label='记录这一支烟'>
+        <SheetPanel
+          className={`smoking-sheet__panel ${harmony ? 'smoking-sheet__panel--harmony' : ''}`}
+          role='dialog'
+          aria-modal='true'
+          aria-label='记录这一支烟'
+          scrollY={harmony}
+        >
         <View className='smoking-sheet__handle' aria-hidden='true' />
         <View className='smoking-sheet__header'>
           <View className='grow'>
@@ -275,12 +306,12 @@ export function SmokingEventSheet({ open, capturedAt, editing, allowTimeEdit = f
         </View>
 
         <View className='smoking-sheet__actions'>
-          <Button className='button smoking-sheet__save' aria-label='保存' disabled={!trigger || !intensity || submitting} onClick={() => void save()}>
+          <Button className='button smoking-sheet__save' aria-label='保存' disabled={!detailsValid || submitting} onClick={() => void save()}>
             {submitting ? '保存中…' : '保存'}
           </Button>
           {!editing && !allowTimeEdit ? <Button className='button button--ghost smoking-sheet__sos' onClick={openSos}>还没吸，先急救</Button> : null}
         </View>
-        </View>
+        </SheetPanel>
         {!interactionReady ? (
           <View
             className='smoking-sheet__entry-guard'

@@ -1,0 +1,186 @@
+.privacy-policy-entry {
+  display: flex;
+  padding: 14px;
+  border: 1px solid #b6cec4;
+  border-radius: 14px;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+}
+
+.privacy-policy-entry__description {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.privacy-policy-entry__button {
+  min-height: 46px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.privacy-policy-modal {
+  position: fixed;
+  z-index: 160;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: var(--canvas);
+}
+
+.privacy-policy-modal--above-tabbar {
+  /* Profile is rendered inside Harmony's generated 56vp native Tabs bar.
+   * The onboarding route has no tab bar, so only the permanent Profile entry
+   * reserves this space. */
+  bottom: calc(56px + var(--safe-bottom, 0px));
+}
+
+.privacy-policy-modal__panel {
+  display: flex;
+  width: 100%;
+  max-width: 560px;
+  height: 100vh;
+  max-height: 100vh;
+  padding-top: var(--safe-top);
+  flex-direction: column;
+  background: var(--paper);
+}
+
+.privacy-policy-modal--above-tabbar .privacy-policy-modal__panel {
+  height: calc(100vh - 56px - var(--safe-bottom, 0px));
+  max-height: calc(100vh - 56px - var(--safe-bottom, 0px));
+}
+
+.privacy-policy-modal__header {
+  display: flex;
+  min-height: 76px;
+  padding: 12px calc(18px + var(--safe-right)) 10px calc(18px + var(--safe-left));
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.privacy-policy-modal__header .eyebrow {
+  margin-bottom: 2px;
+}
+
+.privacy-policy-modal__title {
+  display: block;
+  color: var(--forest-900);
+  font-size: 20px;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.privacy-policy-modal__close {
+  display: flex;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 0 3px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--forest-050);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.privacy-policy-modal__close::after {
+  border: 0;
+}
+
+.privacy-policy-modal__scroll {
+  display: block;
+  height: 1px;
+  min-height: 0;
+  flex: 1;
+  background: var(--canvas);
+}
+
+.privacy-policy-modal__content {
+  padding: 18px calc(20px + var(--safe-right)) 24px calc(20px + var(--safe-left));
+}
+
+.privacy-policy-modal__footer {
+  flex: 0 0 auto;
+  padding: 8px calc(20px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(20px + var(--safe-left));
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.privacy-policy-modal__meta,
+.privacy-policy-modal__lead,
+.privacy-policy-modal__heading,
+.privacy-policy-modal__paragraph {
+  display: block;
+}
+
+.privacy-policy-modal__meta {
+  color: var(--forest-700);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.privacy-policy-modal__lead {
+  margin-top: 10px;
+  padding: 13px;
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--forest-050);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.privacy-policy-modal__section {
+  margin-top: 22px;
+}
+
+.privacy-policy-modal__heading {
+  color: var(--forest-900);
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.privacy-policy-modal__paragraph {
+  margin-top: 9px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.privacy-policy-modal__bullet-row {
+  display: flex;
+  margin-top: 8px;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.privacy-policy-modal__bullet {
+  display: block;
+  flex: 0 0 10px;
+  color: var(--forest-700);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.privacy-policy-modal__bullet-text {
+  min-width: 0;
+  margin-top: 0;
+  flex: 1;
+}
+
+.privacy-policy-modal__done {
+  min-height: 52px;
+  margin: 0;
+}

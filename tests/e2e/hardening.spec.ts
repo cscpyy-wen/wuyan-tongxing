@@ -77,11 +77,12 @@ test('没有逐日确认时不会把时间流逝算成戒烟成功或节省', as
   await page.evaluate((key) => {
     const raw = localStorage.getItem(key)
     if (!raw) throw new Error('missing state')
-    const wrapped = JSON.parse(raw) as { data: { plan: { quitDate: string } } }
+    const wrapped = JSON.parse(raw) as { data: { plan: { quitDate: string; createdAt: string } } }
     const date = new Date(Date.now() - 30 * 86_400_000)
     wrapped.data.plan.quitDate = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
     }).format(date)
+    wrapped.data.plan.createdAt = new Date(`${wrapped.data.plan.quitDate}T12:00:00+08:00`).toISOString()
     localStorage.setItem(key, JSON.stringify(wrapped))
   }, STORAGE_KEY)
   await page.reload()
@@ -164,4 +165,62 @@ test('已有计划冷启动不会短暂渲染首次设置内容', async ({ page 
   expect(await page.evaluate(() => (
     window as typeof window & { __wuyanSawWrongOnboarding?: boolean }
   ).__wuyanSawWrongOnboarding)).toBe(false)
+})
+
+test('快捷记录可只修改时间而不虚构原因或烟瘾强度', async ({ page }) => {
+  await completeOnboarding(page)
+  const before = await page.evaluate((key) => {
+    const wrapped = JSON.parse(localStorage.getItem(key)!)
+    const event = {
+      id: crypto.randomUUID(),
+      createdAt: new Date(Date.now() - 600_000).toISOString(),
+      loggedAt: new Date().toISOString(),
+      count: 1, attemptId: wrapped.data.plan.id, source: 'QUICK_LOG',
+    }
+    wrapped.data.cigarettes = [event]
+    localStorage.setItem(key, JSON.stringify(wrapped))
+    return event
+  }, STORAGE_KEY)
+  await page.reload()
+  await tabLink(page, '记录').click()
+  await page.locator('.records-page:visible').getByRole('button', { name: /编辑 .* 的吸烟记录/ }).first().click()
+  await expect(page.getByText('编辑记录', { exact: true })).toBeVisible()
+  await expect(taroButton(page, '保存')).toBeEnabled()
+  const editedAt = new Date(new Date(before.createdAt).getTime() + 120_000)
+  const date = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(editedAt)
+  const time = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(editedAt)
+  // Exercise the platform picker's public change contract; Android gestures are
+  // independently checked on-device. No React state or action is bypassed.
+  const pickers = page.locator('.smoking-time-row taro-picker-core')
+  await pickers.nth(0).evaluate((element, value) => {
+    element.dispatchEvent(new CustomEvent('change', { detail: { value }, bubbles: true }))
+  }, date)
+  await pickers.nth(1).evaluate((element, value) => {
+    element.dispatchEvent(new CustomEvent('change', { detail: { value }, bubbles: true }))
+  }, time)
+  await taroButton(page, '保存').click()
+  await expect(page.getByText('编辑记录', { exact: true })).toHaveCount(0)
+  const after = (await readStoredState(page))!.cigarettes[0]!
+  expect(after.id).toBe(before.id)
+  expect(after.loggedAt).toBe(before.loggedAt)
+  expect(after.createdAt).toBe(new Date(`${date}T${time}:00+08:00`).toISOString())
+  expect(after.trigger).toBeUndefined()
+  expect(after.cravingIntensity).toBeUndefined()
+  expect(after.updatedAt).toBeTruthy()
+  await expect(page.locator('.records-page:visible').getByText('快捷记录', { exact: true })).toBeVisible()
+})
+
+test('日终确认弹窗跨过北京时间午夜后必须重新确认', async ({ page }) => {
+  await completeOnboarding(page)
+  await page.clock.install({ time: new Date('2026-09-22T15:59:50Z') })
+  await taroButton(page, '确认今日 0 支').click()
+  await expect(page.getByText('确认今日记录？', { exact: true })).toBeVisible()
+  await page.clock.setSystemTime(new Date('2026-09-22T16:00:02Z'))
+  await page.locator('.taro-model__confirm').click()
+  await expect(page.getByText('日期或记录已变化，请重新确认', { exact: true })).toBeVisible()
+  expect((await readStoredState(page))!.checkIns).toHaveLength(0)
 })

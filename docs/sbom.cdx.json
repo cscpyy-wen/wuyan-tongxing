@@ -1,14 +1,14 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:e9699779-69b1-5e10-818a-3840da995920",
+  "serialNumber": "urn:uuid:506b102b-a845-5fa4-a382-58ac2dbe490e",
   "version": 1,
   "metadata": {
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/wuyan-tongxing-android-personal@0.1.0-personal.32",
+      "bom-ref": "pkg:generic/wuyan-tongxing-android-personal@0.1.0-personal.33",
       "name": "wuyan-tongxing-android-personal",
-      "version": "0.1.0-personal.32",
+      "version": "0.1.0-personal.33",
       "properties": [
         {
           "name": "wuyan:inventory-scope",
@@ -16,7 +16,7 @@
         },
         {
           "name": "wuyan:pnpm-lock-sha256",
-          "value": "ce4eee87b4cc229e91f76fadcf6262a90d634c675f3ee74cc6cddd95d3617aba"
+          "value": "1c516cda25d9984c45f133fc74dab4fbdb9670d99002bcfc395c48ce17b3aba3"
         },
         {
           "name": "wuyan:android-package",
@@ -10201,14 +10201,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/chokidar@5.0.0",
+      "bom-ref": "pkg:npm/chokidar@4.0.3",
       "name": "chokidar",
-      "version": "5.0.0",
-      "purl": "pkg:npm/chokidar@5.0.0",
+      "version": "4.0.3",
+      "purl": "pkg:npm/chokidar@4.0.3",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "4d0326737c3ee40c63a4bf22222c1e6c5ef77510c5e1f04889e02a1a7f5118259a115c10e856f67067b7d589ecd11448ce28b982827563bc5b330a354f132997"
+          "content": "420ceef247c1be8f9c038f7ada39cfd4a912e83a29e4d4ba83b4792c5609af86fc51bf783cf417524b02c3d3ef5e87973d145d751342e42d4941447648c1ad9c"
         }
       ],
       "licenses": [
@@ -10223,13 +10223,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:chokidar@5.0.0"
+          "value": "pnpm-license-report:chokidar@4.0.3"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/chokidar/-/chokidar-5.0.0.tgz"
+          "url": "https://registry.npmjs.org/chokidar/-/chokidar-4.0.3.tgz"
         }
       ]
     },
@@ -13533,14 +13533,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/fast-uri@3.1.5",
+      "bom-ref": "pkg:npm/fast-uri@3.1.6",
       "name": "fast-uri",
-      "version": "3.1.5",
-      "purl": "pkg:npm/fast-uri@3.1.5",
+      "version": "3.1.6",
+      "purl": "pkg:npm/fast-uri@3.1.6",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "807c00d4ef4b0c870aba730a84e6d2fc78a6c2d7a13b59cf50408a02ee53a4a81a3b5f5f716125e1b96259ed635b1545bc85f3b498e34382fc5d0d4453d7fb27"
+          "content": "ec871a975bc510caf4a276d5cc40c8ade336d88e24856f9fcf240fc2f005581a758b076c852651b0be238d1bcf1bd24fd6e8aa30746da3e614e91dbf0b30f3e5"
         }
       ],
       "licenses": [
@@ -13555,26 +13555,26 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:fast-uri@3.1.5"
+          "value": "pnpm-license-report:fast-uri@3.1.6"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/fast-uri/-/fast-uri-3.1.5.tgz"
+          "url": "https://registry.npmjs.org/fast-uri/-/fast-uri-3.1.6.tgz"
         }
       ]
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/fast-uri@4.1.2",
+      "bom-ref": "pkg:npm/fast-uri@4.1.3",
       "name": "fast-uri",
-      "version": "4.1.2",
-      "purl": "pkg:npm/fast-uri@4.1.2",
+      "version": "4.1.3",
+      "purl": "pkg:npm/fast-uri@4.1.3",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "4f21a605c6c34d95dc6f6723e4c57cf43ac5e360cabdbdf2e430d4361f7988ef8831e033324552c4ad4f651ad122973dca0f14d8684675ba1f35ad0b4bf6b807"
+          "content": "efeef61babcbb7b8e335ab3c4a64804f1daa7b24488f17aa3b78b82249834f196a61944a00d84e7b56e7a2f729e16666bec62ba7ad16caa3f21ea811897d325f"
         }
       ],
       "licenses": [
@@ -13589,13 +13589,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:fast-uri@4.1.2"
+          "value": "pnpm-license-report:fast-uri@4.1.3"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/fast-uri/-/fast-uri-4.1.2.tgz"
+          "url": "https://registry.npmjs.org/fast-uri/-/fast-uri-4.1.3.tgz"
         }
       ]
     },
@@ -21183,14 +21183,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/qs@6.15.3",
+      "bom-ref": "pkg:npm/qs@6.16.0",
       "name": "qs",
-      "version": "6.15.3",
-      "purl": "pkg:npm/qs@6.15.3",
+      "version": "6.16.0",
+      "purl": "pkg:npm/qs@6.16.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "3bd825df30a5e61e5b970d4a194cd02a1039a145d297caf0508339a344b79c25cc9624afcb90f3c7bfc325c23e4b08080aff889de499c21061d684b210703bd4"
+          "content": "87a7e1388691ac80f609b118d9faacfbbb7e517668f8c2c09d4e60448abce6e16d76250f09db00a4c947857a202953381ccd8355b22318d4d3607d8e7263f5bc"
         }
       ],
       "licenses": [
@@ -21205,13 +21205,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:qs@6.15.3"
+          "value": "pnpm-license-report:qs@6.16.0"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/qs/-/qs-6.15.3.tgz"
+          "url": "https://registry.npmjs.org/qs/-/qs-6.16.0.tgz"
         }
       ]
     },
@@ -21693,14 +21693,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/readdirp@5.1.1",
+      "bom-ref": "pkg:npm/readdirp@4.1.2",
       "name": "readdirp",
-      "version": "5.1.1",
-      "purl": "pkg:npm/readdirp@5.1.1",
+      "version": "4.1.2",
+      "purl": "pkg:npm/readdirp@4.1.2",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "2a4a3e6395d0e9f33e09edddab79bd606c6769c619625f5c035c198da17755baf2d8bde2d6a560f3e08080d3ec5d102b3cc50c09a391ee86bd36a9ed738dc928"
+          "content": "18387090b7f2c162f6b3abc48f286b8be79799f1fa8f52fb244dbb5a1a8b798ce887f0370c16981848f61ff1c56429ff90c7e29bbdc55f11094f0d3a5adc50c2"
         }
       ],
       "licenses": [
@@ -21715,13 +21715,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:readdirp@5.1.1"
+          "value": "pnpm-license-report:readdirp@4.1.2"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/readdirp/-/readdirp-5.1.1.tgz"
+          "url": "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz"
         }
       ]
     },
@@ -22475,14 +22475,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/sass@1.103.1",
+      "bom-ref": "pkg:npm/sass@1.83.4",
       "name": "sass",
-      "version": "1.103.1",
-      "purl": "pkg:npm/sass@1.103.1",
+      "version": "1.83.4",
+      "purl": "pkg:npm/sass@1.83.4",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "f627195116cfe754ba4b4406a3269eaa4f6e074e86356c6c15859f1f9460a4582a2b9140f2d25c33701d571ad911527b773f8bf3b9c6f7980129fe15b9a3071b"
+          "content": "0756e8cc278d4223a00dc2dddf77b60acd94eb4c19c235145f387dd34672405e6a51ab2f31d0d961b439eba2c9bbb72a47eb001e501f3ba44c91a203e6ceaaa4"
         }
       ],
       "licenses": [
@@ -22497,13 +22497,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:sass@1.103.1"
+          "value": "pnpm-license-report:sass@1.83.4"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/sass/-/sass-1.103.1.tgz"
+          "url": "https://registry.npmjs.org/sass/-/sass-1.83.4.tgz"
         }
       ]
     },
@@ -24209,14 +24209,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/svgo@3.3.4",
+      "bom-ref": "pkg:npm/svgo@3.3.5",
       "name": "svgo",
-      "version": "3.3.4",
-      "purl": "pkg:npm/svgo@3.3.4",
+      "version": "3.3.5",
+      "purl": "pkg:npm/svgo@3.3.5",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "1ac3518ace1ef23c67d98f44373ffc95b27ddc2b2d1bcb2fb4c9ee45a1db885d8b4c9e6d2b4feadedfd444fabd65cef35560499cd9c9308a7a6debcaedb4a636"
+          "content": "f1240ccddaef59a0fc75e526ae7601f804b2c415605943a2960f80ef99c4ffbe9674ba63e8ba290b088056f93391cab2ffd6fbb76320edf6852e3834651719df"
         }
       ],
       "licenses": [
@@ -24231,13 +24231,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:svgo@3.3.4"
+          "value": "pnpm-license-report:svgo@3.3.5"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/svgo/-/svgo-3.3.4.tgz"
+          "url": "https://registry.npmjs.org/svgo/-/svgo-3.3.5.tgz"
         }
       ]
     },

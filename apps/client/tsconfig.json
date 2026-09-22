@@ -21,5 +21,6 @@
       "@wuyan/content": ["../../packages/content/src/index.ts"]
     }
   },
-  "include": ["src", "config", "vitest.config.ts"]
+  "include": ["src", "config", "vitest.config.ts"],
+  "exclude": ["src/**/*.harmony_cpp.ts"]
 }

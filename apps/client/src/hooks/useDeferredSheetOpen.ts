@@ -1,5 +1,6 @@
 import { useDidHide, useDidShow } from '@tarojs/taro'
 import { useCallback, useEffect, useRef } from 'react'
+import { isHarmonyApp } from '../lib/platformCapabilities'
 
 /**
  * Some Android WebView builds emit a delayed synthetic click after a tap.
@@ -13,6 +14,7 @@ export function useDeferredSheetOpen(delayMs = 120) {
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
   const pendingRef = useRef(false)
   const pageVisibleRef = useRef(true)
+  const harmony = isHarmonyApp()
 
   const cancel = useCallback(() => {
     if (timerRef.current !== undefined) clearTimeout(timerRef.current)
@@ -37,7 +39,13 @@ export function useDeferredSheetOpen(delayMs = 120) {
     timerRef.current = setTimeout(() => {
       timerRef.current = undefined
       pendingRef.current = false
-      if (pageVisibleRef.current) open()
+      // The Harmony tab-bar adapter currently emits useDidHide when leaving a
+      // tab but does not reliably pair it with useDidShow when returning. The
+      // page is nevertheless active and interactive, so retaining the H5/
+      // mini-program visibility guard there would make the quick-log button a
+      // no-op after the first tab switch. SmokingEventSheet itself is still
+      // closed on a real page hide.
+      if (harmony || pageVisibleRef.current) open()
     }, delayMs)
-  }, [delayMs])
+  }, [delayMs, harmony])
 }

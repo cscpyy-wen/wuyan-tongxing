@@ -2,6 +2,7 @@ import { Picker, Text, View } from '@tarojs/components'
 import Taro, { useDidHide, useDidShow } from '@tarojs/taro'
 import { useMemo, useRef, useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
+import { HarmonyScrollablePage } from '../../components/HarmonyScrollablePage'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
 import { SmokingEventSheet } from '../../components/SmokingEventSheet'
@@ -91,7 +92,20 @@ export default function RecordsPage() {
   }
 
   return (
-    <View className='screen records-page'>
+    <HarmonyScrollablePage
+      className='screen records-page'
+      viewport='tab'
+      overlay={(
+        <SmokingEventSheet
+          open={Boolean(smokeLogAt) || Boolean(editingLog)}
+          capturedAt={smokeLogAt}
+          editing={editingLog}
+          allowTimeEdit
+          onClose={closeSheet}
+          onSaved={(_id, smokedAt) => setSelectedDate(toLocalDate(smokedAt))}
+        />
+      )}
+    >
       <PageHeader title='记录' showSos compact />
 
       <View className='card records-summary'>
@@ -128,7 +142,7 @@ export default function RecordsPage() {
         ) : null}
       </View>
 
-      {timeline.length === 0 ? <Text className='records-empty'>记录后显示原因与间隔</Text> : null}
+      {timeline.length === 0 ? <Text className='records-empty'>暂无记录</Text> : null}
 
       {timeline.length > 0 ? (
         <View className='records-timeline-column'>
@@ -139,6 +153,9 @@ export default function RecordsPage() {
           <View className='card activity-list'>
             {timeline.map((item) => {
               const sequence = summary.logs.findIndex((candidate) => candidate.id === item.id) + 1
+              const isSystemShortcut = item.count === 1
+                && item.trigger === undefined
+                && item.cravingIntensity === undefined
               const linkedLapse = state.lapses.find((lapse) => (
                 lapse.attemptId === state.plan!.id && lapse.cigaretteLogId === item.id
               ))
@@ -150,12 +167,20 @@ export default function RecordsPage() {
                     <Text className='activity-row__sequence'>第 {sequence} 支</Text>
                   </View>
                   <View className='grow'>
-                    <Text className='activity-row__title'>{item.count === 1 ? smokingTriggerLabel(item.trigger) : `历史合计 ${item.count} 支`}</Text>
-                    <Text className='muted'>
-                      {item.count === 1
-                        ? `烟瘾 ${item.cravingIntensity ? `${item.cravingIntensity}/5` : '—'}`
-                        : '合计记录'}
+                    <Text className='activity-row__title'>
+                      {isSystemShortcut
+                        ? '快捷记录'
+                        : item.count === 1
+                          ? smokingTriggerLabel(item.trigger)
+                          : `历史合计 ${item.count} 支`}
                     </Text>
+                    {isSystemShortcut ? null : (
+                      <Text className='muted'>
+                        {item.count === 1
+                          ? `烟瘾 ${item.cravingIntensity ? `${item.cravingIntensity}/5` : '—'}`
+                          : '合计记录'}
+                      </Text>
+                    )}
                     {linkedLapse ? (
                       <View className='activity-row__recovery'>
                         <Text className='pill'>已复盘</Text>
@@ -199,14 +224,6 @@ export default function RecordsPage() {
         </View>
       </> : null}
 
-      <SmokingEventSheet
-        open={Boolean(smokeLogAt) || Boolean(editingLog)}
-        capturedAt={smokeLogAt}
-        editing={editingLog}
-        allowTimeEdit
-        onClose={closeSheet}
-        onSaved={(_id, smokedAt) => setSelectedDate(toLocalDate(smokedAt))}
-      />
-    </View>
+    </HarmonyScrollablePage>
   )
 }

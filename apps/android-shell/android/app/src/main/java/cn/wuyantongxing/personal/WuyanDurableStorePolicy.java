@@ -14,6 +14,8 @@ final class WuyanDurableStorePolicy {
         "wuyan-tongxing/client-state/v1/deletion-in-progress";
     static final String BOOTSTRAP_CIGARETTES_KEY =
         "wuyan-tongxing/android-bootstrap-cigarettes/v1";
+    static final String SYSTEM_SHORTCUT_CIGARETTES_KEY =
+        "wuyan-tongxing/android-system-shortcut-cigarettes/v1";
     static final String BOOTSTRAP_CIGARETTES_QUARANTINE_KEY =
         "wuyan-tongxing/android-bootstrap-cigarettes-quarantine/v1";
     static final String BOOTSTRAP_CIGARETTES_CORRUPT_KEY =
@@ -38,6 +40,9 @@ final class WuyanDurableStorePolicy {
         }
         if (BOOTSTRAP_CIGARETTES_KEY.equals(key)) {
             return "android-bootstrap-cigarettes-v1.json";
+        }
+        if (SYSTEM_SHORTCUT_CIGARETTES_KEY.equals(key)) {
+            return "android-system-shortcut-cigarettes-v1.json";
         }
         if (BOOTSTRAP_CIGARETTES_QUARANTINE_KEY.equals(key)) {
             return "android-bootstrap-cigarettes-quarantine-v1.json";

@@ -5,7 +5,9 @@
   "type": "module",
   "description": "无烟同行 Taro 微信小程序与 H5 客户端",
   "browserslist": [
-    "Chrome >= 61"
+    "Chrome >= 61",
+    "Safari >= 16",
+    "iOS >= 16"
   ],
   "scripts": {
     "dev": "pnpm build:h5 && node ../../scripts/serve-h5.mjs 4173",

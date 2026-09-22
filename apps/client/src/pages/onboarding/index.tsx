@@ -1,15 +1,18 @@
-import { Input, Picker, Text, View } from '@tarojs/components'
+import { Input, Picker, ScrollView, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { AccessibleCheckbox } from '../../components/AccessibleCheckbox'
 import { AccessibleRadio } from '../../components/AccessibleRadio'
 import { LoadingScreen } from '../../components/LoadingScreen'
+import { HarmonyPrivacyPolicyEntry, PrivacyPolicyModal } from '../../components/PrivacyPolicyModal'
 import { useMinuteClock } from '../../hooks/useMinuteClock'
 import { dismissAndroidBootstrap } from '../../lib/androidBootstrap'
 import { canBeginPersonalPlan, MAX_PREVIOUS_ATTEMPTS } from '../../lib/model'
+import { openTodayAsRoot } from '../../lib/navigation'
 import { requestNativeBackupRestoreSelection } from '../../lib/nativeBackupRestoreSelection'
-import { isNativeAndroidApp } from '../../lib/runtime'
+import { isHarmonyApp } from '../../lib/platformCapabilities'
+import { isNativeMobileApp } from '../../lib/runtime'
 import { SMOKING_TRIGGER_OPTIONS } from '../../lib/smokingLogs'
 import { useAppState } from '../../state/AppState'
 import type { QuitPath, Trigger } from '../../types'
@@ -34,8 +37,9 @@ function toggleLimited<T>(values: T[], value: T, limit = 3): T[] {
 export default function OnboardingPage() {
   const { state, ready, loadFailure, actions } = useAppState()
   const [step, setStep] = useState(0)
-  const [adult, setAdult] = useState(false)
-  const [minor, setMinor] = useState(false)
+  const [ageStatus, setAgeStatus] = useState<'unanswered' | 'adult' | 'minor'>('unanswered')
+  const adult = ageStatus === 'adult'
+  const minor = ageStatus === 'minor'
   const [currentSmoker, setCurrentSmoker] = useState(false)
   const [smokerAnswered, setSmokerAnswered] = useState(false)
   const [boundaryAccepted, setBoundaryAccepted] = useState(false)
@@ -48,7 +52,9 @@ export default function OnboardingPage() {
   const [triggers, setTriggers] = useState<Trigger[]>([])
   const [path, setPath] = useState<QuitPath>('abrupt')
   const [restoring, setRestoring] = useState(false)
-  const nativeAndroid = isNativeAndroidApp()
+  const [privacyOpen, setPrivacyOpen] = useState(false)
+  const nativeMobile = isNativeMobileApp()
+  const harmony = isHarmonyApp()
   const now = useMinuteClock()
   const dateWindow = getOnboardingQuitDateWindow(path, now)
   const [quitDate, setQuitDate] = useState(() => getOnboardingQuitDateWindow('abrupt', new Date()).recommended)
@@ -59,7 +65,7 @@ export default function OnboardingPage() {
     }
     if (!ready) return
     if (state.onboarded) {
-      void Taro.reLaunch({ url: '/pages/today/index' })
+      void openTodayAsRoot()
         .finally(() => dismissAndroidBootstrap())
       return
     }
@@ -113,7 +119,7 @@ export default function OnboardingPage() {
       Taro.showToast({ title: '请选择允许范围内的日期', icon: 'none' })
       return
     }
-    const saved = actions.finishOnboarding({
+    actions.finishOnboarding({
       path,
       quitDate,
       baseline: {
@@ -125,11 +131,12 @@ export default function OnboardingPage() {
         pricePerPack,
       },
     })
-    if (saved) Taro.reLaunch({ url: '/pages/today/index' })
+    // The onboarded-state effect owns the single root transition. Calling it
+    // here as well races two Harmony router replacements after a successful save.
   }
 
   const restoreBackup = async () => {
-    if (!nativeAndroid || restoring) return
+    if (!nativeMobile || restoring) return
     setRestoring(true)
     try {
       await requestNativeBackupRestoreSelection()
@@ -140,41 +147,46 @@ export default function OnboardingPage() {
 
   if (minor) {
     return (
-      <View className='screen screen--detail onboarding'>
+      <View className={`screen screen--detail onboarding ${harmony ? 'onboarding--harmony' : ''}`}>
         <View className='minor-card'>
           <Text className='minor-card__icon' aria-hidden='true'>◌</Text>
           <Text className='page-title'>这版产品暂不面向未成年人</Text>
           <Text className='page-subtitle'>我们没有保存你的任何回答。请向监护人、学校卫生人员或正规医疗机构寻求帮助。</Text>
-          <Button className='button button--secondary' onClick={() => setMinor(false)}>返回年龄确认</Button>
+          <Button className='button button--secondary' onClick={() => setAgeStatus('unanswered')}>返回年龄确认</Button>
         </View>
       </View>
     )
   }
 
   return (
-    <View className='screen screen--detail onboarding'>
-      <View className='onboarding__top'>
-        <View className='onboarding__brand'>无烟同行</View>
+    <View className={`screen screen--detail onboarding ${harmony ? 'onboarding--harmony' : ''}`}>
+      <View className={`onboarding__top ${harmony ? 'onboarding__top--native' : ''}`}>
+        {!harmony ? <View className='onboarding__brand'>无烟同行</View> : null}
         <Text className='muted'>{step + 1} / 5</Text>
       </View>
       <View className='progress-track' aria-label={`首次设置进度 ${step + 1}/5`}>
         <View className='progress-fill' style={{ width: `${((step + 1) / 5) * 100}%` }} />
       </View>
 
+      <ScrollView
+        {...(harmony ? { key: `onboarding-step-${step}` } : {})}
+        className='onboarding__scroll'
+        scrollY
+      >
       {step === 0 ? (
         <View className='onboarding__body'>
           <Text className='page-title'>先确认这几项</Text>
           <Text className='page-subtitle'>无需登录，数据只存本机。</Text>
           <View className='card card--soft stack'>
             <Text className='field-label'>请确认年龄</Text>
-            <View className='choice-grid'>
+            <View className='choice-grid choice-grid--one-row'>
               <AccessibleRadio
                 checked={adult}
                 className={`choice ${adult ? 'choice--active' : ''}`}
                 groupName='adult-status'
                 label='我已满 18 岁'
                 value='adult'
-                onSelect={() => { setAdult(true); setMinor(false) }}
+                onSelect={() => setAgeStatus('adult')}
               >
                 我已满 18 岁
               </AccessibleRadio>
@@ -184,7 +196,7 @@ export default function OnboardingPage() {
                 groupName='adult-status'
                 label='我未满 18 岁'
                 value='minor'
-                onSelect={() => { setAdult(false); setMinor(true) }}
+                onSelect={() => setAgeStatus('minor')}
               >
                 我未满 18 岁
               </AccessibleRadio>
@@ -192,7 +204,7 @@ export default function OnboardingPage() {
           </View>
           <View className='card card--soft stack'>
             <Text className='field-label'>你目前是否吸纸烟？</Text>
-            <View className='choice-grid'>
+            <View className='choice-grid choice-grid--one-row'>
               <AccessibleRadio
                 checked={currentSmoker}
                 className={`choice ${currentSmoker ? 'choice--active' : ''}`}
@@ -211,6 +223,7 @@ export default function OnboardingPage() {
               >不是或不确定</AccessibleRadio>
             </View>
           </View>
+          {harmony ? <HarmonyPrivacyPolicyEntry placement='onboarding' onOpen={() => setPrivacyOpen(true)} /> : null}
           <View className='card stack onboarding-consent'>
             <View className='row row--between onboarding-consent__row'>
               <View className='grow'>
@@ -316,7 +329,7 @@ export default function OnboardingPage() {
           <Text className='page-title'>烟瘾来时，什么值得你坚持？</Text>
           <Text className='page-subtitle'>请选择 1–3 项，之后随时能调整。已选 {reasons.length}/3。</Text>
           <View className='card'>
-            <View className='choice-grid'>
+            <View className='choice-grid choice-grid--three-rows'>
               {REASONS.map((reason) => (
                 <AccessibleCheckbox
                   checked={reasons.includes(reason)}
@@ -340,7 +353,7 @@ export default function OnboardingPage() {
           <Text className='page-title'>最容易点烟的场景有哪些？</Text>
           <Text className='page-subtitle'>请选择 1–3 项，用来安排烟瘾急救练习，不用于广告。已选 {triggers.length}/3。</Text>
           <View className='card'>
-            <View className='choice-grid'>
+            <View className='choice-grid choice-grid--six-rows'>
               {SMOKING_TRIGGER_OPTIONS.map((trigger) => (
                 <AccessibleCheckbox
                   checked={triggers.includes(trigger.value)}
@@ -398,10 +411,13 @@ export default function OnboardingPage() {
           </View>
         </View>
       ) : null}
+      </ScrollView>
+
+      <PrivacyPolicyModal open={privacyOpen} onClose={() => setPrivacyOpen(false)} />
 
       <View className='onboarding__actions'>
         {step > 0 ? <Button className='button button--ghost' onClick={() => setStep((current) => current - 1)}>上一步</Button> : null}
-        {step === 0 && nativeAndroid ? (
+        {step === 0 && nativeMobile ? (
           <Button className='button button--ghost' disabled={restoring} onClick={() => void restoreBackup()}>
             {restoring ? '处理中…' : '恢复备份'}
           </Button>

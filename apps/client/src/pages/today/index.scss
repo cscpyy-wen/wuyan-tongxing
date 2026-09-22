@@ -375,9 +375,86 @@
   background: #eef1ef;
 }
 
+.today-page.harmony-page-scroll .smoking-hero__metrics,
+.today-page.harmony-page-scroll .quick-grid {
+  display: flex;
+}
+
+/* Let enlarged text choose fewer columns instead of splitting "分钟". */
+.today-page:not(.harmony-page-scroll) .smoking-hero__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+.today-page:not(.harmony-page-scroll) .smoking-hero__metric {
+  flex: 1 1 auto;
+  width: max-content;
+  max-width: 100%;
+}
+
+.today-page:not(.harmony-page-scroll) .smoking-hero__metric-value:not(.smoking-hero__metric-value--reason) {
+  white-space: nowrap;
+}
+
+.today-page.harmony-page-scroll .smoking-hero__metric,
+.today-page.harmony-page-scroll .quick-card {
+  flex: 1 1 0;
+}
+
+.today-page.harmony-page-scroll .smoking-day-confirm {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+}
+
+.today-page.harmony-page-scroll .smoking-day-unconfirm {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+}
+
+.today-page.harmony-page-scroll .smoke-log-action {
+  height: 70px;
+  min-height: 70px;
+  max-height: 70px;
+}
+
+.today-page.harmony-page-scroll .smoke-log-action--recent {
+  height: 122px;
+  min-height: 122px;
+  max-height: 122px;
+}
+
+.today-page.harmony-page-scroll .smoke-log-primary {
+  height: 70px;
+  min-height: 70px;
+  max-height: 70px;
+}
+
+.today-page.harmony-page-scroll .recent-log-actions,
+.today-page.harmony-page-scroll .recent-log-action {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+}
+
+.today-page.harmony-page-scroll .quick-card {
+  height: 78px;
+  min-height: 78px;
+  max-height: 78px;
+}
+
+.today-page.harmony-page-scroll .schedule-adjust {
+  max-height: 44px;
+}
+
 @media (orientation: landscape) and (max-height: 600px) {
   .today-page {
     padding-top: calc(10px + var(--safe-top));
+    /* A separate right-hand action lane keeps the sticky record control from
+       covering the daily confirmation and other scrollable content. */
+    padding-right: calc(min(396px, 46vw) + 16px);
     /* Includes the optional "刚刚记录 / 编辑 / 撤销" row below the fixed CTA. */
     padding-bottom: calc(204px + var(--safe-bottom));
   }
@@ -413,10 +490,11 @@
     position: fixed;
     z-index: 40;
     bottom: calc(var(--tabbar-height) + 10px + var(--safe-bottom));
-    left: 50%;
-    width: min(520px, calc(100vw - 48px - var(--safe-left) - var(--safe-right)));
+    left: auto;
+    right: max(calc(24px + var(--safe-right)), calc((100vw - 860px) / 2 + 16px));
+    width: min(340px, calc(40vw - var(--safe-left) - var(--safe-right)));
     margin: 0;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .smoke-log-primary {

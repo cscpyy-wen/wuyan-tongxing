@@ -9,6 +9,7 @@ import {
   shouldDismissAndroidBootstrap,
 } from './lib/androidBootstrap'
 import {
+  ANDROID_BOOTSTRAP_QUEUE_EVENT,
   clearAndroidBackupRestoreIntent,
   isAndroidBackupRestoreResultAccepted,
   markAndroidBackupRestoreResultAccepted,
@@ -17,6 +18,7 @@ import {
   readAndroidBackupRestoreIntentState,
 } from './lib/androidBootstrapQueue'
 import { runAppModal } from './lib/modalCoordinator'
+import { openTodayAsRoot } from './lib/navigation'
 import {
   consumeRestoredOpenJson,
   formatNativeBackupRestoreConfirmation,
@@ -26,6 +28,7 @@ import {
   type RestoredOpenJsonEvent,
 } from './lib/nativeBackupRestore'
 import {
+  addNativeQuickRecordListener,
   acknowledgeNativeLastExportOutcome,
   acknowledgeNativePendingOpenJson,
   acknowledgePendingNativeExportOutcome,
@@ -36,6 +39,7 @@ import {
   getNativeLastExportOutcome,
   isTerminalNativeOpenJsonReadError,
   isNativeAndroidApp,
+  isNativeMobileApp,
   nativeExportCleanupIssue,
   nativeExportCleanupFilename,
   NATIVE_OPEN_JSON_READY_EVENT,
@@ -94,7 +98,7 @@ function NativeRuntimeBridge({ children }: PropsWithChildren) {
       do {
         reminderReconciliationPending.current = false
         const latest = latestAppState.current
-        if (!latest.ready || !isNativeAndroidApp()) continue
+        if (!latest.ready || !isNativeMobileApp()) continue
         const platformLease = await latest.actions.beginDataPlatformMutation()
         if (!platformLease) continue
         try {
@@ -377,7 +381,7 @@ function NativeRuntimeBridge({ children }: PropsWithChildren) {
       }
       await releaseIntentThenAcknowledge(descriptor.id)
       if (outcome.status === 'restored') {
-        setTimeout(() => { void Taro.reLaunch({ url: '/pages/today/index' }).catch(() => undefined) }, 400)
+        setTimeout(() => { void openTodayAsRoot().catch(() => undefined) }, 400)
       }
     } finally {
       try { importLease?.release() } catch { /* the durable controller still unlocks */ }
@@ -437,12 +441,12 @@ function NativeRuntimeBridge({ children }: PropsWithChildren) {
   }, [appState.backupRestorePending])
 
   useEffect(() => {
-    if (!appState.ready || !isNativeAndroidApp()) return
+    if (!appState.ready || !isNativeMobileApp()) return
     void reconcileNativeReminder.current()
   }, [appState.ready, appState.state.settings.inAppReminder])
 
   useEffect(() => {
-    if (!isNativeAndroidApp()) return undefined
+    if (!isNativeMobileApp()) return undefined
 
     let disposed = false
     const removeListeners: Array<() => Promise<void>> = []
@@ -470,13 +474,16 @@ function NativeRuntimeBridge({ children }: PropsWithChildren) {
         else removeListeners.push(() => handle.remove())
       }).catch(() => undefined)
     }
+    if (isNativeAndroidApp()) trackListener(addNativeQuickRecordListener(() => {
+      window.dispatchEvent(new Event(ANDROID_BOOTSTRAP_QUEUE_EVENT))
+    }))
 
     void Promise.all([
       import('@capacitor/app'),
       import('@capacitor/local-notifications'),
     ]).then(([{ App: NativeApp }, { LocalNotifications }]) => {
       if (disposed) return
-      trackListener(NativeApp.addListener('backButton', () => {
+      if (isNativeAndroidApp()) trackListener(NativeApp.addListener('backButton', () => {
         if (consumeAndroidBootstrapBack()) return
         if (consumeTaroOverlayBack()) return
         if (consumeNativeBackHandler()) return
@@ -490,6 +497,7 @@ function NativeRuntimeBridge({ children }: PropsWithChildren) {
 
       trackListener(NativeApp.addListener('appStateChange', ({ isActive }) => {
         if (isActive) {
+          window.dispatchEvent(new Event(ANDROID_BOOTSTRAP_QUEUE_EVENT))
           void reconcileNativeReminder.current()
           void probeNativeExportState.current()
           void runRestoredOpenJsonProcessingSafely(

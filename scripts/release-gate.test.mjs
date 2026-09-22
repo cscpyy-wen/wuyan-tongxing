@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import path from 'node:path'
 import test from 'node:test'
+import { ANDROID_DEVICE_TEST_COUNT } from './android-device-test-results.mjs'
 import { releaseGatePlan, runReleaseGate, validateAndroidSerial } from './release-gate.mjs'
 
 const root = path.resolve('release-gate-fixture-root')
@@ -26,10 +27,10 @@ test('device gate fails before any command without explicit valid ANDROID_SERIAL
   assert.throws(() => validateAndroidSerial('bad serial'), /必须显式设置合法的 ANDROID_SERIAL/)
 })
 
-test('device gate adds the explicit 26/26 stage and passes serial only after validation', () => {
+test(`device gate adds the explicit ${ANDROID_DEVICE_TEST_COUNT}/${ANDROID_DEVICE_TEST_COUNT} stage and passes serial only after validation`, () => {
   const plan = releaseGatePlan({ ...base, device: true, serial: 'emulator-explicit-1234' })
   assert.equal(plan.at(-2).script, 'test:android:native:device')
-  assert.equal(plan.at(-2).name, '指定设备 instrumentation 26/26 门禁')
+  assert.equal(plan.at(-2).name, `指定设备 instrumentation ${ANDROID_DEVICE_TEST_COUNT}/${ANDROID_DEVICE_TEST_COUNT} 门禁`)
   assert.equal(plan.at(-1).script, 'release:license-pack')
   assert.ok(plan.every(({ env }) => env.ANDROID_SERIAL === 'emulator-explicit-1234'))
 })

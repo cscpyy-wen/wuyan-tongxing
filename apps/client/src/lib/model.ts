@@ -352,10 +352,12 @@ export function computeClientProgress(state: ClientState, at = new Date()): Prog
   const currentDate = toLocalDate(at)
   const beforeQuitDate = daysBetween(currentDate, state.plan.quitDate) > 0
   const quitStart = shanghaiMidnight(state.plan.quitDate)
+  const planStart = new Date(state.plan.createdAt)
   const smokingTime = latestSmokingTime(state, at, state.plan.id)
-  const streakStart = smokingTime && smokingTime > quitStart ? smokingTime : quitStart
+  // A same-day new attempt must not inherit the hours before it existed.
+  const trackingStart = planStart > quitStart ? planStart : quitStart
+  const streakStart = smokingTime && smokingTime > trackingStart ? smokingTime : trackingStart
   const elapsed = beforeQuitDate ? 0 : Math.max(0, at.getTime() - streakStart.getTime())
-  const currentStreakHours = Math.floor(elapsed / 3_600_000)
 
   const attemptCheckIns = state.checkIns.filter((item) => item.attemptId === state.plan!.id && item.date <= currentDate)
   const checkInByDate = new Map(attemptCheckIns.map((item) => [item.date, item]))
@@ -367,6 +369,14 @@ export function computeClientProgress(state: ClientState, at = new Date()): Prog
   }
   const todayCheckIn = checkInByDate.get(currentDate)
   const streakConfirmed = !beforeQuitDate && Boolean(todayCheckIn?.smokeFree)
+  // Confirming today cannot retroactively certify an earlier unanswered day.
+  // Keep elapsed-since-last-record semantics when unconfirmed, but constrain
+  // an explicitly labelled smoke-free streak to the contiguous confirmed window.
+  const confirmedWindowStart = shanghaiMidnight(addDays(currentDate, -smokeFreeDays))
+  const confirmedStart = confirmedWindowStart > streakStart ? confirmedWindowStart : streakStart
+  const currentStreakHours = Math.floor((streakConfirmed
+    ? Math.max(0, at.getTime() - confirmedStart.getTime())
+    : elapsed) / 3_600_000)
   const completedCheckIns = attemptCheckIns.filter((item) => item.date < currentDate)
   const cigarettesAvoided = completedCheckIns.reduce(
     (total, item) => total + Math.max(0, state.plan!.baselineCigarettesPerDay - item.cigarettesSmoked),
@@ -393,12 +403,55 @@ export function mergeCheckIn(checkIns: ClientCheckIn[], next: ClientCheckIn): Cl
   return [...withoutSameDate, next].sort((a, b) => b.date.localeCompare(a.date))
 }
 
+export interface DailyCheckInConfirmation {
+  attemptId: string
+  date: string
+  cigarettesSmoked: number
+  cravingPeak: CravingLevel
+  recordsSignature: string
+}
+
+/** Captures exactly the plan, Beijing day and records the confirmation describes. */
+export function createDailyCheckInConfirmation(
+  state: ClientState,
+  at = new Date(),
+): DailyCheckInConfirmation | undefined {
+  if (!state.onboarded || !state.plan || !state.settings.sensitiveHealthData) return undefined
+  const date = toLocalDate(at)
+  const logs = state.cigarettes.filter((item) => (
+    item.attemptId === state.plan!.id && toLocalDate(item.createdAt) === date
+  ))
+  const summary = summarizeSmokingLogs(logs, date)
+  return {
+    attemptId: state.plan.id,
+    date,
+    cigarettesSmoked: summary.recordedCount,
+    cravingPeak: summary.peakCravingIntensity ?? 1,
+    recordsSignature: JSON.stringify([...logs].sort((left, right) => left.id.localeCompare(right.id))),
+  }
+}
+
+export function isDailyCheckInConfirmationCurrent(
+  state: ClientState,
+  confirmation: DailyCheckInConfirmation,
+  at = new Date(),
+): boolean {
+  const current = createDailyCheckInConfirmation(state, at)
+  return Boolean(current
+    && current.attemptId === confirmation.attemptId
+    && current.date === confirmation.date
+    && current.cigarettesSmoked === confirmation.cigarettesSmoked
+    && current.cravingPeak === confirmation.cravingPeak
+    && current.recordsSignature === confirmation.recordsSignature)
+}
+
 export function applyDailyCheckIn(state: ClientState, next: ClientCheckIn): ClientState {
   const checkInTime = parseEventTime(next.createdAt)
   const exactSmokingTime = checkInTime ? latestSmokingTime(state, checkInTime, next.attemptId) : undefined
   const loggedCount = state.cigarettes
     .filter((event) => (!event.attemptId || event.attemptId === next.attemptId) && toLocalDate(event.createdAt) === next.date)
     .reduce((total, event) => total + event.count, 0)
+  if (next.cigarettesSmoked < loggedCount) return state
   const legacyProxyTime = next.cigarettesSmoked > loggedCount ? checkInTime : undefined
   const latest = [exactSmokingTime, legacyProxyTime]
     .filter((value): value is Date => Boolean(value))
@@ -423,7 +476,8 @@ export function removeDailyCheckIn(state: ClientState, attemptId: string, date: 
 
 export function applyCigaretteLog(state: ClientState, event: ClientCigaretteLog): ClientState {
   const eventTime = parseEventTime(event.createdAt)
-  if (!eventTime || event.count !== 1 || !event.trigger || !event.cravingIntensity) return state
+  if (!eventTime || event.count !== 1) return state
+  if ((event.trigger === undefined) !== (event.cravingIntensity === undefined)) return state
   if (state.cigarettes.some((item) => item.id === event.id)) return state
   const previousTime = parseEventTime(state.lastCigaretteAt)
   const latest = [previousTime, eventTime]
@@ -437,19 +491,29 @@ export function applyCigaretteLog(state: ClientState, event: ClientCigaretteLog)
   }
 }
 
+export interface CigaretteLogUpdate {
+  smokedAt: string
+  trigger?: Trigger | undefined
+  cravingIntensity?: CravingLevel | undefined
+  updatedAt?: string
+}
+
 export function updateCigaretteLog(
   state: ClientState,
   id: string,
-  input: { smokedAt: string; trigger: Trigger; cravingIntensity: CravingLevel; updatedAt?: string },
+  input: CigaretteLogUpdate,
 ): ClientState {
   const existing = state.cigarettes.find((item) => item.id === id)
   const eventTime = parseEventTime(input.smokedAt)
   if (!existing || existing.count !== 1 || !eventTime) return state
+  if ((input.trigger === undefined) !== (input.cravingIntensity === undefined)) return state
+  if (input.trigger !== undefined && (!parseTrigger(input.trigger) || !integerInRange(input.cravingIntensity, 1, 5))) return state
+  if (input.trigger === undefined && (existing.trigger !== undefined || existing.cravingIntensity !== undefined)) return state
   const updated: ClientCigaretteLog = {
     ...existing,
     createdAt: eventTime.toISOString(),
-    trigger: input.trigger,
-    cravingIntensity: input.cravingIntensity,
+    ...(input.trigger ? { trigger: input.trigger } : {}),
+    ...(input.cravingIntensity ? { cravingIntensity: input.cravingIntensity } : {}),
     updatedAt: input.updatedAt ?? new Date().toISOString(),
   }
   const attemptId = existing.attemptId ?? state.plan?.id
@@ -466,7 +530,7 @@ export function updateCigaretteLog(
           ...item,
           createdAt: updated.createdAt,
           ...(updated.trigger ? { trigger: updated.trigger } : {}),
-          cravingIntensity: input.cravingIntensity,
+          ...(updated.cravingIntensity ? { cravingIntensity: updated.cravingIntensity } : {}),
         }
       : item),
   }
@@ -996,6 +1060,9 @@ function parsePlan(value: unknown, fallbackPricePerPack = 0): ClientQuitPlan | u
     || !integerInRange(input.baselineCigarettesPerDay, 1, 100)
     || !integerInRange(input.attemptNumber, 1, Number.MAX_SAFE_INTEGER)
   ) return undefined
+  // Validate the relationship as well as each field: the schedule renderer
+  // requires these bounds, including when the plan came from an older backup.
+  if (!validateQuitDate(input.path, toLocalDate(input.createdAt), input.quitDate)) return undefined
   const reductionLimits = input.path === 'reduction'
     ? parseReductionLimits(input.reductionLimits, input.baselineCigarettesPerDay)
     : undefined

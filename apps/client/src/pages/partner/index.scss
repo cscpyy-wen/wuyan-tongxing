@@ -110,3 +110,26 @@
 .partner-copy {
   margin-top: 10px;
 }
+
+/* Harmony's native Button keeps a large platform default height unless all
+ * three height bounds are supplied. Keep the four template tabs compact so
+ * the preview remains visible above the fold. */
+.partner-page.harmony-page-scroll .template-tabs {
+  width: 100%;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+}
+
+.partner-page.harmony-page-scroll .template-tab {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+}
+
+.partner-page.harmony-page-scroll .partner-send,
+.partner-page.harmony-page-scroll .partner-copy {
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}

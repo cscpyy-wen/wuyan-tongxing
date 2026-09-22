@@ -50,6 +50,18 @@ describe('逐支吸烟统计', () => {
     expect(summary.reasons.find((item) => item.label === '原因未记录')?.count).toBe(4)
   })
 
+  it('系统快捷记录计入支数和间隔，但不伪装成未填写的原因', () => {
+    const summary = summarizeSmokingLogs([
+      { id: 'tile', createdAt: '2026-08-24T10:00:00+08:00', count: 1, source: 'QUICK_LOG' },
+      { id: 'widget', createdAt: '2026-08-24T10:05:00+08:00', count: 1, source: 'QUICK_LOG' },
+    ], '2026-08-24')
+
+    expect(summary.recordedCount).toBe(2)
+    expect(summary.averageIntervalMinutes).toBe(5)
+    expect(summary.reasons).toEqual([])
+    expect(summary.topReason).toBeUndefined()
+  })
+
   it('明确以中国标准时间跨日分桶', () => {
     expect(toShanghaiDate('2026-08-24T15:59:59.000Z')).toBe('2026-08-24')
     expect(toShanghaiDate('2026-08-24T16:00:00.000Z')).toBe('2026-08-25')

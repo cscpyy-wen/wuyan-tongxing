@@ -5,10 +5,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { consumeRestoredOpenJson } from '../lib/nativeBackupRestore'
 import {
   createClientPlan,
+  createDailyCheckInConfirmation,
   createInitialState,
   MAX_PREVIOUS_ATTEMPTS,
   removeCigaretteLog,
   STORAGE_KEY,
+  toLocalDate,
 } from '../lib/model'
 import { BACKUP_STORAGE_KEY, DELETION_INTENT_STORAGE_KEY } from '../lib/localRepository'
 import {
@@ -18,6 +20,7 @@ import {
   ANDROID_BOOTSTRAP_IMPORT_JOURNAL_KEY,
   ANDROID_BOOTSTRAP_QUARANTINE_KEY,
   ANDROID_BOOTSTRAP_QUEUE_KEY,
+  ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
   markAndroidBackupRestoreResultAccepted,
   sanitizeAndroidBootstrapRecoveryData,
 } from '../lib/androidBootstrapQueue'
@@ -33,6 +36,10 @@ const taroMocks = vi.hoisted(() => {
     failWriteAfterSetKey: undefined as string | undefined,
     failWriteAfterSetRemaining: 0,
     stripInternalFieldsOnCoreWrite: false,
+    getStorageSyncCalls: 0,
+    setStorageSyncCalls: 0,
+    removeStorageSyncCalls: 0,
+    getStorageInfoSyncCalls: 0,
     showToast: vi.fn(),
     showModal: vi.fn(),
     reLaunch: vi.fn(),
@@ -51,8 +58,12 @@ const runtimeMocks = vi.hoisted(() => ({
 
 vi.mock('@tarojs/taro', () => ({
   default: {
-    getStorageSync: (key: string) => taroMocks.values.get(key),
+    getStorageSync: (key: string) => {
+      taroMocks.getStorageSyncCalls += 1
+      return taroMocks.values.get(key)
+    },
     setStorageSync: (key: string, value: unknown) => {
+      taroMocks.setStorageSyncCalls += 1
       if (taroMocks.failWriteAfterSetKey === key && taroMocks.failWriteAfterSetRemaining === 1) {
         taroMocks.failWriteAfterSetRemaining = 0
         throw new Error('write unavailable before commit')
@@ -71,10 +82,14 @@ vi.mock('@tarojs/taro', () => ({
       }
     },
     removeStorageSync: (key: string) => {
+      taroMocks.removeStorageSyncCalls += 1
       if (taroMocks.failRemoveKey === key) throw new Error('remove failed')
       taroMocks.values.delete(key)
     },
-    getStorageInfoSync: () => ({ keys: [...taroMocks.values.keys()] }),
+    getStorageInfoSync: () => {
+      taroMocks.getStorageInfoSyncCalls += 1
+      return { keys: [...taroMocks.values.keys()] }
+    },
     showToast: taroMocks.showToast,
     showModal: taroMocks.showModal,
     reLaunch: taroMocks.reLaunch,
@@ -83,6 +98,8 @@ vi.mock('@tarojs/taro', () => ({
 
 vi.mock('../lib/runtime', () => ({
   isNativeAndroidApp: () => runtimeMocks.native,
+  isNativeMobileApp: () => runtimeMocks.native,
+  isNativeIOSApp: () => false,
   cancelDailyReminder: runtimeMocks.cancelReminder,
   purgeNativeAppPrivatePendingExports: runtimeMocks.purgeExports,
   saveNativeJsonFile: runtimeMocks.saveJson,
@@ -123,12 +140,82 @@ describe('AppState onboarding transaction', () => {
     taroMocks.failWriteAfterSetKey = undefined
     taroMocks.failWriteAfterSetRemaining = 0
     taroMocks.stripInternalFieldsOnCoreWrite = false
+    taroMocks.getStorageSyncCalls = 0
+    taroMocks.setStorageSyncCalls = 0
+    taroMocks.removeStorageSyncCalls = 0
+    taroMocks.getStorageInfoSyncCalls = 0
     window.localStorage.clear()
     delete window.WuyanDurableStore
     delete document.documentElement.dataset.wuyanLocalState
     runtimeMocks.native = false
     vi.clearAllMocks()
     taroMocks.showModal.mockResolvedValue({ confirm: false, cancel: true })
+  })
+
+  it.each(['new-record', 'midnight', 'new-attempt', 'same-count-edit'] as const)(
+    'rejects a stale daily confirmation after %s without persisting it',
+    async (change) => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-09-22T23:59:00+08:00'))
+      try {
+        const stored = validState()
+        stored.cigarettes = [{ id: 'original', createdAt: '2026-09-22T20:00:00+08:00', count: 1, attemptId: stored.plan!.id, source: 'QUICK_LOG' }]
+        taroMocks.values.set(STORAGE_KEY, structuredClone(stored))
+        let current: ReturnType<typeof useAppState> | undefined
+        function Probe() { current = useAppState(); return null }
+        const rendered = render(createElement(AppStateProvider, undefined, createElement(Probe)))
+        const confirmation = createDailyCheckInConfirmation(current!.state)!
+        act(() => {
+          if (change === 'new-record') current!.actions.recordCigarette({ smokedAt: new Date().toISOString(), trigger: 'stress', cravingIntensity: 3 })
+          if (change === 'same-count-edit') current!.actions.editCigarette('original', { smokedAt: '2026-09-22T19:00:00+08:00' })
+          if (change === 'new-attempt') current!.actions.startNewAttempt('abrupt', '2026-09-22')
+          if (change === 'midnight') vi.setSystemTime(new Date('2026-09-23T00:00:01+08:00'))
+        })
+        const beforeConfirm = structuredClone(taroMocks.values.get(STORAGE_KEY))
+        act(() => expect(current!.actions.recordCheckIn(confirmation)).toBe(false))
+        expect(taroMocks.values.get(STORAGE_KEY)).toEqual(beforeConfirm)
+        expect(current!.state.checkIns).toEqual([])
+        expect(taroMocks.showToast).toHaveBeenCalledWith(expect.objectContaining({ title: '日期或记录已变化，请重新确认' }))
+        rendered.unmount()
+      } finally {
+        vi.useRealTimers()
+      }
+    },
+  )
+
+  it('commits an unchanged exact daily confirmation and allows a fresh retry after a new record', () => {
+    const stored = validState()
+    taroMocks.values.set(STORAGE_KEY, structuredClone(stored))
+    let current: ReturnType<typeof useAppState> | undefined
+    function Probe() { current = useAppState(); return null }
+    const rendered = render(createElement(AppStateProvider, undefined, createElement(Probe)))
+    const initial = createDailyCheckInConfirmation(current!.state)!
+    act(() => expect(current!.actions.recordCheckIn(initial)).toBe(true))
+    act(() => { current!.actions.recordCigarette({ smokedAt: new Date().toISOString(), trigger: 'stress', cravingIntensity: 3 }) })
+    expect(current!.state.checkIns).toEqual([])
+    const refreshed = createDailyCheckInConfirmation(current!.state)!
+    act(() => expect(current!.actions.recordCheckIn(refreshed)).toBe(true))
+    expect(current!.state.checkIns[0]).toMatchObject({ cigarettesSmoked: 1, smokeFree: false, cravingPeak: 3 })
+    rendered.unmount()
+  })
+
+  it('rejects an unrenderable reduction backup without changing current durable state', async () => {
+    const stored = validState()
+    taroMocks.values.set(STORAGE_KEY, structuredClone(stored))
+    let current: ReturnType<typeof useAppState> | undefined
+    function Probe() { current = useAppState(); return null }
+    const rendered = render(createElement(AppStateProvider, undefined, createElement(Probe)))
+    const lease = await current!.actions.beginDataImport()
+    const invalid = { ...stored, plan: { ...stored.plan, path: 'reduction', quitDate: '2026-08-29' } }
+    try {
+      act(() => expect(current!.actions.importData(JSON.stringify(invalid), lease!)).toBe(false))
+      expect(taroMocks.values.get(STORAGE_KEY)).toEqual(stored)
+      expect(current!.state.plan).toEqual(stored.plan)
+      expect(current!.ready).toBe(true)
+    } finally {
+      lease!.release()
+      rendered.unmount()
+    }
   })
 
   it('does not mutate DOM or performance markers during React render', () => {
@@ -167,6 +254,85 @@ describe('AppState onboarding transaction', () => {
 
     expect(JSON.parse(nativeValues.get(STORAGE_KEY)!)).toMatchObject({ onboarded: true })
     expect(JSON.parse(nativeValues.get(BACKUP_STORAGE_KEY)!)).toMatchObject({ onboarded: true })
+  })
+
+  it('treats an empty authoritative native store as a fresh install without calling Taro sync storage', async () => {
+    const nativeValues = new Map<string, string>()
+    window.WuyanDurableStore = {
+      authoritativeWhenMissing: true,
+      hasValue: (key) => nativeValues.has(key),
+      readValue: (key) => nativeValues.get(key) ?? null,
+      readRawValue: (key) => nativeValues.get(key) ?? null,
+      writeValue: (key, value) => { nativeValues.set(key, value) },
+      removeValue: (key) => { nativeValues.delete(key) },
+    }
+    let current: ReturnType<typeof useAppState> | undefined
+    function Probe() {
+      current = useAppState()
+      return null
+    }
+
+    render(createElement(AppStateProvider, undefined, createElement(Probe)))
+    await waitFor(() => expect(current?.ready).toBe(true))
+
+    expect(current?.loadFailure).toBeUndefined()
+    expect(current?.state.onboarded).toBe(false)
+
+    let saved = false
+    act(() => {
+      saved = current!.actions.finishOnboarding({
+        path: 'abrupt',
+        quitDate: toLocalDate(new Date()),
+        baseline: {
+          cigarettesPerDay: 10,
+          firstCigaretteMinutes: 30,
+          previousAttempts: 0,
+          reasons: ['为了健康'],
+          triggers: ['stress'],
+          pricePerPack: 25,
+        },
+      })
+    })
+    expect(saved).toBe(true)
+    expect(nativeValues.has(STORAGE_KEY)).toBe(true)
+    expect(nativeValues.has(BACKUP_STORAGE_KEY)).toBe(true)
+
+    await act(async () => {
+      await expect(current!.actions.deleteAllData()).resolves.toBe(true)
+    })
+    expect(nativeValues.size).toBe(0)
+    expect(taroMocks.getStorageSyncCalls).toBe(0)
+    expect(taroMocks.setStorageSyncCalls).toBe(0)
+    expect(taroMocks.removeStorageSyncCalls).toBe(0)
+    expect(taroMocks.getStorageInfoSyncCalls).toBe(0)
+  })
+
+  it('exports authoritative corrupt native raw data without calling Taro sync storage', async () => {
+    runtimeMocks.native = true
+    const nativeValues = new Map<string, string>([[STORAGE_KEY, '{']])
+    window.WuyanDurableStore = {
+      authoritativeWhenMissing: true,
+      hasValue: (key) => nativeValues.has(key),
+      readValue: (key) => nativeValues.get(key) ?? null,
+      readRawValue: (key) => nativeValues.get(key) ?? null,
+      writeValue: (key, value) => { nativeValues.set(key, value) },
+      removeValue: (key) => { nativeValues.delete(key) },
+    }
+    let current: ReturnType<typeof useAppState> | undefined
+    function Probe() {
+      current = useAppState()
+      return null
+    }
+
+    render(createElement(AppStateProvider, undefined, createElement(Probe)))
+    await waitFor(() => expect(current?.loadFailure).toBeDefined())
+    await act(async () => current!.actions.exportRecoveryData())
+
+    expect(runtimeMocks.saveJson).toHaveBeenCalledOnce()
+    expect(taroMocks.getStorageSyncCalls).toBe(0)
+    expect(taroMocks.setStorageSyncCalls).toBe(0)
+    expect(taroMocks.removeStorageSyncCalls).toBe(0)
+    expect(taroMocks.getStorageInfoSyncCalls).toBe(0)
   })
 
   it('keeps React state and regular mutations blocked while a restored picker result is pending', async () => {
@@ -279,6 +445,39 @@ describe('AppState onboarding transaction', () => {
     })
     expect((taroMocks.values.get(STORAGE_KEY) as ClientState).cigarettes).toHaveLength(1)
     expect(window.localStorage.getItem(ANDROID_BOOTSTRAP_QUEUE_KEY)).toBeNull()
+  })
+
+  it('commits a native widget quick record without inventing a reason or craving intensity', async () => {
+    runtimeMocks.native = true
+    const stored = validState()
+    taroMocks.values.set(STORAGE_KEY, structuredClone(stored))
+    const queued = {
+      id: '33666666-3333-4666-8666-333333333333',
+      smokedAt: '2026-08-28T10:16:00.000Z',
+      attemptId: stored.plan!.id,
+      entryPoint: 'APP_WIDGET',
+    }
+    window.localStorage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, JSON.stringify({ data: [queued] }))
+    let current: ReturnType<typeof useAppState> | undefined
+    function Probe() {
+      current = useAppState()
+      return null
+    }
+
+    render(createElement(AppStateProvider, undefined, createElement(Probe)))
+    await waitFor(() => expect(current?.state.cigarettes).toHaveLength(1))
+
+    expect(current?.state.cigarettes[0]).toEqual(expect.objectContaining({
+      id: queued.id,
+      createdAt: queued.smokedAt,
+      attemptId: stored.plan?.id,
+      count: 1,
+      source: 'QUICK_LOG',
+    }))
+    expect(current?.state.cigarettes[0]).not.toHaveProperty('trigger')
+    expect(current?.state.cigarettes[0]).not.toHaveProperty('cravingIntensity')
+    expect((taroMocks.values.get(STORAGE_KEY) as ClientState).cigarettes).toHaveLength(1)
+    expect(window.localStorage.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)).toBeNull()
   })
 
   it('acknowledges an exact same-id crash replay without duplicating it', async () => {
@@ -493,7 +692,7 @@ describe('AppState onboarding transaction', () => {
     act(() => {
       current!.actions.finishOnboarding({
         path: 'abrupt',
-        quitDate: '2026-09-01',
+        quitDate: toLocalDate(new Date()),
         baseline: {
           cigarettesPerDay: 10,
           firstCigaretteMinutes: 30,
@@ -640,12 +839,19 @@ describe('AppState onboarding transaction', () => {
       trigger: 'meal',
       cravingIntensity: 2,
     }] })
+    const systemShortcutRaw = JSON.stringify({ data: [{
+      id: '56565656-5656-4565-8565-565656565656',
+      smokedAt: '2026-08-28T10:27:00.000Z',
+      attemptId: stored.plan!.id,
+      entryPoint: 'QUICK_SETTINGS_TILE',
+    }] })
     const corruptRaw = JSON.stringify({ data: [{
       capturedAt: '2026-08-28T10:30:00.000Z',
       sourceKey: ANDROID_BOOTSTRAP_QUEUE_KEY,
       raw: '{broken',
     }] })
     window.localStorage.setItem(ANDROID_BOOTSTRAP_QUEUE_KEY, queueRaw)
+    window.localStorage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, systemShortcutRaw)
     window.localStorage.setItem(ANDROID_BOOTSTRAP_QUARANTINE_KEY, quarantineRaw)
     window.localStorage.setItem(ANDROID_BOOTSTRAP_CORRUPT_KEY, corruptRaw)
     let current: ReturnType<typeof useAppState> | undefined
@@ -674,6 +880,7 @@ describe('AppState onboarding transaction', () => {
 
     expect(outcome?.status).toBe('restored')
     expect(window.localStorage.getItem(ANDROID_BOOTSTRAP_QUEUE_KEY)).toBe(queueRaw)
+    expect(window.localStorage.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)).toBe(systemShortcutRaw)
     expect(window.localStorage.getItem(ANDROID_BOOTSTRAP_QUARANTINE_KEY)).toBe(quarantineRaw)
     expect(window.localStorage.getItem(ANDROID_BOOTSTRAP_CORRUPT_KEY)).toBe(corruptRaw)
   })
@@ -1090,6 +1297,7 @@ describe('AppState onboarding transaction', () => {
     }
     render(createElement(AppStateProvider, undefined, createElement(Probe)))
     await waitFor(() => expect(current?.ready).toBe(true))
+    window.localStorage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, JSON.stringify({ data: [] }))
 
     const reservation = current!.actions.reserveDataImport()
     const importLease = await current!.actions.beginDataImport(reservation)
@@ -1105,6 +1313,7 @@ describe('AppState onboarding transaction', () => {
     expect(runtimeMocks.purgeExports).toHaveBeenCalledTimes(1)
     expect(taroMocks.values.has(STORAGE_KEY)).toBe(false)
     expect(taroMocks.values.has(BACKUP_STORAGE_KEY)).toBe(false)
+    expect(window.localStorage.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)).toBeNull()
     await waitFor(() => expect(current?.state.onboarded).toBe(false))
   })
 

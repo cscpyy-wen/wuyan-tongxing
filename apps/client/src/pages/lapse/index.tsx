@@ -3,11 +3,14 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useEffect, useRef, useState } from 'react'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { AccessibleRadio } from '../../components/AccessibleRadio'
+import { HarmonyScrollablePage } from '../../components/HarmonyScrollablePage'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
 import { useRequireOnboarding } from '../../hooks/useRequireOnboarding'
 import { createId } from '../../lib/model'
 import { runAppModal } from '../../lib/modalCoordinator'
+import { openProgressAfterLapseSave } from '../../lib/navigation'
+import { LAPSE_SUPPORT_BOUNDARY_COPY } from '../../lib/releaseCopy'
 import { formatSmokingTime, smokingTriggerLabel, SMOKING_TIMEZONE_LABEL, SMOKING_TRIGGER_OPTIONS } from '../../lib/smokingLogs'
 import { cigaretteLogAdditionConsequences } from '../../lib/smokingLogConsequences'
 import { useAppState } from '../../state/AppState'
@@ -105,7 +108,7 @@ export default function LapsePage() {
       }
       committed = true
       Taro.showToast({ title: '计划已恢复，累计进展保留', icon: 'none', duration: 1800 })
-      setTimeout(() => Taro.switchTab({ url: '/pages/progress/index' }), 500)
+      setTimeout(() => void openProgressAfterLapseSave(), 500)
     } catch {
       Taro.showToast({ title: '无法打开确认框，请重试', icon: 'none' })
     } finally {
@@ -117,7 +120,7 @@ export default function LapsePage() {
   }
 
   return (
-    <View className='screen screen--detail lapse-page'>
+    <HarmonyScrollablePage className='screen screen--detail lapse-page' viewport='full'>
       <PageHeader title={existingLapse ? '编辑复盘' : '复盘这次吸烟'} subtitle='连续时间重算，累计进展保留。' />
       <View className='card card--soft lapse-reassurance'>
         <Text className='lapse-reassurance__number'>任务 {state.completedTasks.filter((item) => item.attemptId === state.plan!.id).length} · 急救 {state.cravings.filter((item) => item.attemptId === state.plan!.id).length}</Text>
@@ -187,7 +190,7 @@ export default function LapsePage() {
       <Button className='button lapse-save' disabled={saving || (!referenced && (!trigger || !intensity))} onClick={() => void save()}>
         {saving ? '正在保存…' : existingLapse ? '保存复盘修改' : '保留进展并重新出发'}
       </Button>
-      <Text className='fine-print lapse-note'>本模块是行为支持工具，不替代专业医疗。反复滑倒或戒断反应难以应对时，可在“我的”中查找专业支持。</Text>
-    </View>
+      <Text className='fine-print lapse-note'>{LAPSE_SUPPORT_BOUNDARY_COPY}</Text>
+    </HarmonyScrollablePage>
   )
 }

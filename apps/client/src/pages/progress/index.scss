@@ -219,3 +219,15 @@
   font-weight: 700;
   text-align: center;
 }
+
+.progress-page.harmony-page-scroll .milestone-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.progress-page.harmony-page-scroll .milestone {
+  flex: 1 1 22%;
+  width: 22%;
+  min-width: 22%;
+  max-width: 24%;
+}

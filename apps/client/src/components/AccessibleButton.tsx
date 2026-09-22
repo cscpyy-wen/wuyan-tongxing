@@ -26,6 +26,21 @@ export function AccessibleButton({
   tabIndex = 0,
   ...props
 }: AccessibleButtonProps) {
+  // The Harmony C-API Button host applies enabled/clickable changes but can
+  // retain the previous class-derived visual style until the node is mounted
+  // again. Include every dynamic semantic/style input in a Harmony-only key so
+  // React replaces the native node when those inputs change.
+  const harmonyRefreshKey = process.env.TARO_ENV === 'harmony_cpp'
+    ? [
+        role,
+        disabled ? 'disabled' : 'enabled',
+        String(props.className ?? ''),
+        String(props['aria-checked'] ?? ''),
+        String(props['aria-selected'] ?? ''),
+        String(props['aria-pressed'] ?? ''),
+      ].join('|')
+    : undefined
+
   const handleKeyDown = (event: unknown) => {
     if (disabled) return
     onKeyDown?.(event)
@@ -38,6 +53,7 @@ export function AccessibleButton({
 
   return (
     <SemanticButton
+      {...(harmonyRefreshKey ? { key: harmonyRefreshKey } : {})}
       {...props}
       {...(disabled ? { disabled: true, 'aria-disabled': true } : {})}
       role={role}

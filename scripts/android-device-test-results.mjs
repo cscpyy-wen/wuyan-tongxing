@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
-export const ANDROID_DEVICE_TEST_COUNT = 26
+export const ANDROID_DEVICE_TEST_COUNT = 40
 
 function filesRecursively(root) {
   const files = []

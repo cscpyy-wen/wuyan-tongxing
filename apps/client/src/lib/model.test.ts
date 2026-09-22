@@ -12,6 +12,8 @@ import {
   canBeginPersonalPlan,
   computeClientProgress,
   createClientPlan,
+  createDailyCheckInConfirmation,
+  isDailyCheckInConfirmationCurrent,
   createId,
   createInitialState,
   MAX_PREVIOUS_ATTEMPTS,
@@ -58,6 +60,98 @@ function plannedState(path: OnboardingPayload['path'] = 'abrupt'): ClientState {
 }
 
 describe('双路径与日期边界', () => {
+  it('同日重开计划不会把此前已吸烟的时段计为新计划无烟时间', () => {
+    const base = plannedState()
+    const smoked = applyCigaretteLog(base, {
+      id: 'before-restart', createdAt: '2026-08-12T19:00:00+08:00', count: 1,
+      attemptId: base.plan!.id, source: 'QUICK_LOG',
+    })
+    const restarted = startNextClientAttempt(smoked, 'abrupt', '2026-08-12', new Date('2026-08-12T20:00:00+08:00'))
+    const confirmed = applyDailyCheckIn(restarted, {
+      id: 'after-restart', date: '2026-08-12', cigarettesSmoked: 0, cravingPeak: 1,
+      smokeFree: true, createdAt: '2026-08-12T20:01:00+08:00', attemptId: restarted.plan!.id,
+    })
+    const progress = computeClientProgress(confirmed, new Date('2026-08-12T20:01:00+08:00'))
+    expect(progress.streakConfirmed).toBe(true)
+    expect(progress.currentStreakHours).toBe(0)
+  })
+
+  it.each([
+    ['abrupt', '2026-07-31'], ['abrupt', '2026-08-16'],
+    ['reduction', '2026-08-07'], ['reduction', '2026-08-30'],
+  ] as const)('严格恢复拒绝无法安全渲染的%s日期%s', (path, quitDate) => {
+    const base = plannedState()
+    expect(() => parseStoredStateStrict({ ...base, plan: { ...base.plan, path, quitDate } })).toThrow()
+  })
+
+  it.each([
+    ['abrupt', '2026-08-01'], ['abrupt', '2026-08-15'],
+    ['reduction', '2026-08-08'], ['reduction', '2026-08-29'],
+  ] as const)('兼容历史有效%s计划的日期边界%s', (path, quitDate) => {
+    const base = plannedState()
+    const restored = parseStoredStateStrict({ ...base, plan: { ...base.plan, path, quitDate } })
+    expect(() => buildClientReductionSchedule(restored.plan!)).not.toThrow()
+  })
+
+  it('日终确认绑定具体记录而非仅绑定支数', () => {
+    const base = plannedState()
+    const at = new Date('2026-08-12T20:00:00+08:00')
+    const state = applyCigaretteLog(base, {
+      id: 'one', createdAt: '2026-08-12T19:00:00+08:00', count: 1,
+      attemptId: base.plan!.id, source: 'QUICK_LOG',
+    })
+    const confirmation = createDailyCheckInConfirmation(state, at)!
+    expect(isDailyCheckInConfirmationCurrent(state, confirmation, at)).toBe(true)
+    const edited = updateCigaretteLog(state, 'one', { smokedAt: '2026-08-12T18:00:00+08:00' })
+    expect(isDailyCheckInConfirmationCurrent(edited, confirmation, at)).toBe(false)
+    expect(isDailyCheckInConfirmationCurrent(state, confirmation, new Date('2026-08-13T00:00:00+08:00'))).toBe(false)
+  })
+
+  it('有逐支记录时不接受更低的过期日终总数', () => {
+    const base = plannedState()
+    const state = applyCigaretteLog(base, {
+      id: 'after-prompt', createdAt: '2026-08-12T19:00:00+08:00', count: 1,
+      attemptId: base.plan!.id, source: 'QUICK_LOG',
+    })
+    expect(applyDailyCheckIn(state, {
+      id: 'stale', date: '2026-08-12', cigarettesSmoked: 0, cravingPeak: 1,
+      smokeFree: true, createdAt: '2026-08-12T20:00:00+08:00', attemptId: base.plan!.id,
+    })).toBe(state)
+  })
+
+  it('系统快捷记录允许仅修正时间并保留关联复盘的已有原因和强度', () => {
+    const base = plannedState()
+    const logged = applyCigaretteLog(base, {
+      id: 'system', createdAt: '2026-08-12T19:00:00+08:00', count: 1,
+      attemptId: base.plan!.id, source: 'QUICK_LOG',
+    })
+    const linked = applyLapseEvent(logged, {
+      id: 'review', createdAt: '2026-08-12T19:00:00+08:00', cigarettes: 1,
+      cigaretteLogId: 'system', attemptId: base.plan!.id, trigger: 'stress', cravingIntensity: 4,
+      recoveryAction: '散步',
+    })
+    const edited = updateCigaretteLog(linked, 'system', { smokedAt: '2026-08-12T18:00:00+08:00' })
+    expect(edited.cigarettes[0]).toMatchObject({ createdAt: '2026-08-12T10:00:00.000Z' })
+    expect(edited.cigarettes[0]?.trigger).toBeUndefined()
+    expect(edited.cigarettes[0]?.cravingIntensity).toBeUndefined()
+    expect(edited.lapses[0]).toMatchObject({ trigger: 'stress', cravingIntensity: 4, createdAt: '2026-08-12T10:00:00.000Z' })
+    expect(parseStoredStateStrict(edited).cigarettes[0]?.trigger).toBeUndefined()
+  })
+
+  it('原因和强度只接受成对补齐且已填写记录不可被清空', () => {
+    const base = plannedState()
+    const state = applyCigaretteLog(base, {
+      id: 'system', createdAt: '2026-08-12T19:00:00+08:00', count: 1,
+      attemptId: base.plan!.id, source: 'QUICK_LOG',
+    })
+    const smokedAt = '2026-08-12T18:00:00+08:00'
+    expect(updateCigaretteLog(state, 'system', { smokedAt, trigger: 'stress' })).toBe(state)
+    expect(updateCigaretteLog(state, 'system', { smokedAt, cravingIntensity: 3 })).toBe(state)
+    const completed = updateCigaretteLog(state, 'system', { smokedAt, trigger: 'stress', cravingIntensity: 3 })
+    expect(completed.cigarettes[0]).toMatchObject({ trigger: 'stress', cravingIntensity: 3 })
+    expect(updateCigaretteLog(completed, 'system', { smokedAt })).toBe(completed)
+  })
+
   it('直接戒断允许今天至14天，限期减量允许7至28天', () => {
     expect(validateQuitDate('abrupt', '2026-08-01', '2026-08-01')).toBe(true)
     expect(validateQuitDate('abrupt', '2026-08-01', '2026-08-15')).toBe(true)
@@ -204,6 +298,47 @@ describe('资格与滑倒恢复', () => {
     expect(once.cigarettes).toEqual([event])
     expect(twice.cigarettes).toHaveLength(1)
     expect(once.lastCigaretteAt).toBe('2026-08-12T02:00:00.000Z')
+  })
+
+  it('系统一键入口可只记录一支烟和时间，不伪造原因或烟瘾强度', () => {
+    const before = plannedState()
+    const after = applyCigaretteLog(before, {
+      id: 'system-shortcut-cigarette',
+      createdAt: '2026-08-12T10:30:00+08:00',
+      loggedAt: '2026-08-12T10:30:01+08:00',
+      count: 1,
+      attemptId: before.plan!.id,
+      source: 'QUICK_LOG',
+    })
+
+    expect(after.cigarettes).toEqual([expect.objectContaining({
+      id: 'system-shortcut-cigarette',
+      count: 1,
+      attemptId: before.plan!.id,
+    })])
+    expect(after.cigarettes[0]?.trigger).toBeUndefined()
+    expect(after.cigarettes[0]?.cravingIntensity).toBeUndefined()
+    expect(after.lastCigaretteAt).toBe('2026-08-12T02:30:00.000Z')
+  })
+
+  it('拒绝只有原因或只有烟瘾强度的半完整新记录', () => {
+    const before = plannedState()
+    const common = {
+      createdAt: '2026-08-12T10:31:00+08:00',
+      count: 1,
+      attemptId: before.plan!.id,
+      source: 'QUICK_LOG' as const,
+    }
+    expect(applyCigaretteLog(before, {
+      ...common,
+      id: 'half-trigger-only',
+      trigger: 'work',
+    })).toBe(before)
+    expect(applyCigaretteLog(before, {
+      ...common,
+      id: 'half-intensity-only',
+      cravingIntensity: 4,
+    })).toBe(before)
   })
 
   it('已记录的一支烟进入恢复流程时不会重复计数', () => {
@@ -471,6 +606,31 @@ describe('资格与滑倒恢复', () => {
     expect(snapshot.moneySaved).toBe(0)
     expect(snapshot.smokeFreeDays).toBe(0)
     expect(snapshot.streakConfirmed).toBe(false)
+  })
+
+  it('只确认今天无烟不会把此前漏答的多天算为已确认小时', () => {
+    const base = plannedState()
+    const today = applyDailyCheckIn(base, {
+      id: 'today-only', date: '2026-09-13', cigarettesSmoked: 0, cravingPeak: 1,
+      smokeFree: true, createdAt: '2026-09-13T12:00:00+08:00', attemptId: base.plan!.id,
+    })
+    const progress = computeClientProgress(today, new Date('2026-09-13T12:00:00+08:00'))
+    expect(progress.streakConfirmed).toBe(true)
+    expect(progress.currentStreakHours).toBe(12)
+    expect(progress.smokeFreeDays).toBe(0)
+  })
+
+  it('连续已确认窗口遇到漏答日停止，不跨过未知日累计时长', () => {
+    let state = plannedState()
+    for (const date of ['2026-09-10', '2026-09-12', '2026-09-13']) {
+      state = applyDailyCheckIn(state, {
+        id: date, date, cigarettesSmoked: 0, cravingPeak: 1, smokeFree: true,
+        createdAt: `${date}T12:00:00+08:00`, attemptId: state.plan!.id,
+      })
+    }
+    const progress = computeClientProgress(state, new Date('2026-09-13T12:00:00+08:00'))
+    expect(progress.currentStreakHours).toBe(36)
+    expect(progress.smokeFreeDays).toBe(1)
   })
 
   it('更新烟瘾强度和完成练习时只更新原事件', () => {

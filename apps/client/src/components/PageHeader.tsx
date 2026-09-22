@@ -1,5 +1,7 @@
 import { Text, View } from '@tarojs/components'
+import { isHarmonyApp } from '../lib/platformCapabilities'
 import { GlobalSos } from './GlobalSos'
+import './PageHeader.scss'
 
 interface PageHeaderProps {
   eyebrow?: string
@@ -10,6 +12,7 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ eyebrow, title, subtitle, showSos = false, compact = false }: PageHeaderProps) {
+  const harmonyCompact = compact && isHarmonyApp()
   // Taro's View typings expose only the platform-specific ariaRole/ariaLabel
   // aliases. Keep the standards-based level attribute in the spread so the
   // H5 custom element is a complete heading while mini-program builds retain
@@ -20,15 +23,17 @@ export function PageHeader({ eyebrow, title, subtitle, showSos = false, compact 
 
   if (compact) {
     return (
-      <View className='page-header page-header--compact'>
+      <View className={`page-header page-header--compact ${harmonyCompact ? 'page-header--harmony-compact' : ''}`}>
         <View className='page-header__compact-row'>
-          <View
-            className='page-title'
-            role='heading'
-            ariaRole='heading'
-            ariaLabel={title}
-            {...headingLevel}
-          >{title}</View>
+          {!harmonyCompact ? (
+            <View
+              className='page-title'
+              role='heading'
+              ariaRole='heading'
+              ariaLabel={title}
+              {...headingLevel}
+            >{title}</View>
+          ) : <Text className='page-header__harmony-spacer'>{'\u00A0'}</Text>}
           {showSos && process.env.TARO_ENV !== 'h5' ? <GlobalSos /> : null}
         </View>
         {subtitle ? <Text className='page-subtitle'>{subtitle}</Text> : null}

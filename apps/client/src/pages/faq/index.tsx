@@ -1,9 +1,12 @@
 import { Text, View } from '@tarojs/components'
 import { contentItemsByKind } from '@wuyan/content'
 import { PageHeader } from '../../components/PageHeader'
+import { WithheldHealthContent } from '../../components/WithheldHealthContent'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
 import './index.scss'
 
 export default function FaqPage() {
+  if (!HEALTH_CONTENT_ENABLED) return <WithheldHealthContent />
   return (
     <View className='screen screen--detail faq-page'>
       <PageHeader eyebrow='12 个常见问题' title='把疑问说清楚' subtitle='回答用于一般健康教育，不诊断、不处方，也不替代医生或药师。' />

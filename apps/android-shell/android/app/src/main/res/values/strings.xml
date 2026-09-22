@@ -2,4 +2,15 @@
 <resources>
     <string name="app_name">无烟同行</string>
     <string name="title_activity_main">无烟同行</string>
+    <string name="quick_record_widget_name">记录一支烟</string>
+    <string name="quick_record_widget_description">今日支数与距上一支计时，点击记录一支</string>
+    <string name="quick_record_widget_accessibility">今日已记录 %1$d 支，点击记录一支；下方为距上一支计时</string>
+    <string name="quick_record_tile_label">记录一支</string>
+    <string name="quick_record_tile_hint">点一下记录</string>
+    <string name="quick_record_in_progress">记录中</string>
+    <string name="quick_record_success">已记录 1 支</string>
+    <string name="quick_record_open_app_first">请先打开 App</string>
+    <string name="quick_record_temporarily_blocked">数据处理中，请稍后</string>
+    <string name="quick_record_queue_full">请打开 App 同步</string>
+    <string name="quick_record_failed">记录失败，请打开 App</string>
 </resources>

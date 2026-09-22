@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ANDROID_DEVICE_TEST_COUNT } from './android-device-test-results.mjs'
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -26,7 +27,7 @@ export function releaseGatePlan(options = {}) {
     ['维护者签名 Android APK 构建与供应链生成', 'build:android:maintainer-release'],
     ['Android APK/清单/源码归档验证', 'verify:android'],
     ['Android JVM 与无设备构建门禁', 'test:android:native'],
-    ...(device ? [['指定设备 instrumentation 26/26 门禁', 'test:android:native:device']] : []),
+    ...(device ? [[`指定设备 instrumentation ${ANDROID_DEVICE_TEST_COUNT}/${ANDROID_DEVICE_TEST_COUNT} 门禁`, 'test:android:native:device']] : []),
     ['公开 Release 邻接许可证包', 'release:license-pack'],
   ]
   return scripts.map(([name, script]) => ({
@@ -79,8 +80,8 @@ if (isMain()) {
   if (unknown.length > 0) throw new Error(`未知总发布门禁参数：${unknown.join(', ')}`)
   const result = runReleaseGate({ device: process.argv.includes('--device') })
   if (result.deviceAcceptance) {
-    console.log(`总发布门禁通过，包含指定设备 instrumentation 26/26：${result.serial}`)
+    console.log(`总发布门禁通过，包含指定设备 instrumentation ${ANDROID_DEVICE_TEST_COUNT}/${ANDROID_DEVICE_TEST_COUNT}：${result.serial}`)
   } else {
-    console.log('构建侧发布门禁通过（工作区、许可证、全依赖审计、APK、JVM）；未执行设备 26/26，不能宣称完整设备验收。')
+    console.log(`构建侧发布门禁通过（工作区、许可证、全依赖审计、APK、JVM）；未执行设备 ${ANDROID_DEVICE_TEST_COUNT}/${ANDROID_DEVICE_TEST_COUNT}，不能宣称完整设备验收。`)
   }
 }

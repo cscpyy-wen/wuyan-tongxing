@@ -5,7 +5,7 @@ import { useAppState } from '../state/AppState'
 import {
   dispatchNativeOpenJsonReady,
   dispatchNativeOpenJsonRetry,
-  isNativeAndroidApp,
+  isNativeMobileApp,
   probeNativePendingOpenJson,
   selectNativeOpenJson,
 } from '../lib/runtime'
@@ -56,14 +56,14 @@ export function LoadingScreen() {
         <Text className='page-subtitle'>应用没有覆盖原记录。请先重试；仍失败时可导出恢复副本。</Text>
         <Button className='button' onClick={actions.retryLocalState}>重试读取</Button>
         <Button className='button button--secondary' onClick={() => void actions.exportRecoveryData()}>导出恢复副本</Button>
-        {isNativeAndroidApp()
+        {isNativeMobileApp()
           ? <Button className='button button--secondary' onClick={() => void restoreFromFile()}>从副本恢复</Button>
           : null}
         <Button className='button button--danger' onClick={() => void actions.clearCorruptedState()}>清除后重来</Button>
       </View>
     )
   }
-  if (backupRestorePending && isNativeAndroidApp()) {
+  if (backupRestorePending && isNativeMobileApp()) {
     return (
       <View className='screen screen--detail'>
         <View className='card empty-state' role='status'>

@@ -1,8 +1,11 @@
+import { validTimestamp } from './model'
+
 type CapacitorRuntime = {
   getPlatform?: () => string
   isNativePlatform?: () => boolean
   Plugins?: {
     PersonalExport?: PersonalExportPlugin
+    QuickRecord?: QuickRecordPlugin
   }
 }
 
@@ -29,6 +32,15 @@ type PersonalExportPlugin = {
   forgetCorruptExportOutcome: () => Promise<void>
   getLastExportOutcome: () => Promise<{ available: boolean; saved?: boolean; id?: string; filename?: string }>
   acknowledgeLastExportOutcome: (options: { id: string }) => Promise<void>
+}
+
+type QuickRecordPlugin = {
+  requestPinWidget: () => Promise<{ supported: boolean; requested: boolean }>
+  requestAddTile: () => Promise<{ result: 'added' | 'already-added' | 'not-added' | 'unavailable' }>
+  addListener: (
+    eventName: 'recordCommitted',
+    listener: (event: { id?: unknown; smokedAt?: unknown }) => void,
+  ) => Promise<{ remove: () => Promise<void> }>
 }
 
 export interface NativePendingOpenJsonMetadata {
@@ -103,6 +115,46 @@ function getPersonalExport(): PersonalExportPlugin {
   const plugin = window.Capacitor?.Plugins?.PersonalExport
   if (!plugin) throw new Error('PersonalExport native plugin is unavailable')
   return plugin
+}
+
+function getQuickRecord(): QuickRecordPlugin {
+  const plugin = window.Capacitor?.Plugins?.QuickRecord
+  if (!plugin) throw new Error('QuickRecord native plugin is unavailable')
+  return plugin
+}
+
+export async function requestNativeQuickRecordWidget(): Promise<{
+  supported: boolean
+  requested: boolean
+}> {
+  if (!isNativeAndroidApp()) throw new Error('Native Android quick record is unavailable')
+  const result = await getQuickRecord().requestPinWidget()
+  if (typeof result?.supported !== 'boolean' || typeof result.requested !== 'boolean') {
+    throw new Error('Native widget request returned invalid data')
+  }
+  return result
+}
+
+export async function requestNativeQuickRecordTile(): Promise<
+  'added' | 'already-added' | 'not-added' | 'unavailable'
+> {
+  if (!isNativeAndroidApp()) throw new Error('Native Android quick record is unavailable')
+  const result = await getQuickRecord().requestAddTile()
+  if (!['added', 'already-added', 'not-added', 'unavailable'].includes(result?.result)) {
+    throw new Error('Native tile request returned invalid data')
+  }
+  return result.result
+}
+
+export async function addNativeQuickRecordListener(
+  listener: () => void,
+): Promise<{ remove: () => Promise<void> }> {
+  if (!isNativeAndroidApp()) throw new Error('Native Android quick record is unavailable')
+  return getQuickRecord().addListener('recordCommitted', (event) => {
+    if (typeof event?.id !== 'string' || !UUID_PATTERN.test(event.id)
+      || !validTimestamp(event.smokedAt)) return
+    listener()
+  })
 }
 
 function strictUtf8AndJsonEscapedLengths(value: string, stopAfter: number): {
@@ -330,8 +382,18 @@ export function isNativeAndroidApp(): boolean {
   return capacitor.getPlatform?.() === 'android'
 }
 
+export function isNativeIOSApp(): boolean {
+  if (typeof window === 'undefined') return false
+  const capacitor = window.Capacitor
+  return capacitor?.isNativePlatform?.() === true && capacitor.getPlatform?.() === 'ios'
+}
+
+export function isNativeMobileApp(): boolean {
+  return isNativeAndroidApp() || isNativeIOSApp()
+}
+
 export async function shareNativeText(title: string, text: string): Promise<void> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android share is unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile share is unavailable')
   const { Share } = await import('@capacitor/share')
   await Share.share({ title, text, dialogTitle: '选择要发送到的应用' })
 }
@@ -347,7 +409,7 @@ async function scheduleDailyReminderInternal(
   hour: number,
   requestPermission: boolean,
 ): Promise<DailyReminderResult> {
-  if (!isNativeAndroidApp()) return 'unsupported'
+  if (!isNativeMobileApp()) return 'unsupported'
   if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new Error('提醒时间无效')
   dailyReminderMutationRevision += 1
 
@@ -392,14 +454,14 @@ export async function rescheduleDailyReminderForLocalTime(hour: number): Promise
 }
 
 export async function cancelDailyReminder(): Promise<void> {
-  if (!isNativeAndroidApp()) return
+  if (!isNativeMobileApp()) return
   dailyReminderMutationRevision += 1
   const { LocalNotifications } = await import('@capacitor/local-notifications')
   await LocalNotifications.cancel({ notifications: [{ id: DAILY_REMINDER_ID }] })
 }
 
 export async function isDailyReminderScheduled(): Promise<boolean> {
-  if (!isNativeAndroidApp()) return false
+  if (!isNativeMobileApp()) return false
   const { LocalNotifications } = await import('@capacitor/local-notifications')
   const permission = await LocalNotifications.checkPermissions()
   if (permission.display !== 'granted') return false
@@ -417,7 +479,7 @@ export async function isDailyReminderScheduled(): Promise<boolean> {
 export async function reconcileDailyReminderAfterSystemChange(
   onSystemDisabled: () => void,
 ): Promise<DailyReminderReconciliationResult> {
-  if (!isNativeAndroidApp()) return 'unsupported'
+  if (!isNativeMobileApp()) return 'unsupported'
   const observedRevision = dailyReminderMutationRevision
   const scheduled = await isDailyReminderScheduled()
   if (dailyReminderMutationRevision !== observedRevision) return 'stale'
@@ -447,7 +509,7 @@ export function formatBeijingBackupTimestamp(now: Date): string {
 }
 
 export async function saveNativeJsonFile(json: string, now = new Date(), filename?: string): Promise<boolean> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android file export is unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile file export is unavailable')
   const PersonalExport = getPersonalExport()
   assessNativeSaveJsonPayload(json, false)
   const requestedFilename = filename ?? `wuyan-tongxing-backup-${formatBeijingBackupTimestamp(now)}.json`
@@ -464,7 +526,7 @@ export async function saveNativeRecoveryJsonFile(
   now = new Date(),
   filename?: string,
 ): Promise<boolean> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android file export is unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile file export is unavailable')
   const PersonalExport = getPersonalExport()
   assessNativeSaveJsonPayload(json, true)
   const requestedFilename = filename ?? `wuyan-tongxing-recovery-${formatBeijingBackupTimestamp(now)}.json`
@@ -473,7 +535,7 @@ export async function saveNativeRecoveryJsonFile(
 }
 
 export async function probeNativePendingOpenJson(): Promise<NativePendingOpenJsonMetadata | undefined> {
-  if (!isNativeAndroidApp()) return undefined
+  if (!isNativeMobileApp()) return undefined
   const result = await getPersonalExport().probePendingOpenJson()
   if (result?.available === false) return undefined
   if (result?.available !== true) throw new Error('Native pending openJson probe is invalid')
@@ -483,7 +545,7 @@ export async function probeNativePendingOpenJson(): Promise<NativePendingOpenJso
 export async function readAndVerifyNativePendingOpenJson(
   descriptor: NativePendingOpenJsonMetadata,
 ): Promise<VerifiedNativeOpenJson> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android file import is unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile file import is unavailable')
   const expected = parseNativePendingOpenJsonMetadata(descriptor)
   // Validate the trusted upper bound before making the only payload-sized
   // allocation. Every later bridge envelope remains <= one 256 KiB chunk.
@@ -552,7 +614,7 @@ export async function acknowledgeNativePendingOpenJson(id: string): Promise<{
   acknowledged: true
   alreadyAcknowledged: boolean
 }> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android file import is unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile file import is unavailable')
   if (!UUID_PATTERN.test(id)) throw new Error('Native pending openJson id is invalid')
   const response = await getPersonalExport().acknowledgePendingOpenJson({ id })
   if (response?.acknowledged !== true
@@ -563,7 +625,7 @@ export async function acknowledgeNativePendingOpenJson(id: string): Promise<{
 }
 
 export async function selectNativeOpenJson(): Promise<NativePendingOpenJsonMetadata | undefined> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android file import is unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile file import is unavailable')
   const PersonalExport = getPersonalExport()
   const result = await PersonalExport.openJson()
   if (!result.selected) return undefined
@@ -576,28 +638,28 @@ export async function openNativeJsonFile(): Promise<VerifiedNativeOpenJson | und
 }
 
 export async function openNativeNotificationSettings(): Promise<boolean> {
-  if (!isNativeAndroidApp()) throw new Error('Native Android notification settings are unavailable')
+  if (!isNativeMobileApp()) throw new Error('Native mobile notification settings are unavailable')
   return (await getPersonalExport().openNotificationSettings()).opened
 }
 
 export async function purgeNativePendingExports(): Promise<void> {
-  if (!isNativeAndroidApp()) return
+  if (!isNativeMobileApp()) return
   const PersonalExport = getPersonalExport()
   await PersonalExport.purgePendingExports()
 }
 
 export async function purgeNativeAppPrivatePendingExports(): Promise<void> {
-  if (!isNativeAndroidApp()) return
+  if (!isNativeMobileApp()) return
   await getPersonalExport().purgeAppPrivatePendingExports()
 }
 
 export async function acknowledgeNativeSelectedDocumentCleanup(): Promise<void> {
-  if (!isNativeAndroidApp()) return
+  if (!isNativeMobileApp()) return
   await getPersonalExport().acknowledgeSelectedDocumentCleanup()
 }
 
 export async function getNativeExportCleanupWarning(): Promise<NativeExportCleanupNotice | undefined> {
-  if (!isNativeAndroidApp()) return undefined
+  if (!isNativeMobileApp()) return undefined
   const PersonalExport = getPersonalExport()
   const warning = await PersonalExport.getCleanupWarning()
   if (!warning.pending) return undefined
@@ -618,7 +680,7 @@ export async function getNativeExportCleanupWarning(): Promise<NativeExportClean
 }
 
 export async function forgetNativeCorruptExportOutcome(): Promise<void> {
-  if (!isNativeAndroidApp()) return
+  if (!isNativeMobileApp()) return
   await getPersonalExport().forgetCorruptExportOutcome()
 }
 
@@ -632,7 +694,7 @@ function safeNativeExportFilename(value: unknown): string | undefined {
 }
 
 export async function getNativeLastExportOutcome(): Promise<NativeExportOutcome | undefined> {
-  if (!isNativeAndroidApp()) return undefined
+  if (!isNativeMobileApp()) return undefined
   const result = await getPersonalExport().getLastExportOutcome()
   if (!result.available) return undefined
   if (result.saved !== true
@@ -645,7 +707,7 @@ export async function getNativeLastExportOutcome(): Promise<NativeExportOutcome 
 }
 
 export async function acknowledgeNativeLastExportOutcome(id: string): Promise<void> {
-  if (!isNativeAndroidApp()) return
+  if (!isNativeMobileApp()) return
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(id)) {
     throw new Error('Native export outcome id is invalid')
   }

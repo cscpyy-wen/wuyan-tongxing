@@ -28,6 +28,25 @@ export default defineConfig<'webpack5'>(async (merge, { mode }) => {
       compile: {
         include: [sharedPackagesPath],
       },
+      commonChunks: (chunks) => [...chunks, 'content'],
+      webpackChain(chain) {
+        // Keep the offline content catalog out of WeApp's shared UI chunk.
+        chain.merge({
+          optimization: {
+            splitChunks: {
+              cacheGroups: {
+                content: {
+                  name: 'content',
+                  test: /[\\/]packages[\\/]content[\\/]/,
+                  chunks: 'all',
+                  priority: 20,
+                  enforce: true,
+                },
+              },
+            },
+          },
+        })
+      },
       postcss: {
         pxtransform: { enable: true, config: {} },
         cssModules: { enable: false },

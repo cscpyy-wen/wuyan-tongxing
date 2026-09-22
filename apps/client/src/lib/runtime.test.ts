@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  addNativeQuickRecordListener,
   cancelDailyReminder,
   acknowledgeNativeLastExportOutcome,
   acknowledgeNativePendingOpenJson,
@@ -25,6 +26,8 @@ import {
   purgeNativePendingExports,
   purgeNativeAppPrivatePendingExports,
   reconcileDailyReminderAfterSystemChange,
+  requestNativeQuickRecordTile,
+  requestNativeQuickRecordWidget,
   readAndVerifyNativePendingOpenJson,
   registerNativeBackHandler,
   rescheduleDailyReminderForLocalTime,
@@ -55,6 +58,9 @@ const nativeMocks = vi.hoisted(() => ({
   getLastExportOutcome: vi.fn(),
   acknowledgeLastExportOutcome: vi.fn(),
   forgetCorruptExportOutcome: vi.fn(),
+  requestPinWidget: vi.fn(),
+  requestAddTile: vi.fn(),
+  addQuickRecordListener: vi.fn(),
 }))
 
 vi.mock('@capacitor/share', () => ({ Share: { share: nativeMocks.share } }))
@@ -86,6 +92,11 @@ function useAndroidRuntime() {
         getLastExportOutcome: nativeMocks.getLastExportOutcome,
         acknowledgeLastExportOutcome: nativeMocks.acknowledgeLastExportOutcome,
         forgetCorruptExportOutcome: nativeMocks.forgetCorruptExportOutcome,
+      },
+      QuickRecord: {
+        requestPinWidget: nativeMocks.requestPinWidget,
+        requestAddTile: nativeMocks.requestAddTile,
+        addListener: nativeMocks.addQuickRecordListener,
       },
     },
   }
@@ -267,6 +278,49 @@ describe('Android runtime detection', () => {
 })
 
 describe('Android native capabilities', () => {
+  it('requests quick entrances and accepts only authenticated commit wake events', async () => {
+    useAndroidRuntime()
+    nativeMocks.requestPinWidget.mockResolvedValue({ supported: true, requested: true })
+    nativeMocks.requestAddTile.mockResolvedValue({ result: 'added' })
+    const remove = vi.fn(async () => undefined)
+    let nativeListener: ((event: { id?: unknown; smokedAt?: unknown }) => void) | undefined
+    nativeMocks.addQuickRecordListener.mockImplementation(async (
+      _name: string,
+      listener: (event: { id?: unknown; smokedAt?: unknown }) => void,
+    ) => {
+      nativeListener = listener
+      return { remove }
+    })
+    const wake = vi.fn()
+
+    await expect(requestNativeQuickRecordWidget()).resolves.toEqual({ supported: true, requested: true })
+    await expect(requestNativeQuickRecordTile()).resolves.toBe('added')
+    const handle = await addNativeQuickRecordListener(wake)
+    nativeListener?.({ id: 'bad', smokedAt: '2026-09-19T08:00:00.000Z' })
+    nativeListener?.({
+      id: '11111111-1111-4111-8111-111111111111',
+      smokedAt: 'not-a-time',
+    })
+    nativeListener?.({
+      id: '11111111-1111-4111-8111-111111111111',
+      smokedAt: '2026-09-19T08:00:00.000Z',
+    })
+
+    expect(wake).toHaveBeenCalledOnce()
+    expect(nativeMocks.addQuickRecordListener).toHaveBeenCalledWith('recordCommitted', expect.any(Function))
+    await handle.remove()
+    expect(remove).toHaveBeenCalledOnce()
+  })
+
+  it('rejects malformed quick-entry plugin responses', async () => {
+    useAndroidRuntime()
+    nativeMocks.requestPinWidget.mockResolvedValue({ supported: 'yes', requested: true })
+    nativeMocks.requestAddTile.mockResolvedValue({ result: 'unexpected' })
+
+    await expect(requestNativeQuickRecordWidget()).rejects.toThrow('invalid data')
+    await expect(requestNativeQuickRecordTile()).rejects.toThrow('invalid data')
+  })
+
   it('dispatches an in-process retry signal without copying backup bytes into the event', () => {
     const listener = vi.fn()
     window.addEventListener('wuyan:native-open-json-retry', listener, { once: true })

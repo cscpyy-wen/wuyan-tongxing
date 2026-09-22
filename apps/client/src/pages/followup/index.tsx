@@ -5,6 +5,8 @@ import { getContentItem } from '@wuyan/content'
 import { AccessibleButton as Button } from '../../components/AccessibleButton'
 import { LoadingScreen } from '../../components/LoadingScreen'
 import { PageHeader } from '../../components/PageHeader'
+import { WithheldHealthContent } from '../../components/WithheldHealthContent'
+import { HEALTH_CONTENT_ENABLED } from '../../lib/healthContentGate'
 import { addMonths, daysBetween, toLocalDate } from '../../lib/model'
 import { useRequireOnboarding } from '../../hooks/useRequireOnboarding'
 import { useAppState } from '../../state/AppState'
@@ -66,6 +68,7 @@ export default function FollowupPage() {
   }, [saved])
 
   const content = useMemo(() => getContentItem(`followup-month-${String(month).padStart(2, '0')}`), [month])
+  if (!HEALTH_CONTENT_ENABLED) return <WithheldHealthContent />
   if (!ready || !state.plan) return <LoadingScreen />
 
   const dueDate = addMonths(state.plan.quitDate, month)

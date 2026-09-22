@@ -1,19 +1,7 @@
+import { appPagesForBuildTarget } from './appPages'
+
 export default defineAppConfig({
-  pages: [
-    'pages/today/index',
-    'pages/onboarding/index',
-    'pages/lesson/index',
-    'pages/records/index',
-    'pages/progress/index',
-    'pages/profile/index',
-    'pages/sos/index',
-    'pages/lapse/index',
-    'pages/partner/index',
-    'pages/medicine/index',
-    'pages/faq/index',
-    'pages/referral/index',
-    'pages/followup/index',
-  ],
+  pages: appPagesForBuildTarget(process.env.TARO_ENV),
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#F6F7F5',

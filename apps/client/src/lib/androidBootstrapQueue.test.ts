@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   acknowledgeAndroidBootstrapQueue,
+  acknowledgeAndroidSystemShortcutQueue,
   applyAndroidBootstrapImportJournal,
   beginAndroidBackupRestoreIntent,
   ANDROID_BOOTSTRAP_CORRUPT_KEY,
@@ -8,18 +9,21 @@ import {
   ANDROID_BACKUP_RESTORE_INTENT_KEY,
   ANDROID_BOOTSTRAP_QUARANTINE_KEY,
   ANDROID_BOOTSTRAP_QUEUE_KEY,
+  ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
   clearAndroidBootstrapData,
   clearAndroidBootstrapImportJournal,
   clearAndroidBackupRestoreIntent,
   exportAndroidBootstrapRecoveryData,
   isolateAndroidBootstrapQuarantineCorruption,
   isolateAndroidBootstrapQueueCorruption,
+  isolateAndroidSystemShortcutQueueCorruption,
   markAndroidBackupRestoreResultAccepted,
   markAndroidBackupRestoreResultCommitted,
   markAndroidBackupRestoreSelection,
   moveAndroidBootstrapEventsToQuarantine,
   readAndroidBootstrapQuarantine,
   readAndroidBootstrapQueue,
+  readAndroidSystemShortcutQueue,
   readAndroidBootstrapImportJournal,
   readAndroidBackupRestoreIntentState,
   replaceAndroidBootstrapData,
@@ -64,11 +68,61 @@ const legacy = {
   trigger: 'coffee' as const,
   cravingIntensity: 3 as const,
 }
+const systemShortcut = {
+  id: '77777777-7777-4777-8777-777777777777',
+  smokedAt: '2026-08-28T12:30:00.000Z',
+  attemptId: 'plan-current',
+  entryPoint: 'APP_WIDGET' as const,
+}
 
 describe('Android bootstrap cigarette queue', () => {
   it('reads the same Taro localStorage wrapper written by the static runtime', () => {
     const storage = memoryStorage(JSON.stringify({ data: [first, second] }))
     expect(readAndroidBootstrapQueue(storage)).toEqual([first, second])
+  })
+
+  it('accepts a reasonless native system shortcut and acknowledges only its UUID', () => {
+    const storage = memoryStorage()
+    storage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, JSON.stringify({ data: [systemShortcut, {
+      ...systemShortcut,
+      id: '88888888-8888-4888-8888-888888888888',
+      entryPoint: 'QUICK_SETTINGS_TILE',
+    }] }))
+
+    expect(readAndroidSystemShortcutQueue(storage)).toHaveLength(2)
+    acknowledgeAndroidSystemShortcutQueue(storage, new Set([systemShortcut.id]))
+    expect(readAndroidSystemShortcutQueue(storage)).toEqual([expect.objectContaining({
+      id: '88888888-8888-4888-8888-888888888888',
+      entryPoint: 'QUICK_SETTINGS_TILE',
+    })])
+  })
+
+  it('isolates a system shortcut that smuggles reason or intensity fields', () => {
+    const poisoned = { ...systemShortcut, trigger: 'work', cravingIntensity: 4 }
+    const raw = JSON.stringify({ data: [poisoned] })
+    const storage = memoryStorage()
+    storage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, raw)
+
+    expect(readAndroidSystemShortcutQueue(storage)).toEqual([])
+    expect(isolateAndroidSystemShortcutQueueCorruption(storage)).toBe(true)
+    expect(storage.getItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY)).toBeNull()
+    expect(JSON.parse(storage.getItem(ANDROID_BOOTSTRAP_CORRUPT_KEY)!).data[0]).toMatchObject({
+      sourceKey: ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY,
+      raw,
+    })
+  })
+
+  it('keeps detailed bootstrap and reasonless system queue schemas source-bound', () => {
+    const detailedInSystem = JSON.stringify({ data: [first] })
+    const systemStorage = memoryStorage()
+    systemStorage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, detailedInSystem)
+    expect(readAndroidSystemShortcutQueue(systemStorage)).toEqual([])
+    expect(isolateAndroidSystemShortcutQueueCorruption(systemStorage)).toBe(true)
+
+    const shortcutInBootstrap = JSON.stringify({ data: [systemShortcut] })
+    const bootstrapStorage = memoryStorage(shortcutInBootstrap)
+    expect(readAndroidBootstrapQueue(bootstrapStorage)).toEqual([])
+    expect(isolateAndroidBootstrapQueueCorruption(bootstrapStorage)).toBe(true)
   })
 
   it('archives the original raw queue before removing a damaged item', () => {
@@ -360,6 +414,7 @@ describe('Android bootstrap cigarette queue', () => {
 
   it('round-trips all bootstrap recovery keys through a validated replacement', () => {
     const storage = memoryStorage(JSON.stringify({ data: [first] }))
+    storage.setItem(ANDROID_SYSTEM_SHORTCUT_QUEUE_KEY, JSON.stringify({ data: [systemShortcut] }))
     storage.setItem(ANDROID_BOOTSTRAP_QUARANTINE_KEY, JSON.stringify({ data: [second] }))
     const archiveRaw = JSON.stringify({ data: [{
       capturedAt: '2026-08-28T12:30:00.000Z',
@@ -373,6 +428,7 @@ describe('Android bootstrap cigarette queue', () => {
     expect(storage.values.size).toBe(0)
     replaceAndroidBootstrapData(storage, exported)
     expect(snapshotAndroidBootstrapData(storage)).toEqual(exported)
+    expect(readAndroidSystemShortcutQueue(storage)).toEqual([systemShortcut])
   })
 
   it('applies a partial import per key without validating or changing an untouched damaged archive', () => {

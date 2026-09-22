@@ -240,6 +240,26 @@
 
 .activity-action::after { border: 0; }
 
+.records-page.harmony-page-scroll .records-metrics {
+  display: flex;
+}
+
+.records-page.harmony-page-scroll .records-metric {
+  flex: 1 1 0;
+}
+
+.records-page.harmony-page-scroll .records-log-button {
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
+}
+
+.records-page.harmony-page-scroll .activity-action {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+}
+
 @media (orientation: landscape) and (min-width: 720px) and (max-height: 600px) {
   .records-page {
     display: grid;

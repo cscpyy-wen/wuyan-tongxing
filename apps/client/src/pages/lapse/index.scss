@@ -109,3 +109,108 @@
   margin-top: 12px;
   text-align: center;
 }
+
+/* Harmony's native style bridge does not implement CSS Grid and gives Button
+ * an oversized intrinsic height when only min-height is present. Keep every
+ * control row explicit and bounded so the Scroll content can measure it
+ * without stacking the stepper/intensity items vertically or overlapping the
+ * following section. */
+.lapse-page.harmony-page-scroll .lapse-count-stepper {
+  display: flex;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.lapse-page.harmony-page-scroll .lapse-count-stepper__button {
+  width: 52px;
+  min-width: 52px;
+  max-width: 52px;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  padding: 0;
+  flex: 0 0 52px;
+}
+
+.lapse-page.harmony-page-scroll .lapse-count-stepper__value {
+  display: block;
+  width: 0;
+  min-width: 0;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+.lapse-page.harmony-page-scroll picker,
+.lapse-page.harmony-page-scroll .picker-field--trigger {
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}
+
+.lapse-page.harmony-page-scroll picker {
+  display: block;
+}
+
+.lapse-page.harmony-page-scroll .picker-field--trigger {
+  padding: 0 14px;
+}
+
+.lapse-page.harmony-page-scroll .lapse-intensity {
+  display: flex;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.lapse-page.harmony-page-scroll .lapse-intensity__choice {
+  width: 18%;
+  min-width: 18%;
+  max-width: 20%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 18%;
+}
+
+.lapse-page.harmony-page-scroll .stack[role='radiogroup'] {
+  display: flex;
+  width: 100%;
+  height: 262px;
+  min-height: 262px;
+  max-height: 262px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lapse-page.harmony-page-scroll .recovery-choice {
+  width: 100%;
+  height: 58px;
+  min-height: 58px;
+  max-height: 58px;
+  margin: 0;
+  padding: 0 15px;
+  flex: 0 0 58px;
+  flex-direction: row;
+}
+
+.lapse-page.harmony-page-scroll .lapse-save {
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  padding: 0 18px;
+}
