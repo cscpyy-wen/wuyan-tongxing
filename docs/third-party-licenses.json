@@ -3506,11 +3506,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/brace-expansion@1.1.18",
+      "purl": "pkg:npm/brace-expansion@1.1.21",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:brace-expansion@1.1.18",
+      "licenseSource": "pnpm-license-report:brace-expansion@1.1.21",
       "name": "brace-expansion",
-      "version": "1.1.18",
+      "version": "1.1.21",
       "licenses": [
         {
           "expression": "MIT"
@@ -3518,11 +3518,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/brace-expansion@5.0.9",
+      "purl": "pkg:npm/brace-expansion@5.0.12",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:brace-expansion@5.0.9",
+      "licenseSource": "pnpm-license-report:brace-expansion@5.0.12",
       "name": "brace-expansion",
-      "version": "5.0.9",
+      "version": "5.0.12",
       "licenses": [
         {
           "expression": "MIT"
@@ -3734,11 +3734,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/chokidar@4.0.3",
+      "purl": "pkg:npm/chokidar@5.0.0",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:chokidar@4.0.3",
+      "licenseSource": "pnpm-license-report:chokidar@5.0.0",
       "name": "chokidar",
-      "version": "4.0.3",
+      "version": "5.0.0",
       "licenses": [
         {
           "expression": "MIT"
@@ -3950,11 +3950,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/compression@1.8.1",
+      "purl": "pkg:npm/compression@1.8.2",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:compression@1.8.1",
+      "licenseSource": "pnpm-license-report:compression@1.8.2",
       "name": "compression",
-      "version": "1.8.1",
+      "version": "1.8.2",
       "licenses": [
         {
           "expression": "MIT"
@@ -4910,11 +4910,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/fast-uri@3.1.6",
+      "purl": "pkg:npm/fast-uri@3.1.8",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:fast-uri@3.1.6",
+      "licenseSource": "pnpm-license-report:fast-uri@3.1.8",
       "name": "fast-uri",
-      "version": "3.1.6",
+      "version": "3.1.8",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -4922,11 +4922,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/fast-uri@4.1.3",
+      "purl": "pkg:npm/fast-uri@4.1.5",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:fast-uri@4.1.3",
+      "licenseSource": "pnpm-license-report:fast-uri@4.1.5",
       "name": "fast-uri",
-      "version": "4.1.3",
+      "version": "4.1.5",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -4970,11 +4970,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/fastify@5.12.1",
+      "purl": "pkg:npm/fastify@5.12.5",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:fastify@5.12.1",
+      "licenseSource": "pnpm-license-report:fastify@5.12.5",
       "name": "fastify",
-      "version": "5.12.1",
+      "version": "5.12.5",
       "licenses": [
         {
           "expression": "MIT"
@@ -5078,11 +5078,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/follow-redirects@1.16.0",
+      "purl": "pkg:npm/follow-redirects@1.16.1",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:follow-redirects@1.16.0",
+      "licenseSource": "pnpm-license-report:follow-redirects@1.16.1",
       "name": "follow-redirects",
-      "version": "1.16.0",
+      "version": "1.16.1",
       "licenses": [
         {
           "expression": "MIT"
@@ -5918,11 +5918,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/joi@17.13.6",
+      "purl": "pkg:npm/joi@17.13.8",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:joi@17.13.6",
+      "licenseSource": "pnpm-license-report:joi@17.13.8",
       "name": "joi",
-      "version": "17.13.6",
+      "version": "17.13.8",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -6062,11 +6062,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/launch-editor@2.14.1",
+      "purl": "pkg:npm/launch-editor@2.14.2",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:launch-editor@2.14.1",
+      "licenseSource": "pnpm-license-report:launch-editor@2.14.2",
       "name": "launch-editor",
-      "version": "2.14.1",
+      "version": "2.14.2",
       "licenses": [
         {
           "expression": "MIT"
@@ -7430,11 +7430,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/postcss-selector-parser@6.1.4",
+      "purl": "pkg:npm/postcss-selector-parser@7.1.6",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:postcss-selector-parser@6.1.4",
+      "licenseSource": "pnpm-license-report:postcss-selector-parser@7.1.6",
       "name": "postcss-selector-parser",
-      "version": "6.1.4",
+      "version": "7.1.6",
       "licenses": [
         {
           "expression": "MIT"
@@ -7574,11 +7574,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/proxy-addr@2.0.7",
+      "purl": "pkg:npm/proxy-addr@2.0.8",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:proxy-addr@2.0.7",
+      "licenseSource": "pnpm-license-report:proxy-addr@2.0.8",
       "name": "proxy-addr",
-      "version": "2.0.7",
+      "version": "2.0.8",
       "licenses": [
         {
           "expression": "MIT"
@@ -7790,11 +7790,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/readdirp@4.1.2",
+      "purl": "pkg:npm/readdirp@5.1.1",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:readdirp@4.1.2",
+      "licenseSource": "pnpm-license-report:readdirp@5.1.1",
       "name": "readdirp",
-      "version": "4.1.2",
+      "version": "5.1.1",
       "licenses": [
         {
           "expression": "MIT"
@@ -8066,11 +8066,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/sass@1.83.4",
+      "purl": "pkg:npm/sass@1.103.1",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:sass@1.83.4",
+      "licenseSource": "pnpm-license-report:sass@1.103.1",
       "name": "sass",
-      "version": "1.83.4",
+      "version": "1.103.1",
       "licenses": [
         {
           "expression": "MIT"
@@ -8234,11 +8234,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/seroval@1.5.6",
+      "purl": "pkg:npm/seroval@1.6.3",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:seroval@1.5.6",
+      "licenseSource": "pnpm-license-report:seroval@1.6.3",
       "name": "seroval",
-      "version": "1.5.6",
+      "version": "1.6.3",
       "licenses": [
         {
           "expression": "MIT"
@@ -8330,11 +8330,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/shell-quote@1.10.0",
+      "purl": "pkg:npm/shell-quote@1.11.0",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:shell-quote@1.10.0",
+      "licenseSource": "pnpm-license-report:shell-quote@1.11.0",
       "name": "shell-quote",
-      "version": "1.10.0",
+      "version": "1.11.0",
       "licenses": [
         {
           "expression": "MIT"
@@ -8450,11 +8450,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/source-map-js@1.2.1",
+      "purl": "pkg:npm/source-map-js@1.2.2",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:source-map-js@1.2.1",
+      "licenseSource": "pnpm-license-report:source-map-js@1.2.2",
       "name": "source-map-js",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "licenses": [
         {
           "expression": "BSD-3-Clause"
@@ -9134,11 +9134,11 @@
       ]
     },
     {
-      "purl": "pkg:npm/webpack-dev-middleware@7.4.5",
+      "purl": "pkg:npm/webpack-dev-middleware@7.4.6",
       "ecosystem": "npm",
-      "licenseSource": "pnpm-license-report:webpack-dev-middleware@7.4.5",
+      "licenseSource": "pnpm-license-report:webpack-dev-middleware@7.4.6",
       "name": "webpack-dev-middleware",
-      "version": "7.4.5",
+      "version": "7.4.6",
       "licenses": [
         {
           "expression": "MIT"

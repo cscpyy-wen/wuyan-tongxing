@@ -52,11 +52,8 @@ jobs:
       - name: Build unsigned-for-release public debug APK
         run: pnpm build:android
 
-      - name: Audit production dependency graph
-        run: pnpm audit --prod --audit-level moderate
-
-      - name: Audit China preview deployment dependency graph
-        run: npm --prefix deploy/tencent-cloudbase audit --audit-level moderate
+      - name: Audit all graphs at low threshold and verify actual security patches
+        run: pnpm audit:all
 
       - name: Regenerate supply-chain inventory
         run: pnpm supply-chain

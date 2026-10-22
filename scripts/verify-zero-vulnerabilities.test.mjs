@@ -14,6 +14,8 @@ const options = {
   nodeExecutable: 'fixture-node',
   npmExecutable: 'fixture-npm',
   platform: 'linux',
+  verifyPatches: () => ({ packages: [] }),
+  saveReport: false,
 }
 
 function cleanReport() {
@@ -70,7 +72,7 @@ test('audit gate fails closed on a vulnerability and stops later scopes', () => 
       if (calls === 2) report.metadata.vulnerabilities.low = 1
       return { status: calls === 2 ? 1 : 0, stdout: JSON.stringify(report), stderr: '' }
     },
-  }), /完整依赖图必须在 low 阈值下为 0 漏洞/)
+  }), /counts do not match|完整依赖图必须在 low 阈值下为 0 漏洞/)
   assert.equal(calls, 2)
 })
 

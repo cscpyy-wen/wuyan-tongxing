@@ -1,0 +1,256 @@
+diff --git a/index.js b/index.js
+--- a/index.js
++++ b/index.js
+@@ -122,22 +122,96 @@ function isErrorResponse(response) {
+  * @param {string} [header] - The Cache-Control header value.
+  * @returns {Record<string, string|boolean>} An object representing Cache-Control directives.
+  */
+-function parseCacheControl(header) {
++function parseCacheControl(header, isPragma = false) {
+     /** @type {Record<string, string|boolean>} */
+-    const cc = {};
++    const cc = Object.create(null);
+     if (!header) return cc;
+-
+-    // TODO: When there is more than one value present for a given directive (e.g., two Expires header fields, multiple Cache-Control: max-age directives),
+-    // the directive's value is considered invalid. Caches are encouraged to consider responses that have invalid freshness information to be stale
+-    const parts = header.trim().split(/,/);
++    if (typeof header !== 'string') return invalidCacheControl(cc);
++
++    // A comma in a quoted extension value is data, never a new directive.
++    const parts = [];
++    let start = 0;
++    let quoted = false;
++    let escaped = false;
++    for (let i = 0; i < header.length; i++) {
++        const ch = header[i];
++        if (escaped) escaped = false;
++        else if (quoted && ch === '\\') escaped = true;
++        else if (ch === '"') quoted = !quoted;
++        else if (!quoted && ch === ',') {
++            parts.push(header.slice(start, i));
++            start = i + 1;
++        }
++    }
++    if (quoted || escaped) return invalidCacheControl(cc);
++    parts.push(header.slice(start));
+     for (const part of parts) {
+-        const [k, v] = part.split(/=/, 2);
+-        cc[k.trim()] = v === undefined ? true : v.trim().replace(/^"|"$/g, '');
++        if (!part.trim()) continue;
++        const equals = part.indexOf('=');
++        const name = (equals < 0 ? part : part.slice(0, equals)).trim();
++        let value = true;
++        if (equals >= 0) {
++            const raw = part.slice(equals + 1).trim();
++            if (raw[0] === '"') {
++                if (!/^"(?:[\t !#-\[\]-~\x80-\xff]|\\[\t !-~\x80-\xff])*"$/.test(raw)) return invalidCacheControl(cc);
++                value = raw.slice(1, -1).replace(/\\(.)/g, '$1');
++            } else {
++                if (!cacheControlToken.test(raw)) return invalidCacheControl(cc);
++                value = raw;
++            }
++        }
++        if (isPragma) {
++            if (!cacheControlToken.test(name)) return invalidCacheControl(cc);
++            if (name.toLowerCase() === 'no-cache') cc['no-cache'] = true;
++        } else {
++            addCacheControlDirective(cc, name, value);
++        }
++    }
++    return cc;
++}
++
++const cacheControlToken = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
++const restrictedCacheControl = new Set(['no-cache', 'no-store', 'private', 'must-revalidate', 'proxy-revalidate']);
++const numericCacheControl = new Set(['max-age', 's-maxage', 'max-stale', 'min-fresh', 'stale-if-error', 'stale-while-revalidate']);
++
++function invalidCacheControl(cc) {
++    cc['no-store'] = true;
++    cc['no-cache'] = true;
++    return cc;
++}
++
++function addCacheControlDirective(cc, name, value) {
++    if (!cacheControlToken.test(name) || (value !== true && (typeof value !== 'string' || /[^\t\x20-\x7e\x80-\xff]/.test(value)))) {
++        return invalidCacheControl(cc);
++    }
++    name = name.toLowerCase();
++    if (restrictedCacheControl.has(name)) {
++        // Presence is restrictive, even for an empty field-name list or duplicate.
++        cc[name] = true;
++    } else if (numericCacheControl.has(name)) {
++        if (Object.prototype.hasOwnProperty.call(cc, name) ||
++            !(name === 'max-stale' && value === true) && (typeof value !== 'string' || !/^\d+$/.test(value))) {
++            return invalidCacheControl(cc);
++        }
++        cc[name] = value;
++    } else if ((name === 'public' || name === 'immutable') && value !== true) {
++        return invalidCacheControl(cc);
++    } else {
++        cc[name] = value;
+     }
++    return cc;
++}
+ 
++function normalizeCacheControl(input) {
++    const cc = Object.create(null);
++    for (const name of Object.keys(input || {})) addCacheControlDirective(cc, name, input[name]);
+     return cc;
+ }
+ 
++function hasNoCachePragma(header) {
++    return !!parseCacheControl(header, true)['no-cache'];
++}
++
+ /**
+  * Formats a Cache-Control directives object into a header string.
+  * @param {Record<string, string|boolean>} cc - The Cache-Control directives.
+@@ -145,9 +219,10 @@ function parseCacheControl(header) {
+  */
+ function formatCacheControl(cc) {
+     let parts = [];
+-    for (const k in cc) {
++    for (const k of Object.keys(cc)) {
+         const v = cc[k];
+-        parts.push(v === true ? k : k + '=' + v);
++        const value = v === true || cacheControlToken.test(v) ? v : '"' + String(v).replace(/[\\"]/g, '\\$&') + '"';
++        parts.push(v === true ? k : k + '=' + value);
+     }
+     if (!parts.length) {
+         return undefined;
+@@ -245,7 +320,7 @@ module.exports = class CachePolicy {
+         // as having the same effect as if "Cache-Control: no-cache" were present (see Section 5.2.1).
+         if (
+             res.headers['cache-control'] == null &&
+-            /no-cache/.test(res.headers.pragma)
++            hasNoCachePragma(res.headers.pragma)
+         ) {
+             this._rescc['no-cache'] = true;
+         }
+@@ -395,8 +470,7 @@ module.exports = class CachePolicy {
+     evaluateRequest(req) {
+         this._assertRequestHasHeaders(req);
+ 
+-        // In all circumstances, a cache MUST NOT ignore the must-revalidate directive
+-        if (this._rescc['must-revalidate']) {
++        if (!this._allowsReuse()) {
+             return this._evaluateRequestMissResult(req);
+         }
+ 
+@@ -409,7 +483,7 @@ module.exports = class CachePolicy {
+         // unless the stored response is successfully validated (Section 4.3), and
+         const requestCC = parseCacheControl(req.headers['cache-control']);
+ 
+-        if (requestCC['no-cache'] || /no-cache/.test(req.headers.pragma)) {
++        if (requestCC['no-cache'] || hasNoCachePragma(req.headers.pragma)) {
+             return this._evaluateRequestMissResult(req);
+         }
+ 
+@@ -427,7 +501,7 @@ module.exports = class CachePolicy {
+             // If a value is present, then the client is willing to accept a response that has
+             // exceeded its freshness lifetime by no more than the specified number of seconds
+             const allowsStaleWithoutRevalidation = 'max-stale' in requestCC &&
+-                (true === requestCC['max-stale'] || requestCC['max-stale'] > this.age() - this.maxAge());
++                (true === requestCC['max-stale'] || requestCC['max-stale'] >= this.age() - this.maxAge());
+ 
+             if (allowsStaleWithoutRevalidation) {
+                 return this._evaluateRequestHitResult(undefined);
+@@ -453,10 +527,10 @@ module.exports = class CachePolicy {
+         return !!(
+             (!this._url || this._url === req.url) &&
+             this._host === req.headers.host &&
+-            // the request method associated with the stored response allows it to be used for the presented request, and
++            // HEAD can validate a stored GET representation, not a stored POST.
+             (!req.method ||
+                 this._method === req.method ||
+-                (allowHeadMethod && 'HEAD' === req.method)) &&
++                (allowHeadMethod && this._method === 'GET' && 'HEAD' === req.method)) &&
+             // selecting header fields nominated by the stored response (if any) match those presented, and
+             this._varyMatches(req)
+         );
+@@ -640,9 +714,6 @@ module.exports = class CachePolicy {
+         }
+ 
+         if (this._isShared) {
+-            if (this._rescc['proxy-revalidate']) {
+-                return 0;
+-            }
+             // if a response includes the s-maxage directive, a shared cache recipient MUST ignore the Expires field.
+             if (this._rescc['s-maxage']) {
+                 return toNumberOrZero(this._rescc['s-maxage']);
+@@ -702,11 +773,32 @@ module.exports = class CachePolicy {
+         return this.maxAge() <= this.age();
+     }
+ 
++    /** Response restrictions take precedence over every stale-use extension. */
++    _allowsReuse() {
++        if (!this.storable() || this._rescc['no-cache']) {
++            return false;
++        }
++        if (!this.stale()) {
++            return true;
++        }
++        return !(
++            this._rescc['must-revalidate'] ||
++            (this._isShared && (
++                this._rescc['proxy-revalidate'] ||
++                this._rescc['s-maxage'] ||
++                (this._resHeaders['set-cookie'] &&
++                    !this._rescc.public &&
++                    !this._rescc.immutable)
++            ))
++        );
++    }
++
+     /**
+      * @returns {boolean} `true` if `stale-if-error` condition allows use of a stale response.
+      */
+     _useStaleIfError() {
+-        return this.maxAge() + toNumberOrZero(this._rescc['stale-if-error']) > this.age();
++        const sie = toNumberOrZero(this._rescc['stale-if-error']);
++        return sie > 0 && this._allowsReuse() && this.maxAge() + sie >= this.age();
+     }
+ 
+     /** See `evaluateRequest()` for a more complete solution
+@@ -714,7 +806,7 @@ module.exports = class CachePolicy {
+      */
+     useStaleWhileRevalidate() {
+         const swr = toNumberOrZero(this._rescc['stale-while-revalidate']);
+-        return swr > 0 && this.maxAge() + swr > this.age();
++        return swr > 0 && this._allowsReuse() && this.maxAge() + swr > this.age();
+     }
+ 
+     /**
+@@ -742,13 +834,20 @@ module.exports = class CachePolicy {
+         this._ignoreCargoCult = !!obj.icc;
+         this._status = obj.st;
+         this._resHeaders = obj.resh;
+-        this._rescc = obj.rescc;
++        // Reparse original headers: older parsers may have fabricated public /
++        // immutable directives from commas inside quoted extension values.
++        this._rescc = parseCacheControl(this._resHeaders['cache-control']);
++        if (this._resHeaders['cache-control'] == null && hasNoCachePragma(this._resHeaders.pragma)) {
++            this._rescc['no-cache'] = true;
++        }
+         this._method = obj.m;
+         this._url = obj.u;
+         this._host = obj.h;
+         this._noAuthorization = obj.a;
+         this._reqHeaders = obj.reqh;
+-        this._reqcc = obj.reqcc;
++        // Request headers are not always retained. Normalize fields directly,
++        // never interpolate decoded values back into a Cache-Control header.
++        this._reqcc = normalizeCacheControl(obj.reqcc);
+     }
+ 
+     /**
+@@ -855,7 +954,7 @@ module.exports = class CachePolicy {
+     revalidatedPolicy(request, response) {
+         this._assertRequestHasHeaders(request);
+ 
+-        if (this._useStaleIfError() && isErrorResponse(response)) {
++        if (this._requestMatches(request, true) && this._useStaleIfError() && isErrorResponse(response)) {
+           return {
+               policy: this,
+               modified: false,

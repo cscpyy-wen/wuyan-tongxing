@@ -45,6 +45,31 @@ pnpm test:android:native
 
 设备测试必须选择专用模拟器或测试设备，显式设置 `ANDROID_SERIAL` 后运行 `pnpm test:android:native:device`。覆盖升级前保存测试数据副本；不得通过卸载或清空数据“验证”数据保留。
 
+## 供应链报告与只读门禁
+
+当前策略保留原始 npm/pnpm 与 OSV 警报，要求 **low 阈值下未处置项为 0**。本地修补的依赖仍使用原包名、上游版本和 PURL；不能把“已验证补丁处置”写成扫描没有报告漏洞。范围包括根 pnpm 生产图、完整开发图、Tencent 部署包装目录的 npm 锁，以及 SBOM 中的 npm/Maven 组件。
+
+修改依赖或补丁后的维护准备阶段，可显式生成报告并审阅差异：
+
+```powershell
+pnpm supply-chain
+pnpm verify:licenses
+pnpm audit:all --write-report
+pnpm audit:sbom-osv
+```
+
+其中 `audit:all --write-report` 保存 `docs/dependency-audit.json`；`audit:sbom-osv` 更新 `docs/osv-audit.json`。连同锁文件、补丁、来源与回归证据审阅后提交。报告生成不是正式发布完成。
+
+正式候选/CI 使用只读审计，不自动修正已提交报告：
+
+```powershell
+pnpm verify:security-patches
+pnpm audit:all
+pnpm audit:sbom-osv:check
+```
+
+补丁验证会重新绑定官方包完整性、锁和补丁哈希、回归程序、每份实际安装副本的所有文件，并实际运行回归；未知或变更公告、过期审查、缺失副本、字节不符、零用例/跳过/失败和不完整扫描结果均阻止发布。OSV `--check` 还实时查询并比对已提交报告。若报告需要刷新，返回维护准备阶段审阅、提交，再重新运行门禁，不能在正式检查中顺手改写。具体风险与修补范围见[依赖风险登记](dependency-risk-register.md)和[补丁证据清单](security-patches/manifest.json)。
+
 ## 安装包核验
 
 从同一 Release 下载 APK 与 `SHA256SUMS.txt`，在电脑上计算 APK 的 SHA-256，并与清单对应条目比较：
@@ -76,7 +101,7 @@ b0fdad152952a3c3c7c97fb214ac1a9b392cfaf7c160c55b40cf6eaa680bf1d7
 | 安装与日常使用 | [使用指南](user-guide.md) |
 | Android 构建、签名、快捷记录原理 | [Android 专题说明](android-personal-app.md) |
 | 贡献与安全报告 | [贡献约定](../CONTRIBUTING.md)、[安全政策](../SECURITY.md) |
-| 版本变化 | [CHANGELOG](../CHANGELOG.md)、[v33 发布说明](releases/v33.md) |
+| 版本变化 | [CHANGELOG](../CHANGELOG.md)、[v34 发布准备](releases/v34.md)、[v33 历史发布说明](releases/v33.md) |
 | 无烟首页计算与来源 | [指标证据矩阵](quit-dashboard-evidence.md)、[2026-10-13 候选验证记录](quit-dashboard-validation-2026-10-13.md) |
 | 数据与风险 | [隐私数据地图](privacy-data-map.md)、[威胁模型](threat-model.md) |
 | 健康内容维护 | [主张与证据矩阵](content-claims-matrix.md)、[证据目录](content-evidence-catalog.md)、[医学审核清单](medical-review-checklist.md) |

@@ -8,6 +8,7 @@ import { cyclonedxLicense } from './spdx-license-expression.mjs'
 import { reviewedOptionalPlatformLicense } from './supply-chain-license-policy.mjs'
 import { validateLicenseInventory } from './verify-license-inventory.mjs'
 import { verifyGradleWrapper } from './verify-gradle-wrapper.mjs'
+import { patchProperties, patchProvenance, upstreamNpmVersion } from './supply-chain-patch-policy.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const docs = path.join(root, 'docs')
@@ -205,6 +206,7 @@ async function mavenPomMetadata(module, seen = new Set()) {
 
 const lockfile = await fs.readFile(path.join(root, 'pnpm-lock.yaml'))
 const lockDocument = parseYaml(lockfile.toString('utf8'))
+const patchesByComponent = patchProvenance(root, lockDocument, parseYaml(await fs.readFile(path.join(root, 'pnpm-workspace.yaml'), 'utf8')))
 const npmIntegrityByComponent = new Map()
 for (const [lockKey, entry] of Object.entries(lockDocument?.packages ?? {})) {
   const identity = packageIdentityFromLockKey(lockKey)
@@ -245,8 +247,9 @@ const components = new Map()
 
 async function collectNpm(dependencies = {}) {
   for (const [name, dependency] of Object.entries(dependencies)) {
-    const componentVersion = dependency.version
-    if (typeof componentVersion === 'string' && !/^(?:link|file|workspace):/.test(componentVersion) && dependency.resolved) {
+    const installedVersion = dependency.version
+    if (typeof installedVersion === 'string' && !/^(?:link|file|workspace):/.test(installedVersion) && dependency.resolved) {
+      const componentVersion = upstreamNpmVersion(installedVersion)
       const key = `${name}@${componentVersion}`
       if (!components.has(`npm:${key}`)) {
         const purl = `pkg:npm/${purlName(name)}@${encodeURIComponent(componentVersion)}`
@@ -285,6 +288,7 @@ async function collectNpm(dependencies = {}) {
           properties: [
             { name: 'wuyan:ecosystem', value: 'npm' },
             { name: 'wuyan:license-source', value: licenseSource },
+            ...patchProperties(patchesByComponent.get(key)),
           ],
           externalReferences: [{ type: 'distribution', url: dependency.resolved }],
         })

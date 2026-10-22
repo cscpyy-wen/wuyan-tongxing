@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-22T08:15:15.160Z",
+  "threshold": "low",
+  "policy": "No unresolved findings; original advisories retained; installed patch bytes and regressions verified",
+  "evidence": {
+    "schemaVersion": 1,
+    "manifestSha256": "b0aec0ee4fdca654c34443cfdc1ac744afda936c2fdff261adbafb8a4a382a8f",
+    "lockfileSha256": "7f00c7860f24df535e327549a30b5d7ef7b33d6b629e341d964223e02ce3c4d0",
+    "packages": [
+      {
+        "name": "braces",
+        "version": "3.0.3",
+        "purl": "pkg:npm/braces@3.0.3",
+        "patchPath": "patches/braces@3.0.3.patch",
+        "patchSha256": "6fd0203dc23690cde48857c39c94d8a237e8b5f588339645b1c02851d234f4a9",
+        "pnpmPatchHash": "6fd0203dc23690cde48857c39c94d8a237e8b5f588339645b1c02851d234f4a9",
+        "upstreamIntegrity": "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==",
+        "installedTreeSha256": "604306e369464d766ac512440d7b0d000a4ad135f38df2f0a156315d0d39ee5a",
+        "regressionPath": "scripts/security-patches/braces.test.cjs",
+        "regressionSha256": "faca0754c4769611a035af6450a7398b2dae0de676a5e5d00c0b6c4c1d4cd66a",
+        "minimumTestCount": 807,
+        "advisories": [
+          {
+            "id": "GHSA-vfj7-8cjw-p6xm",
+            "npmFingerprint": "a24ee4bb01c06ad7a1fb0a9ac793deb465d7e88b6f383db5c2e780f389f40e93",
+            "osvModified": "2026-10-02T22:45:04.328737Z",
+            "reason": "Depth and parent traversal bounded; original package identity retained."
+          }
+        ]
+      },
+      {
+        "name": "http-cache-semantics",
+        "version": "4.3.0",
+        "purl": "pkg:npm/http-cache-semantics@4.3.0",
+        "patchPath": "patches/http-cache-semantics@4.3.0.patch",
+        "patchSha256": "5c5a8bea129d78517e0a69dc421a858dd0afa5c54b7f1e71ccf58bafee8b3077",
+        "pnpmPatchHash": "5c5a8bea129d78517e0a69dc421a858dd0afa5c54b7f1e71ccf58bafee8b3077",
+        "upstreamIntegrity": "sha512-M5t5LlJpS1UHMjvwRQVdFHvPISGeLAxNcrWuJkeGh0KxsqCHZ1O3NXZU/8x7cD0BDcGW8kapxMKTvwlqrNkHkA==",
+        "installedTreeSha256": "26c57baccfa35f5e87273a445e1d8aaa9f9794f2f3799bb3c5965f33a8131332",
+        "regressionPath": "scripts/security-patches/http-cache-semantics.test.cjs",
+        "regressionSha256": "81f498215fa74259c1646385e7d5a50096693dd0ffa1515bfa333c5db847e635",
+        "minimumTestCount": 172,
+        "advisories": [
+          {
+            "id": "GHSA-ch52-4w7c-c8xp",
+            "npmFingerprint": "712248ebda278eb4f5f3685fac42f47a93e22dd608c97b5bce3b0acae03995a3",
+            "osvModified": null,
+            "reason": "Enforce response revalidation restrictions across stale reuse paths; 4.3.0 is also vulnerable despite scanner range."
+          }
+        ]
+      }
+    ]
+  },
+  "scopes": [
+    {
+      "name": "根工作区 pnpm 生产依赖图",
+      "total": 1,
+      "report": {
+        "advisories": {
+          "1240992": {
+            "findings": [
+              {
+                "version": "3.0.3",
+                "paths": [
+                  "apps__client>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@pmmmwh/react-refresh-webpack-plugin>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@pmmmwh/react-refresh-webpack-plugin>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/runner-utils>scss-bundle>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/runner-utils>scss-bundle>chokidar>braces",
+                  "apps__client>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces"
+                ],
+                "dev": false,
+                "optional": false,
+                "bundled": false
+              }
+            ],
+            "id": 1240992,
+            "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+            "module_name": "braces",
+            "vulnerable_versions": "<=3.0.3",
+            "patched_versions": ">=3.0.4",
+            "severity": "high",
+            "cwe": "CWE-674",
+            "github_advisory_id": "GHSA-vfj7-8cjw-p6xm",
+            "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+          }
+        },
+        "metadata": {
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 1,
+            "critical": 0
+          },
+          "dependencies": 327,
+          "devDependencies": 0,
+          "optionalDependencies": 395,
+          "totalDependencies": 722
+        }
+      },
+      "assessment": {
+        "rawFindingCount": 1,
+        "unresolvedFindingCount": 0,
+        "dispositions": [
+          {
+            "id": "GHSA-vfj7-8cjw-p6xm",
+            "package": "braces",
+            "versions": [
+              "3.0.3"
+            ],
+            "status": "fixed-by-verified-local-patch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "根工作区 pnpm 完整依赖图",
+      "total": 1,
+      "report": {
+        "advisories": {
+          "1240992": {
+            "findings": [
+              {
+                "version": "3.0.3",
+                "paths": [
+                  "apps__client>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@pmmmwh/react-refresh-webpack-plugin>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-framework-react>@pmmmwh/react-refresh-webpack-plugin>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/components-react>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/service>@tarojs/runner-utils>scss-bundle>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/components>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-h5>@tarojs/taro-h5>@tarojs/router>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/plugin-platform-weapp>@tarojs/service>@tarojs/runner-utils>scss-bundle>chokidar>braces",
+                  "apps__client>@tarojs/taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/taro>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/taro>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@pmmmwh/react-refresh-webpack-plugin>webpack-dev-server>chokidar>braces",
+                  "apps__client>@pmmmwh/react-refresh-webpack-plugin>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>@tarojs/cli>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/cli>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/cli>@tarojs/service>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/cli>@tarojs/service>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/cli>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/cli>@tarojs/service>@tarojs/runner-utils>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/cli>@tarojs/service>@tarojs/runner-utils>scss-bundle>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/runner-utils>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/runner-utils>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/runner-utils>scss-bundle>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/taro-loader>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/taro-loader>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/webpack5-prebundle>@tarojs/helper>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>@tarojs/webpack5-prebundle>@tarojs/helper>find-yarn-workspace-root>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>copy-webpack-plugin>fast-glob>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>copy-webpack-plugin>globby>fast-glob>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>stylus-loader>fast-glob>micromatch>braces",
+                  "apps__client>@tarojs/webpack5-runner>webpack-dev-server>chokidar>braces",
+                  "apps__client>@tarojs/webpack5-runner>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+                  "apps__client>babel-preset-taro>@tarojs/helper>chokidar>braces",
+                  "apps__client>babel-preset-taro>@tarojs/helper>find-yarn-workspace-root>micromatch>braces"
+                ],
+                "dev": false,
+                "optional": false,
+                "bundled": false
+              }
+            ],
+            "id": 1240992,
+            "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+            "module_name": "braces",
+            "vulnerable_versions": "<=3.0.3",
+            "patched_versions": ">=3.0.4",
+            "severity": "high",
+            "cwe": "CWE-674",
+            "github_advisory_id": "GHSA-vfj7-8cjw-p6xm",
+            "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+          }
+        },
+        "metadata": {
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 1,
+            "critical": 0
+          },
+          "dependencies": 659,
+          "devDependencies": 747,
+          "optionalDependencies": 162,
+          "totalDependencies": 1469
+        }
+      },
+      "assessment": {
+        "rawFindingCount": 1,
+        "unresolvedFindingCount": 0,
+        "dispositions": [
+          {
+            "id": "GHSA-vfj7-8cjw-p6xm",
+            "package": "braces",
+            "versions": [
+              "3.0.3"
+            ],
+            "status": "fixed-by-verified-local-patch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "tencent-cloudbase npm 锁文件",
+      "total": 0,
+      "report": {
+        "auditReportVersion": 2,
+        "vulnerabilities": {},
+        "metadata": {
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "prod": 1,
+            "dev": 2,
+            "optional": 0,
+            "peer": 0,
+            "peerOptional": 0,
+            "total": 2
+          }
+        }
+      },
+      "assessment": {
+        "rawFindingCount": 0,
+        "unresolvedFindingCount": 0,
+        "dispositions": []
+      }
+    }
+  ]
+}

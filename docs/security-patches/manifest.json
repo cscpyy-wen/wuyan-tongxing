@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-22T07:00:00.000Z",
+  "reviewBy": "2026-11-21T07:00:00.000Z",
+  "packages": [
+    {
+      "name": "braces",
+      "version": "3.0.3",
+      "upstreamIntegrity": "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==",
+      "patchPath": "patches/braces@3.0.3.patch",
+      "patchSha256": "6fd0203dc23690cde48857c39c94d8a237e8b5f588339645b1c02851d234f4a9",
+      "pnpmPatchHash": "6fd0203dc23690cde48857c39c94d8a237e8b5f588339645b1c02851d234f4a9",
+      "regressionPath": "scripts/security-patches/braces.test.cjs",
+      "regressionSha256": "faca0754c4769611a035af6450a7398b2dae0de676a5e5d00c0b6c4c1d4cd66a",
+      "minimumTestCount": 807,
+      "files": [
+        {
+          "path": "index.js",
+          "sha256": "332ea07c7b006361aad12aa994ca75dc1db8e8382b884909e2f38f10b85c88a4"
+        },
+        {
+          "path": "lib/compile.js",
+          "sha256": "88cf20f18b59c9b2741c2d9b0f0ac6b2967d8e174667edf817133ca57d76809e"
+        },
+        {
+          "path": "lib/constants.js",
+          "sha256": "c18ac5adb57308f1ce42a28552da3a31f5d83709743ebd9a636336813a744d4b"
+        },
+        {
+          "path": "lib/expand.js",
+          "sha256": "c0e6923f3e5aab16d189676c5b82481bb7d2c4a57b5228ad2f1c9ca66b0f912a"
+        },
+        {
+          "path": "lib/parse.js",
+          "sha256": "adf3c108a16afaabe5379298d2227881e88f536cc7345b7df780a80d38dd01f9"
+        },
+        {
+          "path": "lib/stringify.js",
+          "sha256": "a3b8b5e7567ff9bfdbe155479fbdd92d5a924c3919adf05316f8f0c4f6330332"
+        },
+        {
+          "path": "lib/utils.js",
+          "sha256": "3874b7db6934be091aa204554f29dbd988b441f6f16b7c202e08069de6b6c35d"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "35bdd8a44339719441900fb50fbefc5e2dca1ca662cbaed7a687de842c8b70f2"
+        },
+        {
+          "path": "package.json",
+          "sha256": "56f08b888a4f30dc7cf8a7dbb36ffe92b737912ba36abe9d069d32167c957ac7"
+        },
+        {
+          "path": "README.md",
+          "sha256": "947b0fc3cc12eaaa070207126213fbdf9ab2bf8cd13dcc6e4007b36b79309866"
+        }
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-vfj7-8cjw-p6xm",
+          "npmFingerprint": "a24ee4bb01c06ad7a1fb0a9ac793deb465d7e88b6f383db5c2e780f389f40e93",
+          "osvModified": "2026-10-02T22:45:04.328737Z",
+          "reason": "Depth and parent traversal bounded; original package identity retained."
+        }
+      ]
+    },
+    {
+      "name": "http-cache-semantics",
+      "version": "4.3.0",
+      "upstreamIntegrity": "sha512-M5t5LlJpS1UHMjvwRQVdFHvPISGeLAxNcrWuJkeGh0KxsqCHZ1O3NXZU/8x7cD0BDcGW8kapxMKTvwlqrNkHkA==",
+      "patchPath": "patches/http-cache-semantics@4.3.0.patch",
+      "patchSha256": "5c5a8bea129d78517e0a69dc421a858dd0afa5c54b7f1e71ccf58bafee8b3077",
+      "pnpmPatchHash": "5c5a8bea129d78517e0a69dc421a858dd0afa5c54b7f1e71ccf58bafee8b3077",
+      "regressionPath": "scripts/security-patches/http-cache-semantics.test.cjs",
+      "regressionSha256": "81f498215fa74259c1646385e7d5a50096693dd0ffa1515bfa333c5db847e635",
+      "minimumTestCount": 172,
+      "files": [
+        {
+          "path": "index.js",
+          "sha256": "75c20f8d1ac6057addc0f5a7e875e4b1195181e071e532b381f78dd5861be49b"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "ab868ad5a2ef5068560d9cd3b2180ec63c140bb4c5cae1ba779d300a0ac74fa3"
+        },
+        {
+          "path": "package.json",
+          "sha256": "dbe99941ed2092d43257294405cfb389a476ef54a029488b51125e6f3a777fde"
+        },
+        {
+          "path": "README.md",
+          "sha256": "be77466544e7060ad859664e779d84db4440f6dcca28da0975d0bcd97000c9fa"
+        }
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-ch52-4w7c-c8xp",
+          "npmFingerprint": "712248ebda278eb4f5f3685fac42f47a93e22dd608c97b5bce3b0acae03995a3",
+          "osvModified": null,
+          "reason": "Enforce response revalidation restrictions across stale reuse paths; 4.3.0 is also vulnerable despite scanner range."
+        }
+      ]
+    }
+  ]
+}

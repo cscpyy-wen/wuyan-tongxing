@@ -1,65 +1,17 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-10-22T07:26:46.207Z",
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T08:15:26.921Z",
   "source": "OSV querybatch API",
   "endpoint": "https://api.osv.dev/v1/querybatch",
   "sbomPath": "docs/sbom.cdx.json",
-  "sbomSha256": "4334c298b8b828d8ec2c25531ea6fcb03acd517c0eac6145ab2ff8cee1a47fb1",
+  "sbomSha256": "6a2f4e239684482b0174d4b8038ae9623e4c61826742bbf88a51119dc2f06176",
   "componentCount": 773,
   "ecosystems": {
     "npm": 722,
     "maven": 51
   },
-  "findingCount": 34,
+  "findingCount": 1,
   "findings": [
-    {
-      "ref": "pkg:npm/brace-expansion@1.1.18",
-      "purl": "pkg:npm/brace-expansion@1.1.18",
-      "ecosystem": "npm",
-      "id": "GHSA-6j4f-fj2g-mc7p",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:03.836613Z"
-    },
-    {
-      "ref": "pkg:npm/brace-expansion@1.1.18",
-      "purl": "pkg:npm/brace-expansion@1.1.18",
-      "ecosystem": "npm",
-      "id": "GHSA-q2hr-2g5m-vwhr",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:03.849541Z"
-    },
-    {
-      "ref": "pkg:npm/brace-expansion@1.1.18",
-      "purl": "pkg:npm/brace-expansion@1.1.18",
-      "ecosystem": "npm",
-      "id": "GHSA-qhr7-859c-m2p7",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:04.402763Z"
-    },
-    {
-      "ref": "pkg:npm/brace-expansion@5.0.9",
-      "purl": "pkg:npm/brace-expansion@5.0.9",
-      "ecosystem": "npm",
-      "id": "GHSA-6j4f-fj2g-mc7p",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:03.836613Z"
-    },
-    {
-      "ref": "pkg:npm/brace-expansion@5.0.9",
-      "purl": "pkg:npm/brace-expansion@5.0.9",
-      "ecosystem": "npm",
-      "id": "GHSA-q2hr-2g5m-vwhr",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:03.849541Z"
-    },
-    {
-      "ref": "pkg:npm/brace-expansion@5.0.9",
-      "purl": "pkg:npm/brace-expansion@5.0.9",
-      "ecosystem": "npm",
-      "id": "GHSA-qhr7-859c-m2p7",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:04.402763Z"
-    },
     {
       "ref": "pkg:npm/braces@3.0.3",
       "purl": "pkg:npm/braces@3.0.3",
@@ -67,222 +19,66 @@
       "id": "GHSA-vfj7-8cjw-p6xm",
       "aliases": [],
       "modified": "2026-10-02T22:45:04.328737Z"
-    },
-    {
-      "ref": "pkg:npm/compression@1.8.1",
-      "purl": "pkg:npm/compression@1.8.1",
-      "ecosystem": "npm",
-      "id": "GHSA-vc2v-76pw-4v95",
-      "aliases": [],
-      "modified": "2026-10-05T23:45:07.378615Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@3.1.6",
-      "purl": "pkg:npm/fast-uri@3.1.6",
-      "ecosystem": "npm",
-      "id": "GHSA-58mr-gqgx-xq4g",
-      "aliases": [],
-      "modified": "2026-09-28T21:30:05.360758Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@3.1.6",
-      "purl": "pkg:npm/fast-uri@3.1.6",
-      "ecosystem": "npm",
-      "id": "GHSA-hrr3-gc8f-f4qj",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:04.426165Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@3.1.6",
-      "purl": "pkg:npm/fast-uri@3.1.6",
-      "ecosystem": "npm",
-      "id": "GHSA-qw65-cvwx-89v3",
-      "aliases": [],
-      "modified": "2026-09-28T21:45:03.859117Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@4.1.3",
-      "purl": "pkg:npm/fast-uri@4.1.3",
-      "ecosystem": "npm",
-      "id": "GHSA-58mr-gqgx-xq4g",
-      "aliases": [],
-      "modified": "2026-09-28T21:30:05.360758Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@4.1.3",
-      "purl": "pkg:npm/fast-uri@4.1.3",
-      "ecosystem": "npm",
-      "id": "GHSA-hrr3-gc8f-f4qj",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:04.426165Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@4.1.3",
-      "purl": "pkg:npm/fast-uri@4.1.3",
-      "ecosystem": "npm",
-      "id": "GHSA-jvvf-x445-j334",
-      "aliases": [],
-      "modified": "2026-09-30T00:00:03.854518Z"
-    },
-    {
-      "ref": "pkg:npm/fast-uri@4.1.3",
-      "purl": "pkg:npm/fast-uri@4.1.3",
-      "ecosystem": "npm",
-      "id": "GHSA-qw65-cvwx-89v3",
-      "aliases": [],
-      "modified": "2026-09-28T21:45:03.859117Z"
-    },
-    {
-      "ref": "pkg:npm/fastify@5.12.1",
-      "purl": "pkg:npm/fastify@5.12.1",
-      "ecosystem": "npm",
-      "id": "GHSA-4mh8-r7rc-xpvc",
-      "aliases": [],
-      "modified": "2026-10-01T00:00:05.778371Z"
-    },
-    {
-      "ref": "pkg:npm/fastify@5.12.1",
-      "purl": "pkg:npm/fastify@5.12.1",
-      "ecosystem": "npm",
-      "id": "GHSA-667r-xxjv-c9mm",
-      "aliases": [],
-      "modified": "2026-10-01T00:00:04.671540Z"
-    },
-    {
-      "ref": "pkg:npm/fastify@5.12.1",
-      "purl": "pkg:npm/fastify@5.12.1",
-      "ecosystem": "npm",
-      "id": "GHSA-9q9j-q6p8-xq58",
-      "aliases": [],
-      "modified": "2026-10-01T00:00:05.759936Z"
-    },
-    {
-      "ref": "pkg:npm/fastify@5.12.1",
-      "purl": "pkg:npm/fastify@5.12.1",
-      "ecosystem": "npm",
-      "id": "GHSA-hwr6-493r-vm6h",
-      "aliases": [],
-      "modified": "2026-10-01T00:00:04.687101Z"
-    },
-    {
-      "ref": "pkg:npm/fastify@5.12.1",
-      "purl": "pkg:npm/fastify@5.12.1",
-      "ecosystem": "npm",
-      "id": "GHSA-p68q-wchp-6fh7",
-      "aliases": [],
-      "modified": "2026-10-01T00:00:05.665955Z"
-    },
-    {
-      "ref": "pkg:npm/follow-redirects@1.16.0",
-      "purl": "pkg:npm/follow-redirects@1.16.0",
-      "ecosystem": "npm",
-      "id": "GHSA-8r9p-f939-6h3c",
-      "aliases": [],
-      "modified": "2026-10-20T18:00:04.701467Z"
-    },
-    {
-      "ref": "pkg:npm/follow-redirects@1.16.0",
-      "purl": "pkg:npm/follow-redirects@1.16.0",
-      "ecosystem": "npm",
-      "id": "GHSA-q3jh-wrc6-jgq8",
-      "aliases": [],
-      "modified": "2026-10-20T18:15:04.527852Z"
-    },
-    {
-      "ref": "pkg:npm/joi@17.13.6",
-      "purl": "pkg:npm/joi@17.13.6",
-      "ecosystem": "npm",
-      "id": "GHSA-6h2x-m376-mqjq",
-      "aliases": [],
-      "modified": "2026-10-05T23:45:07.542652Z"
-    },
-    {
-      "ref": "pkg:npm/joi@17.13.6",
-      "purl": "pkg:npm/joi@17.13.6",
-      "ecosystem": "npm",
-      "id": "GHSA-wr44-6hxh-3jwq",
-      "aliases": [],
-      "modified": "2026-10-05T23:45:08.228760Z"
-    },
-    {
-      "ref": "pkg:npm/launch-editor@2.14.1",
-      "purl": "pkg:npm/launch-editor@2.14.1",
-      "ecosystem": "npm",
-      "id": "GHSA-587h-7wmj-h5pm",
-      "aliases": [],
-      "modified": "2026-10-20T20:00:04.608979Z"
-    },
-    {
-      "ref": "pkg:npm/launch-editor@2.14.1",
-      "purl": "pkg:npm/launch-editor@2.14.1",
-      "ecosystem": "npm",
-      "id": "GHSA-698v-4r3x-3vcv",
-      "aliases": [],
-      "modified": "2026-10-20T18:45:09.467993Z"
-    },
-    {
-      "ref": "pkg:npm/launch-editor@2.14.1",
-      "purl": "pkg:npm/launch-editor@2.14.1",
-      "ecosystem": "npm",
-      "id": "GHSA-r825-w8mm-5pxw",
-      "aliases": [],
-      "modified": "2026-10-20T20:00:04.608907Z"
-    },
-    {
-      "ref": "pkg:npm/postcss-selector-parser@6.1.4",
-      "purl": "pkg:npm/postcss-selector-parser@6.1.4",
-      "ecosystem": "npm",
-      "id": "GHSA-rj75-hqrm-r3gf",
-      "aliases": [],
-      "modified": "2026-10-05T23:00:05.308008Z"
-    },
-    {
-      "ref": "pkg:npm/proxy-addr@2.0.7",
-      "purl": "pkg:npm/proxy-addr@2.0.7",
-      "ecosystem": "npm",
-      "id": "GHSA-jqcg-44mw-7w3h",
-      "aliases": [],
-      "modified": "2026-10-05T23:45:07.322157Z"
-    },
-    {
-      "ref": "pkg:npm/seroval@1.5.6",
-      "purl": "pkg:npm/seroval@1.5.6",
-      "ecosystem": "npm",
-      "id": "GHSA-jp82-f5mq-hwhp",
-      "aliases": [],
-      "modified": "2026-10-05T23:45:07.431923Z"
-    },
-    {
-      "ref": "pkg:npm/seroval@1.5.6",
-      "purl": "pkg:npm/seroval@1.5.6",
-      "ecosystem": "npm",
-      "id": "GHSA-p6vx-979v-rg4c",
-      "aliases": [],
-      "modified": "2026-10-06T00:00:08.435171Z"
-    },
-    {
-      "ref": "pkg:npm/shell-quote@1.10.0",
-      "purl": "pkg:npm/shell-quote@1.10.0",
-      "ecosystem": "npm",
-      "id": "GHSA-pqg4-j6r4-53mv",
-      "aliases": [],
-      "modified": "2026-10-06T13:45:06.393196Z"
-    },
-    {
-      "ref": "pkg:npm/source-map-js@1.2.1",
-      "purl": "pkg:npm/source-map-js@1.2.1",
-      "ecosystem": "npm",
-      "id": "GHSA-68fv-2mgg-jv7q",
-      "aliases": [],
-      "modified": "2026-10-05T23:45:07.974936Z"
-    },
-    {
-      "ref": "pkg:npm/webpack-dev-middleware@7.4.5",
-      "purl": "pkg:npm/webpack-dev-middleware@7.4.5",
-      "ecosystem": "npm",
-      "id": "GHSA-g84c-rxfj-3j2c",
-      "aliases": [],
-      "modified": "2026-10-03T03:56:01.635170Z"
     }
-  ]
+  ],
+  "assessment": {
+    "evidence": {
+      "schemaVersion": 1,
+      "manifestSha256": "b0aec0ee4fdca654c34443cfdc1ac744afda936c2fdff261adbafb8a4a382a8f",
+      "lockfileSha256": "7f00c7860f24df535e327549a30b5d7ef7b33d6b629e341d964223e02ce3c4d0",
+      "packages": [
+        {
+          "name": "braces",
+          "version": "3.0.3",
+          "purl": "pkg:npm/braces@3.0.3",
+          "patchPath": "patches/braces@3.0.3.patch",
+          "patchSha256": "6fd0203dc23690cde48857c39c94d8a237e8b5f588339645b1c02851d234f4a9",
+          "pnpmPatchHash": "6fd0203dc23690cde48857c39c94d8a237e8b5f588339645b1c02851d234f4a9",
+          "upstreamIntegrity": "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==",
+          "installedTreeSha256": "604306e369464d766ac512440d7b0d000a4ad135f38df2f0a156315d0d39ee5a",
+          "regressionPath": "scripts/security-patches/braces.test.cjs",
+          "regressionSha256": "faca0754c4769611a035af6450a7398b2dae0de676a5e5d00c0b6c4c1d4cd66a",
+          "minimumTestCount": 807,
+          "advisories": [
+            {
+              "id": "GHSA-vfj7-8cjw-p6xm",
+              "npmFingerprint": "a24ee4bb01c06ad7a1fb0a9ac793deb465d7e88b6f383db5c2e780f389f40e93",
+              "osvModified": "2026-10-02T22:45:04.328737Z",
+              "reason": "Depth and parent traversal bounded; original package identity retained."
+            }
+          ]
+        },
+        {
+          "name": "http-cache-semantics",
+          "version": "4.3.0",
+          "purl": "pkg:npm/http-cache-semantics@4.3.0",
+          "patchPath": "patches/http-cache-semantics@4.3.0.patch",
+          "patchSha256": "5c5a8bea129d78517e0a69dc421a858dd0afa5c54b7f1e71ccf58bafee8b3077",
+          "pnpmPatchHash": "5c5a8bea129d78517e0a69dc421a858dd0afa5c54b7f1e71ccf58bafee8b3077",
+          "upstreamIntegrity": "sha512-M5t5LlJpS1UHMjvwRQVdFHvPISGeLAxNcrWuJkeGh0KxsqCHZ1O3NXZU/8x7cD0BDcGW8kapxMKTvwlqrNkHkA==",
+          "installedTreeSha256": "26c57baccfa35f5e87273a445e1d8aaa9f9794f2f3799bb3c5965f33a8131332",
+          "regressionPath": "scripts/security-patches/http-cache-semantics.test.cjs",
+          "regressionSha256": "81f498215fa74259c1646385e7d5a50096693dd0ffa1515bfa333c5db847e635",
+          "minimumTestCount": 172,
+          "advisories": [
+            {
+              "id": "GHSA-ch52-4w7c-c8xp",
+              "npmFingerprint": "712248ebda278eb4f5f3685fac42f47a93e22dd608c97b5bce3b0acae03995a3",
+              "osvModified": null,
+              "reason": "Enforce response revalidation restrictions across stale reuse paths; 4.3.0 is also vulnerable despite scanner range."
+            }
+          ]
+        }
+      ]
+    },
+    "rawFindingCount": 1,
+    "unresolvedFindingCount": 0,
+    "dispositions": [
+      {
+        "purl": "pkg:npm/braces@3.0.3",
+        "id": "GHSA-vfj7-8cjw-p6xm",
+        "status": "fixed-by-verified-local-patch"
+      }
+    ]
+  }
 }
