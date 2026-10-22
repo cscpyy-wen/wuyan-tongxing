@@ -8,7 +8,7 @@ import { LoadingScreen } from '../../components/LoadingScreen'
 import { HarmonyPrivacyPolicyEntry, PrivacyPolicyModal } from '../../components/PrivacyPolicyModal'
 import { useMinuteClock } from '../../hooks/useMinuteClock'
 import { dismissAndroidBootstrap } from '../../lib/androidBootstrap'
-import { canBeginPersonalPlan, MAX_PREVIOUS_ATTEMPTS } from '../../lib/model'
+import { canBeginPersonalPlan, MAX_PREVIOUS_ATTEMPTS, toLocalDate } from '../../lib/model'
 import { openTodayAsRoot } from '../../lib/navigation'
 import { requestNativeBackupRestoreSelection } from '../../lib/nativeBackupRestoreSelection'
 import { isHarmonyApp } from '../../lib/platformCapabilities'
@@ -40,8 +40,8 @@ export default function OnboardingPage() {
   const [ageStatus, setAgeStatus] = useState<'unanswered' | 'adult' | 'minor'>('unanswered')
   const adult = ageStatus === 'adult'
   const minor = ageStatus === 'minor'
-  const [currentSmoker, setCurrentSmoker] = useState(false)
-  const [smokerAnswered, setSmokerAnswered] = useState(false)
+  const [smokingStatus, setSmokingStatus] = useState<'unanswered' | 'current' | 'former' | 'other'>('unanswered')
+  const currentSmoker = smokingStatus === 'current'
   const [boundaryAccepted, setBoundaryAccepted] = useState(false)
   const [localHealthAccepted, setLocalHealthAccepted] = useState(false)
   const [cigarettesPerDay, setCigarettesPerDay] = useState(10)
@@ -55,6 +55,7 @@ export default function OnboardingPage() {
   const [privacyOpen, setPrivacyOpen] = useState(false)
   const nativeMobile = isNativeMobileApp()
   const harmony = isHarmonyApp()
+  const formerSmoker = !harmony && smokingStatus === 'former'
   const now = useMinuteClock()
   const dateWindow = getOnboardingQuitDateWindow(path, now)
   const [quitDate, setQuitDate] = useState(() => getOnboardingQuitDateWindow('abrupt', new Date()).recommended)
@@ -65,12 +66,12 @@ export default function OnboardingPage() {
     }
     if (!ready) return
     if (state.onboarded) {
-      void openTodayAsRoot()
+      void (formerSmoker ? Taro.reLaunch({ url: '/pages/quit-settings/index' }) : openTodayAsRoot())
         .finally(() => dismissAndroidBootstrap())
       return
     }
     dismissAndroidBootstrap()
-  }, [loadFailure, ready, state.onboarded])
+  }, [formerSmoker, loadFailure, ready, state.onboarded])
 
   if (!ready || state.onboarded) return <LoadingScreen />
 
@@ -93,6 +94,7 @@ export default function OnboardingPage() {
     canBeginPersonalPlan({
       adultConfirmed: adult,
       currentPaperCigaretteUser: currentSmoker,
+      formerPaperCigaretteUser: formerSmoker,
       medicalBoundaryAccepted: boundaryAccepted,
       sensitiveHealthDataAccepted: localHealthAccepted,
     }),
@@ -115,13 +117,13 @@ export default function OnboardingPage() {
       Taro.showToast({ title: '请选择起床后第一支时间', icon: 'none' })
       return
     }
-    if (!validateOnboardingQuitDateAtSubmission(path, quitDate)) {
+    if (!formerSmoker && !validateOnboardingQuitDateAtSubmission(path, quitDate)) {
       Taro.showToast({ title: '请选择允许范围内的日期', icon: 'none' })
       return
     }
     actions.finishOnboarding({
-      path,
-      quitDate,
+      path: formerSmoker ? 'abrupt' : path,
+      quitDate: formerSmoker ? toLocalDate(new Date()) : quitDate,
       baseline: {
         cigarettesPerDay,
         firstCigaretteMinutes,
@@ -211,15 +213,23 @@ export default function OnboardingPage() {
                 groupName='smoking-status'
                 label='是，当前吸纸烟'
                 value='paper-cigarette'
-                onSelect={() => { setCurrentSmoker(true); setSmokerAnswered(true) }}
+                onSelect={() => setSmokingStatus('current')}
               >是，当前吸纸烟</AccessibleRadio>
+              {!harmony ? <AccessibleRadio
+                checked={formerSmoker}
+                className={`choice ${formerSmoker ? 'choice--active' : ''}`}
+                groupName='smoking-status'
+                label='已停止吸纸烟'
+                value='former-paper-cigarette'
+                onSelect={() => setSmokingStatus('former')}
+              >已停止吸纸烟</AccessibleRadio> : null}
               <AccessibleRadio
-                checked={smokerAnswered && !currentSmoker}
-                className={`choice ${smokerAnswered && !currentSmoker ? 'choice--active' : ''}`}
+                checked={smokingStatus === 'other'}
+                className={`choice ${smokingStatus === 'other' ? 'choice--active' : ''}`}
                 groupName='smoking-status'
                 label='不是或不确定'
                 value='not-current-smoker'
-                onSelect={() => { setCurrentSmoker(false); setSmokerAnswered(true) }}
+                onSelect={() => setSmokingStatus('other')}
               >不是或不确定</AccessibleRadio>
             </View>
           </View>
@@ -265,12 +275,12 @@ export default function OnboardingPage() {
 
       {step === 1 ? (
         <View className='onboarding__body'>
-          <Text className='eyebrow'>你的吸烟情况</Text>
+          <Text className='eyebrow'>{formerSmoker ? '戒烟前的吸烟习惯' : '你的吸烟情况'}</Text>
           <Text className='page-title'>不评判，只为让建议更合适</Text>
           <View className='card stack'>
             <View>
-              <Text className='field-label'>通常每天吸多少支？</Text>
-              <View className='number-stepper' role='group' aria-label={`通常每天 ${cigarettesPerDay} 支`}>
+              <Text className='field-label'>{formerSmoker ? '戒烟前通常每天吸多少支？' : '通常每天吸多少支？'}</Text>
+              <View className='number-stepper' role='group' aria-label={`${formerSmoker ? '戒烟前' : ''}通常每天 ${cigarettesPerDay} 支`}>
                 <Button className='number-stepper__button' aria-label='每天少一支' disabled={cigarettesPerDay <= 1} onClick={() => setCigarettesPerDay((value) => Math.max(1, value - 1))}>−</Button>
                 <Text className='range-value' aria-live='polite'>{cigarettesPerDay} 支</Text>
                 <Button className='number-stepper__button' aria-label='每天多一支' disabled={cigarettesPerDay >= 60} onClick={() => setCigarettesPerDay((value) => Math.min(60, value + 1))}>＋</Button>
@@ -278,7 +288,7 @@ export default function OnboardingPage() {
             </View>
             <View className='divider' />
             <View>
-              <Text className='field-label'>起床后多久吸第一支？</Text>
+              <Text className='field-label'>{formerSmoker ? '戒烟前起床后多久吸第一支？' : '起床后多久吸第一支？'}</Text>
               <Picker
                 mode='selector'
                 range={FIRST_CIGARETTE_LABELS}
@@ -289,7 +299,7 @@ export default function OnboardingPage() {
               >
                 <Button
                   className='picker-field picker-field--trigger'
-                  aria-label={`起床后多久吸第一支，${firstCigaretteMinutes === undefined ? '尚未选择' : `当前 ${firstCigaretteText}`}`}
+                  aria-label={`${formerSmoker ? '戒烟前' : ''}起床后多久吸第一支，${firstCigaretteMinutes === undefined ? '尚未选择' : `当前 ${firstCigaretteText}`}`}
                 >
                   {firstCigaretteText}
                 </Button>
@@ -309,7 +319,7 @@ export default function OnboardingPage() {
               />
             </View>
             <View>
-              <Text className='field-label'>一包烟大约多少钱？</Text>
+              <Text className='field-label'>{formerSmoker ? '戒烟前一包烟大约多少钱？' : '一包烟大约多少钱？'}</Text>
               <Input
                 className='input'
                 type='digit'
@@ -371,7 +381,17 @@ export default function OnboardingPage() {
         </View>
       ) : null}
 
-      {step === 4 ? (
+      {step === 4 && formerSmoker ? (
+        <View className='onboarding__body'>
+          <Text className='eyebrow'>无烟生活</Text>
+          <Text className='page-title'>设置你的无烟起点</Text>
+          <View className='card stack'>
+            <Text className='field-label'>下一步，确认最后一支烟的时间</Text>
+            <Text className='muted'>先从今天建立本机记录，再由你填写真实的无烟起点。过去的无烟天数不会自动变成每日确认记录。</Text>
+          </View>
+        </View>
+      ) : null}
+      {step === 4 && !formerSmoker ? (
         <View className='onboarding__body'>
           <Text className='eyebrow'>选择路径</Text>
           <Text className='page-title'>你想怎样开始？</Text>
@@ -423,7 +443,7 @@ export default function OnboardingPage() {
           </Button>
         ) : null}
         <Button className='button' disabled={!canContinue || restoring} onClick={step === 4 ? submit : next}>
-          {step === 4 ? '创建我的计划' : '继续'}
+          {step === 4 ? formerSmoker ? '设置无烟起点' : '创建我的计划' : '继续'}
         </Button>
       </View>
     </View>

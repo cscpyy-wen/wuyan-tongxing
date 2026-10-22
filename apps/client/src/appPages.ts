@@ -15,6 +15,7 @@ export const CORE_APP_PAGES = Object.freeze([
  * the first Harmony store package until named review is complete.
  */
 export const REVIEW_GATED_APP_PAGES = Object.freeze([
+  'pages/quit-settings/index',
   'pages/lesson/index',
   'pages/medicine/index',
   'pages/faq/index',

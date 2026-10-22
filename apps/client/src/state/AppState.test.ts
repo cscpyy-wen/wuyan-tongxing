@@ -199,6 +199,72 @@ describe('AppState onboarding transaction', () => {
     rendered.unmount()
   })
 
+  it.each(['clock-rollback', 'new-attempt', 'replacement'] as const)(
+    'does not remove another daily confirmation when the captured removal target becomes stale after %s',
+    (change) => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-09-22T12:00:00+08:00'))
+      const stored = validState()
+      stored.checkIns = ['2026-09-21', '2026-09-22'].map((date) => ({
+        id: `check-${date}`, date, cigarettesSmoked: 0, cravingPeak: 1, smokeFree: true,
+        createdAt: `${date}T10:00:00+08:00`, attemptId: stored.plan!.id,
+      }))
+      taroMocks.values.set(STORAGE_KEY, structuredClone(stored))
+      let current: ReturnType<typeof useAppState> | undefined
+      function Probe() { current = useAppState(); return null }
+      const rendered = render(createElement(AppStateProvider, undefined, createElement(Probe)))
+      try {
+        const target = current!.state.checkIns.find((item) => item.date === '2026-09-22')!
+        act(() => {
+          if (change === 'clock-rollback') vi.setSystemTime(new Date('2026-09-21T12:00:00+08:00'))
+          if (change === 'new-attempt') current!.actions.startNewAttempt('abrupt', '2026-09-22')
+          if (change === 'replacement') current!.actions.recordCheckIn(createDailyCheckInConfirmation(current!.state)!)
+        })
+        const before = structuredClone(taroMocks.values.get(STORAGE_KEY))
+        const stateBefore = current!.state
+
+        act(() => expect(current!.actions.removeTodayCheckIn(target)).toBe(false))
+
+        expect(current!.state).toBe(stateBefore)
+        expect(taroMocks.values.get(STORAGE_KEY)).toEqual(before)
+        expect(current!.state.checkIns).toHaveLength(2)
+        expect(taroMocks.showToast).toHaveBeenCalledWith({ title: '日期或记录已变化，请重新确认', icon: 'none' })
+      } finally {
+        rendered.unmount()
+        vi.useRealTimers()
+      }
+    },
+  )
+
+  it('removes exactly the unchanged captured daily confirmation and preserves other days and smoking logs', () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-09-22T12:00:00+08:00'))
+    const stored = validState()
+    stored.cigarettes = [{ id: 'original-smoke', createdAt: '2026-09-21T09:00:00+08:00', count: 1, attemptId: stored.plan!.id, source: 'QUICK_LOG' }]
+    stored.checkIns = ['2026-09-21', '2026-09-22'].map((date) => ({
+      id: `check-${date}`, date, cigarettesSmoked: date === '2026-09-21' ? 1 : 0,
+      cravingPeak: 1, smokeFree: date !== '2026-09-21', createdAt: `${date}T10:00:00+08:00`, attemptId: stored.plan!.id,
+    }))
+    taroMocks.values.set(STORAGE_KEY, structuredClone(stored))
+    let current: ReturnType<typeof useAppState> | undefined
+    function Probe() { current = useAppState(); return null }
+    const rendered = render(createElement(AppStateProvider, undefined, createElement(Probe)))
+    try {
+      const target = current!.state.checkIns.find((item) => item.date === '2026-09-22')!
+      const previousDay = current!.state.checkIns.find((item) => item.date === '2026-09-21')!
+      const cigarettes = current!.state.cigarettes
+      act(() => expect(current!.actions.removeTodayCheckIn(target)).toBe(true))
+      expect(current!.state.checkIns).toEqual([previousDay])
+      expect(current!.state.cigarettes).toBe(cigarettes)
+      const after = structuredClone(taroMocks.values.get(STORAGE_KEY))
+      act(() => expect(current!.actions.removeTodayCheckIn(target)).toBe(false))
+      expect(taroMocks.values.get(STORAGE_KEY)).toEqual(after)
+    } finally {
+      rendered.unmount()
+      vi.useRealTimers()
+    }
+  })
+
   it('rejects an unrenderable reduction backup without changing current durable state', async () => {
     const stored = validState()
     taroMocks.values.set(STORAGE_KEY, structuredClone(stored))

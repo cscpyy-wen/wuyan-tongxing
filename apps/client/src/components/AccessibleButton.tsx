@@ -44,10 +44,13 @@ export function AccessibleButton({
   const handleKeyDown = (event: unknown) => {
     if (disabled) return
     onKeyDown?.(event)
-    const keyboardEvent = event as { key?: string; preventDefault?: () => void }
-    if ((keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') && onClick) {
+    const keyboardEvent = event as { key?: string; defaultPrevented?: boolean; preventDefault?: () => void; currentTarget?: { click?: () => void }; target?: { click?: () => void } }
+    if (!keyboardEvent.defaultPrevented && (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ')) {
       keyboardEvent.preventDefault?.()
-      onClick(event as never)
+      if (onClick) onClick(event as never)
+      // A Picker handles the bubbling click on its own host. Its child button
+      // still needs native-like keyboard activation even without an onClick prop.
+      else (keyboardEvent.currentTarget ?? keyboardEvent.target)?.click?.()
     }
   }
 

@@ -1,14 +1,14 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:506b102b-a845-5fa4-a382-58ac2dbe490e",
+  "serialNumber": "urn:uuid:20c128d3-654e-54fc-bda5-11614d6bcd9f",
   "version": 1,
   "metadata": {
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/wuyan-tongxing-android-personal@0.1.0-personal.33",
+      "bom-ref": "pkg:generic/wuyan-tongxing-android-personal@0.1.0-personal.34",
       "name": "wuyan-tongxing-android-personal",
-      "version": "0.1.0-personal.33",
+      "version": "0.1.0-personal.34",
       "properties": [
         {
           "name": "wuyan:inventory-scope",
@@ -16,7 +16,7 @@
         },
         {
           "name": "wuyan:pnpm-lock-sha256",
-          "value": "1c516cda25d9984c45f133fc74dab4fbdb9670d99002bcfc395c48ce17b3aba3"
+          "value": "5c18bd5c1143531dd40d67ba53ea073965ba14206f44de82f1746ab90a35174a"
         },
         {
           "name": "wuyan:android-package",
@@ -2109,14 +2109,14 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40capacitor/android@8.5.0",
+      "bom-ref": "pkg:npm/%40capacitor/android@8.5.1",
       "name": "@capacitor/android",
-      "version": "8.5.0",
-      "purl": "pkg:npm/%40capacitor/android@8.5.0",
+      "version": "8.5.1",
+      "purl": "pkg:npm/%40capacitor/android@8.5.1",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "45bde9ac9790893a74a5085248e45e26e1bd56089b386306e040acf9484cc2be930821d9dcd0993bcd756c30341f10f4c6b4ff802ac902c639c9f1004eef3825"
+          "content": "a3c7d420f0d210049e5c71eb0f3dba594ece9728916fe42ab48f4a15d9cb4b58d42fbee8e621abbde8226da657f2b5a9882c8327a8e55218611e57deab7a2ef4"
         }
       ],
       "licenses": [
@@ -2131,13 +2131,13 @@
         },
         {
           "name": "wuyan:license-source",
-          "value": "pnpm-license-report:@capacitor/android@8.5.0"
+          "value": "pnpm-license-report:@capacitor/android@8.5.1"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/@capacitor/android/-/android-8.5.0.tgz"
+          "url": "https://registry.npmjs.org/@capacitor/android/-/android-8.5.1.tgz"
         }
       ]
     },

@@ -1,3 +1,6 @@
+.quit-start-entry { display: flex; align-items: center; justify-content: space-between; margin: 0 0 16px; padding: 12px 18px; min-height: 52px; border: 1px solid #bdd5c4; border-radius: 18px; background: #edf4eb; color: #1d583f; font-size: 15px; }
+.quit-start-entry > *:last-child { font-size: 13px; }
+
 .today-page .section-title {
   margin-bottom: 12px;
 }
@@ -450,7 +453,7 @@
 }
 
 @media (orientation: landscape) and (max-height: 600px) {
-  .today-page {
+  .today-page:not(.today-page--quit) {
     padding-top: calc(10px + var(--safe-top));
     /* A separate right-hand action lane keeps the sticky record control from
        covering the daily confirmation and other scrollable content. */

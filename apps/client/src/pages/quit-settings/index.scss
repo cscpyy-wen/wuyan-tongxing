@@ -1,0 +1,12 @@
+.quit-back { margin: 0 0 12px; padding: 0 8px; min-height: 44px; background: transparent; color: #176b55; font-size: 15px; text-align: left; }
+.quit-settings__fields { display: flex; flex-direction: column; gap: 18px; }
+.quit-settings__date { display: flex; gap: 12px; }
+.quit-settings__date > * { flex: 1; min-width: 0; }
+.quit-settings__date .picker-field { margin: 0; width: 100%; }
+.quit-declaration { display: flex; gap: 10px; align-items: center; min-height: 48px; padding: 8px 12px; border: 1px solid #bdcdc3; border-radius: 12px; font-size: 15px; }
+.quit-declaration--checked { color: #0f513f; background: #e7f1eb; border-color: #176b55; }
+.quit-settings__field { display: grid; grid-template-columns: 1fr minmax(60px, 100px) 65px; align-items: center; gap: 10px; }
+.quit-settings__field .input { text-align: right; width: 100%; box-sizing: border-box; min-height: 48px; }
+.quit-settings__note { display: block; margin: 8px 2px 22px; color: #53625c; font-size: 13px; }
+.quit-settings__error { display: block; color: #a8382d; margin: 12px 0; }
+@media (max-width: 360px) { .quit-settings__field { grid-template-columns: 1fr minmax(48px, 76px) 60px; gap: 6px; } }

@@ -1,0 +1,68 @@
+.quit-dashboard { --quit-ink: #183f32; font-variant-numeric: tabular-nums; }
+.quit-hero { background: #164c3c; color: #fff; border-radius: 30px; padding: 16px 22px 18px; box-shadow: 0 12px 28px #143e3014; }
+.quit-hero__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.quit-hero__eyebrow { font-size: 14px; letter-spacing: 3px; color: #dfecdc; }
+.quit-hero__edit { width: auto; flex: 0 0 auto; border: 0; min-height: 44px; margin: 0 -8px 0 0; padding: 0 8px; color: #e4eedf; background: transparent; font-size: 14px; }
+.quit-orbit { position: relative; width: 196px; min-height: 196px; max-width: 100%; margin: 4px auto 20px; border-radius: 50%; padding: 3px; box-sizing: border-box; }
+.quit-orbit__ring { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 196px; height: 196px; max-width: 100%; border-radius: 50%; pointer-events: none; mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0); }
+.quit-orbit__inside { width: 100%; min-height: 190px; border-radius: 50%; background: #164c3c; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.quit-orbit--expanded { width: 100%; min-height: 0; padding: 16px 0; }
+.quit-orbit--expanded .quit-orbit__ring { visibility: hidden; }
+.quit-orbit--expanded .quit-orbit__inside { min-height: 0; gap: 8px; border-radius: 0; }
+.quit-orbit__label, .quit-orbit__time { max-width: 100%; text-align: center; }
+.quit-orbit__label { font-size: 15px; letter-spacing: 4px; color: #dcebd3; }
+.quit-orbit__count { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
+.quit-orbit__number { font-size: 76px; font-weight: 350; letter-spacing: -3px; line-height: 1.25; }
+.quit-orbit__unit { font-size: 14px; color: #dfecdc; }
+.quit-orbit__number--long { font-size: 48px; letter-spacing: -2px; }
+.quit-orbit__time { color: #dfecdc; font-size: 13px; }
+.quit-hero__foot { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; color: #dfecdc; font-size: 12px; }
+.quit-hero__badge { padding: 5px 12px; border-radius: 20px; color: #193e2d; background: #d9eabb; font-size: 12px; font-weight: 600; }
+.quit-hero__basis { display: block; color: #d4e4d1; font-size: 11px; margin-top: 14px; text-align: center; }
+.quit-gains { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin: 16px 0 28px; }
+.quit-gain { padding: 18px 16px; border: 1px solid #e0e7df; border-radius: 22px; background: #fff; min-width: 0; }
+.quit-gain--money { background: #ecf1e7; border-color: #ecf1e7; }
+.quit-gain__label { display: block; font-size: 13px; color: #405949; }
+.quit-estimate { font-size: 11px; color: #53625c; }
+.quit-gain__value { display: block; margin-top: 10px; font-size: 30px; line-height: 1.3; font-weight: 600; color: #183f32; overflow-wrap: anywhere; }
+.quit-gain__currency, .quit-gain__unit { font-size: 16px; font-weight: 400; }
+.quit-nicotine { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-radius: 18px; background: #eeeee8; flex-wrap: wrap; }
+.quit-nicotine__label { display: block; color: #3f4d3d; font-size: 13px; }
+.quit-nicotine__value { color: #273f2f; font-size: 21px; font-weight: 500; overflow-wrap: anywhere; }
+.quit-nicotine__value > * { font-size: 12px; }
+.quit-section-head { display: flex; gap: 10px; justify-content: space-between; align-items: center; }
+.quit-section-title { font-size: 20px; font-weight: 650; color: #223c30; }
+.quit-text-button { width: auto; flex: 0 0 auto; border: 0; margin: 0; min-height: 44px; padding: 0 6px; background: transparent; color: #32634f; font-size: 13px; }
+.quit-health__caption { display: block; font-size: 12px; color: #53625c; margin: 0 0 16px; }
+.quit-health__current { padding: 18px; background: #fff; border-radius: 20px; border-left: 3px solid #6c8e5b; }
+.quit-health__time { font-size: 12px; color: #526646; }
+.quit-health__current-title { display: block; font-size: 16px; font-weight: 600; color: #274335; margin: 3px 0 8px; }
+.quit-health__detail { display: block; font-size: 13px; color: #53625c; line-height: 1.75; }
+.quit-risk-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin-top: 12px; }
+.quit-risk-card { background: #eaf0e9; border-radius: 20px; padding: 16px; }
+.quit-risk-card__time { display: block; color: #4a6047; font-size: 12px; }
+.quit-risk-card__value { display: block; color: #254b37; font-size: 25px; font-weight: 550; margin: 6px 0; }
+.quit-risk-card__label { display: block; color: #3d5747; font-size: 12px; }
+.quit-health__comparison { display: block; font-size: 11px; color: #53625c; margin: 12px 4px 0; }
+.quit-timeline { padding: 16px 0 0 12px; }
+.quit-timeline__item { padding: 0 0 22px 20px; border-left: 2px solid #d3dfd3; position: relative; }
+.quit-timeline__item::before { content: ''; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #7e927d; }
+.quit-timeline__item--within::before { background: #176b55; box-shadow: 0 0 0 4px #d5e9da; }
+.quit-timeline__time { display: block; font-size: 13px; color: #2d593e; }
+.quit-timeline__phase { font-size: 11px; color: #53625c; }
+.quit-timeline__label { display: block; font-size: 15px; font-weight: 600; margin: 6px 0; }
+.quit-support-actions { display: flex; gap: 12px; margin: 26px 0 6px; align-items: stretch; }
+.quit-support-actions .button { flex: 1; margin: 0; min-height: 52px; font-size: 15px; }
+.quit-record-button { display: flex; align-items: center; justify-content: center; width: auto; flex: 0 0 auto; border: 0; border-radius: 16px; background: #fff; color: #4a5b50; font-size: 14px; padding: 0 20px; margin: 0; min-height: 52px; }
+.quit-basis-toggle { display: flex; align-items: center; justify-content: center; min-height: 44px; width: 100%; border: 0; padding: 10px 4px; line-height: 1.4; background: transparent; color: #53625c; font-size: 12px; }
+.quit-basis { background: #fff; border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 14px; font-size: 13px; color: #53625c; }
+.quit-source-button { background: #edf4f0; color: #24573e; font-size: 13px; min-height: 44px; padding: 10px; width: 100%; }
+.quit-start-entry { display: flex; align-items: center; justify-content: space-between; margin: 0 0 16px; padding: 12px 18px; min-height: 52px; border: 1px solid #bdd5c4; border-radius: 18px; background: #edf4eb; color: #1d583f; font-size: 15px; }
+.quit-start-entry > *:last-child { font-size: 13px; }
+.quit-dashboard button::after, .quit-dashboard taro-button-core::after { border: 0; }
+.quit-day-confirmation { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; margin: 10px auto 0; font-size: 13px; color: #53625c; }
+.quit-day-confirmation button::after, .quit-day-confirmation taro-button-core::after { border: 0; }
+.quit-recent-actions { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 12px; font-size: 13px; }
+@media (min-width: 700px) { .quit-dashboard { max-width: 640px; margin: 0 auto; } }
+@media (max-width: 360px) { .quit-orbit__number { font-size: 64px; } .quit-orbit__number--long { font-size: 42px; } .quit-gain { padding: 16px 12px; } .quit-gain__value { font-size: 25px; } .quit-risk-card { padding: 14px 12px; } }
+@media (prefers-reduced-motion: reduce) { .quit-dashboard * { animation: none; transition: none; } }

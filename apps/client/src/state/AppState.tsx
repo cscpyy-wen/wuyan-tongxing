@@ -60,7 +60,6 @@ import {
   isolateAndroidBootstrapQuarantineCorruption,
   isolateAndroidBootstrapQueueCorruption,
   isolateAndroidSystemShortcutQueueCorruption,
-  hasAndroidBootstrapRecoveryToRotate,
   hasAndroidBackupRestoreIntent,
   markAndroidBackupRestoreResultCommitted,
   moveAndroidBootstrapEventsToQuarantine,
@@ -71,7 +70,6 @@ import {
   readAndroidSystemShortcutQueue,
   readAndroidBootstrapImportJournal,
   readAndroidBootstrapImportMarker,
-  rotateAndroidBootstrapCorruptArchiveAfterExport,
   sanitizeAndroidBootstrapRecoveryData,
   exportAndroidBootstrapRecoveryData,
   snapshotAndroidBootstrapData,
@@ -111,6 +109,7 @@ import {
   parseNativeDurableValue,
 } from '../lib/nativeDurableStore'
 import { getAndroidHealthStorage, migrateLegacyAndroidHealthStorage } from '../lib/androidHealthStorage'
+import type { QuitJourneyInput } from '../lib/quitJourney'
 import type {
   ClientBaseline,
   ClientCheckIn,
@@ -126,6 +125,7 @@ import type {
 } from '../types'
 
 interface AppStateActions {
+  saveQuitJourney(input: QuitJourneyInput): Promise<boolean>
   finishOnboarding(payload: OnboardingPayload): boolean
   startNewAttempt(
     path: OnboardingPayload['path'],
@@ -134,7 +134,7 @@ interface AppStateActions {
   ): boolean
   adjustReductionLimit(ratio: 0.75 | 0.5 | 0.25, delta: -1 | 1): boolean
   recordCheckIn(confirmation: DailyCheckInConfirmation): boolean
-  removeTodayCheckIn(): boolean
+  removeTodayCheckIn(target: Pick<ClientCheckIn, 'id' | 'attemptId' | 'date'>): boolean
   recordCraving(level: CravingLevel, trigger?: Trigger, technique?: string): string | undefined
   updateCravingLevel(id: string, level: CravingLevel): boolean
   resolveCraving(id: string, technique: string, level: CravingLevel): boolean
@@ -866,6 +866,11 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     }, '创建计划失败，请检查本机存储空间')
   }, [commitState])
 
+  const saveQuitJourney = useCallback(async (input: QuitJourneyInput) => {
+    const { saveQuitJourneyAfterQueue } = await import('../lib/quitJourneySave')
+    return saveQuitJourneyAfterQueue(input, () => stateRef.current, commitState, consumeAndroidBootstrapQueue)
+  }, [commitState, consumeAndroidBootstrapQueue])
+
   const startNewAttempt = useCallback((
     path: OnboardingPayload['path'],
     quitDate: string,
@@ -898,11 +903,16 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     return commitState((previous) => applyDailyCheckIn(previous, next), '今日记录确认失败')
   }, [commitState])
 
-  const removeTodayCheckIn = useCallback(() => {
-    const currentPlan = stateRef.current.plan
-    if (!currentPlan) return false
+  const removeTodayCheckIn = useCallback((target: Pick<ClientCheckIn, 'id' | 'attemptId' | 'date'>) => {
     return commitState(
-      (previous) => removeDailyCheckIn(previous, currentPlan.id, toLocalDate(new Date())),
+      (previous) => {
+        if (previous.plan?.id !== target.attemptId || target.date !== toLocalDate(new Date())
+          || !previous.checkIns.some((item) => item.id === target.id && item.attemptId === target.attemptId && item.date === target.date)) {
+          Taro.showToast({ title: '日期或记录已变化，请重新确认', icon: 'none' })
+          return previous
+        }
+        return removeDailyCheckIn(previous, target.attemptId, target.date)
+      },
       '撤销今日确认失败',
     )
   }, [commitState])
@@ -1454,22 +1464,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   }, [])
 
   const offerAndroidBootstrapRecoveryRotationAfterExport = useCallback(async () => {
-    const androidStorage = getAndroidHealthStorage()
-    if (!androidStorage || !hasAndroidBootstrapRecoveryToRotate(androidStorage)) return
-    const result = await runAppModal(() => Taro.showModal({
-      title: '释放快速记录恢复区？',
-      content: '恢复快照已包含在刚导出的副本中。释放后，当前异常记录会重新隔离，快速记录可继续使用。',
-      confirmText: '确认释放',
-      cancelText: '继续保留',
-    }))
-    if (!result.confirm) return
-    try {
-      rotateAndroidBootstrapCorruptArchiveAfterExport(androidStorage)
-      consumeAndroidBootstrapQueue()
-      Taro.showToast({ title: '快速记录恢复区已释放', icon: 'success' })
-    } catch {
-      Taro.showToast({ title: '恢复区未改变，请保留导出副本', icon: 'none' })
-    }
+    const { offerRecoveryRotation } = await import('../lib/nativeRecoveryRotation')
+    await offerRecoveryRotation(consumeAndroidBootstrapQueue)
   }, [consumeAndroidBootstrapQueue])
 
   const clearCorruptedState = useCallback(async () => {
@@ -1514,6 +1510,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
 
   const actions = useMemo<AppStateActions>(
     () => ({
+      saveQuitJourney,
       finishOnboarding,
       startNewAttempt,
       adjustReductionLimit,
@@ -1544,6 +1541,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     }),
     [
       finishOnboarding,
+      saveQuitJourney,
       startNewAttempt,
       adjustReductionLimit,
       recordCheckIn,
