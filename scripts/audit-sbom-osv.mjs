@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { assessOsvFindings, verifySecurityPatches } from './security-patch-policy.mjs'
 
 const DEFAULT_ENDPOINT = 'https://api.osv.dev/v1/querybatch'
 const DEFAULT_BATCH_SIZE = 100
@@ -47,6 +48,9 @@ export async function queryOsvBatch(entries, options = {}) {
       throw new Error('OSV 返回条目数与请求不一致')
     }
     body.results.forEach((result, index) => {
+      if (!result || typeof result !== 'object' || Array.isArray(result)
+        || ('vulns' in result && !Array.isArray(result.vulns))) throw new Error('OSV 返回无效结果结构')
+      if (result.next_page_token) throw new Error('OSV 结果需要分页；未取得完整结果，发布停止')
       const entry = batch[index]
       const vulnerabilities = Array.isArray(result?.vulns) ? result.vulns : []
       vulnerabilities.forEach((vulnerability) => {
@@ -67,6 +71,44 @@ export async function queryOsvBatch(entries, options = {}) {
   ))
 }
 
+export function verifyOsvReportForRelease(report, sbomBytes, evidence, now = Date.now()) {
+  const sbom = JSON.parse(sbomBytes.toString('utf8'))
+  const entries = osvQueriesFromSbom(sbom)
+  const generatedAt = Date.parse(report?.generatedAt)
+  if (report?.schemaVersion !== 2 || report.source !== 'OSV querybatch API' || report.endpoint !== DEFAULT_ENDPOINT
+    || report.sbomPath !== 'docs/sbom.cdx.json' || report.sbomSha256 !== sha256(sbomBytes)
+    || report.componentCount !== entries.length
+    || report.ecosystems?.npm !== entries.filter((item) => item.ecosystem === 'npm').length
+    || report.ecosystems?.maven !== entries.filter((item) => item.ecosystem === 'maven').length
+    || !Array.isArray(report.findings) || report.findingCount !== report.findings.length
+    || !Number.isFinite(generatedAt) || generatedAt > now + 300_000 || now - generatedAt > DEFAULT_MAX_REPORT_AGE_MS) {
+    throw new Error('OSV 报告结构、时效或 SBOM 绑定无效')
+  }
+  const keys = new Set()
+  for (const finding of report.findings) {
+    const key = `${finding.purl}#${finding.id}`
+    if (typeof finding.id !== 'string' || keys.has(key) || !entries.some((entry) => (
+      entry.purl === finding.purl && entry.ref === finding.ref && entry.ecosystem === finding.ecosystem
+    ))) throw new Error('OSV 原始警报与组件不匹配或重复')
+    keys.add(key)
+  }
+  // This recomputes the disposition using freshly verified installed bytes,
+  // never trusts a caller-provided `unresolvedFindingCount: 0` flag.
+  const assessment = assessOsvFindings(report.findings, evidence)
+  if (assessment.unresolvedFindingCount !== 0 || JSON.stringify(report.assessment) !== JSON.stringify(assessment)) {
+    throw new Error('OSV 包含未修复项或补丁证据与当前实际安装不匹配')
+  }
+  for (const entry of evidence.packages) {
+    const component = sbom.components.find((item) => item.purl === entry.purl)
+    if (!component) continue // full-development-only patch remains in evidence
+    const properties = Object.fromEntries((component.properties ?? []).map((property) => [property.name, property.value]))
+    if (properties['wuyan:patch-sha256'] !== entry.patchSha256 || properties['wuyan:pnpm-patch-hash'] !== entry.pnpmPatchHash) {
+      throw new Error('SBOM 缺少当前本地补丁来源绑定')
+    }
+  }
+  return assessment
+}
+
 export async function runOsvAudit(options = {}) {
   const repositoryRoot = options.repositoryRoot ?? path.resolve(import.meta.dirname, '..')
   const sbomPath = path.join(repositoryRoot, 'docs', 'sbom.cdx.json')
@@ -75,10 +117,12 @@ export async function runOsvAudit(options = {}) {
   const sbom = JSON.parse(sbomBytes.toString('utf8'))
   const entries = osvQueriesFromSbom(sbom)
   const findings = await queryOsvBatch(entries, options)
+  const evidence = (options.verifyPatches ?? verifySecurityPatches)({ root: repositoryRoot })
+  const assessment = assessOsvFindings(findings, evidence)
   const now = options.now ? new Date(options.now()) : new Date()
   if (!Number.isFinite(now.getTime())) throw new Error('OSV 审计时间无效')
   const report = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generatedAt: now.toISOString(),
     source: 'OSV querybatch API',
     endpoint: options.endpoint ?? DEFAULT_ENDPOINT,
@@ -91,10 +135,11 @@ export async function runOsvAudit(options = {}) {
     },
     findingCount: findings.length,
     findings,
+    assessment,
   }
   if (options.checkOnly) {
-    if (findings.length > 0) {
-      throw new Error(`OSV 实时复查发现 ${findings.length} 个受影响组件记录；发布已停止且未改写已提交报告`)
+    if (assessment.unresolvedFindingCount > 0) {
+      throw new Error(`OSV 实时复查发现 ${assessment.unresolvedFindingCount} 个未修复组件记录；发布已停止且未改写已提交报告`)
     }
     let stored
     try {
@@ -123,6 +168,7 @@ export async function runOsvAudit(options = {}) {
       ecosystems: stored.ecosystems,
       findingCount: stored.findingCount,
       findings: stored.findings,
+      assessment: stored.assessment,
     }
     const comparableCurrent = {
       schemaVersion: report.schemaVersion,
@@ -134,6 +180,7 @@ export async function runOsvAudit(options = {}) {
       ecosystems: report.ecosystems,
       findingCount: report.findingCount,
       findings: report.findings,
+      assessment: report.assessment,
     }
     if (JSON.stringify(comparableStored) !== JSON.stringify(comparableCurrent)) {
       throw new Error('已提交 OSV 审计报告与当前 SBOM 或实时查询结果不一致；请刷新并提交报告')
@@ -141,8 +188,8 @@ export async function runOsvAudit(options = {}) {
     return stored
   }
   await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8')
-  if (findings.length > 0) {
-    throw new Error(`OSV 发现 ${findings.length} 个受影响组件记录；详见 docs/osv-audit.json`)
+  if (assessment.unresolvedFindingCount > 0) {
+    throw new Error(`OSV 原始记录 ${findings.length}，未修复 ${assessment.unresolvedFindingCount}；详见 docs/osv-audit.json`)
   }
   return report
 }
@@ -156,6 +203,6 @@ if (invokedPath === import.meta.url) {
   const checkOnly = argumentsList.includes('--check')
   const report = await runOsvAudit({ checkOnly })
   console.log(
-    `OSV 审计通过：npm ${report.ecosystems.npm} 个，Maven ${report.ecosystems.maven} 个，发现 0${checkOnly ? '；已提交报告匹配且未改写' : ''}。`,
+    `OSV 审计通过：npm ${report.ecosystems.npm} 个，Maven ${report.ecosystems.maven} 个，原始警报 ${report.findingCount}，未修复 0；已验证补丁${checkOnly ? '；已提交报告匹配且未改写' : ''}。`,
   )
 }

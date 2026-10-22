@@ -3,7 +3,9 @@ import { promises as fs } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { describe, it } from 'node:test'
-import { osvQueriesFromSbom, queryOsvBatch, runOsvAudit } from './audit-sbom-osv.mjs'
+import { osvQueriesFromSbom, queryOsvBatch, runOsvAudit, verifyOsvReportForRelease } from './audit-sbom-osv.mjs'
+import { createHash } from 'node:crypto'
+import { assessOsvFindings } from './security-patch-policy.mjs'
 
 const entries = osvQueriesFromSbom({
   components: [
@@ -58,6 +60,14 @@ describe('OSV SBOM 审计', () => {
     )
   })
 
+  it('未获取的分页或无效结果结构不能当作零发现', async () => {
+    for (const result of [null, [], { vulns: null }, { vulns: [], next_page_token: 'unread' }]) {
+      await assert.rejects(queryOsvBatch(entries, {
+        fetchImpl: async () => ({ ok: true, json: async () => ({ results: [result, {}] }) }),
+      }), /无效结果结构|分页/)
+    }
+  })
+
   it('发布检查实时复查已提交报告且保持工作树文件不变', async (t) => {
     const repositoryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'wuyan-osv-check-'))
     t.after(() => fs.rm(repositoryRoot, { recursive: true, force: true }))
@@ -76,6 +86,7 @@ describe('OSV SBOM 审计', () => {
       repositoryRoot,
       fetchImpl: emptyResponse,
       now: () => new Date('2026-08-30T01:00:00.000Z'),
+      verifyPatches: () => ({ packages: [] }),
     })
     const reportPath = path.join(repositoryRoot, 'docs', 'osv-audit.json')
     const before = await fs.readFile(reportPath)
@@ -84,6 +95,7 @@ describe('OSV SBOM 审计', () => {
       fetchImpl: emptyResponse,
       checkOnly: true,
       now: () => new Date('2026-08-30T02:00:00.000Z'),
+      verifyPatches: () => ({ packages: [] }),
     })
     const after = await fs.readFile(reportPath)
     assert.equal(checked.generatedAt, '2026-08-30T01:00:00.000Z')
@@ -98,8 +110,33 @@ describe('OSV SBOM 审计', () => {
         fetchImpl: emptyResponse,
         checkOnly: true,
         now: () => new Date('2026-08-30T02:00:00.000Z'),
+        verifyPatches: () => ({ packages: [] }),
       }),
       /与当前 SBOM 或实时查询结果不一致/,
     )
   })
+})
+
+it('APK 报告核验重新计算处置结果，不信任人为填零或过期证据', () => {
+  const patchSha = '1'.repeat(64)
+  const evidence = { packages: [{ purl: 'pkg:npm/a@1.0.0', patchSha256: patchSha, pnpmPatchHash: patchSha,
+    advisories: [{ id: 'GHSA-aaaa-bbbb-cccc', osvModified: '2026-10-02T00:00:00Z' }] }] }
+  const sbomBytes = Buffer.from(JSON.stringify({ components: [{ 'bom-ref': 'npm-a', purl: 'pkg:npm/a@1.0.0', properties: [
+    { name: 'wuyan:patch-sha256', value: patchSha }, { name: 'wuyan:pnpm-patch-hash', value: patchSha },
+  ] }] }))
+  const findings = [{ purl: 'pkg:npm/a@1.0.0', ref: 'npm-a', ecosystem: 'npm', id: 'GHSA-aaaa-bbbb-cccc', modified: '2026-10-02T00:00:00Z' }]
+  const report = {
+    schemaVersion: 2, source: 'OSV querybatch API', endpoint: 'https://api.osv.dev/v1/querybatch',
+    generatedAt: '2026-10-22T07:00:00Z', sbomPath: 'docs/sbom.cdx.json',
+    sbomSha256: createHash('sha256').update(sbomBytes).digest('hex'), componentCount: 1,
+    ecosystems: { npm: 1, maven: 0 }, findingCount: 1, findings, assessment: assessOsvFindings(findings, evidence),
+  }
+  const now = Date.parse('2026-10-22T08:00:00Z')
+  assert.equal(verifyOsvReportForRelease(report, sbomBytes, evidence, now).unresolvedFindingCount, 0)
+  assert.throws(() => verifyOsvReportForRelease({ ...report, findingCount: 0 }, sbomBytes, evidence, now), /结构/)
+  assert.throws(() => verifyOsvReportForRelease(report, sbomBytes, { packages: [] }, now), /未修复/)
+  assert.throws(() => verifyOsvReportForRelease(report, sbomBytes, evidence, now + 86_400_000), /时效/)
+  const changed = structuredClone(report)
+  changed.findings[0].modified = '2026-10-03T00:00:00Z'
+  assert.throws(() => verifyOsvReportForRelease(changed, sbomBytes, evidence, now), /未修复/)
 })

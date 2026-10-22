@@ -28,5 +28,10 @@ that directory retain their upstream Apache-2.0 notices.
 Third-party components remain subject to their respective licenses. See
 THIRD_PARTY_NOTICES.md, docs/third-party-licenses.json, and docs/sbom.cdx.json.
 
+Local dependency patches retain upstream licenses: patches/LICENSE-braces
+(MIT) and patches/LICENSE-http-cache-semantics (BSD-2-Clause). Embedded
+upstream braces test fixtures retain the MIT notice in their source file.
+See patches/README.md and docs/security-patches/README.md for provenance.
+
 No medical organization, guideline publisher, research author, or cited
 institution endorses this project merely because its work is referenced.

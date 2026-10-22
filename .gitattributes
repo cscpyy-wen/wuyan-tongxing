@@ -9,6 +9,7 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 *.lock text eol=lf
+*.patch text eol=lf whitespace=-blank-at-eol
 pnpm-lock.yaml text eol=lf
 package-lock.json text eol=lf
 *.jpg binary

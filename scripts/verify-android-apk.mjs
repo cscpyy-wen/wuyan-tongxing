@@ -1,5 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { verifySecurityPatches } from './security-patch-policy.mjs'
+import { verifyOsvReportForRelease } from './audit-sbom-osv.mjs'
 import { mkdtemp, readFile, readdir, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, relative, resolve, sep } from 'node:path'
@@ -796,15 +798,7 @@ if (
 ) throw new Error('Android SBOM 缺少当前版本或 Capacitor/Gradle release 依赖')
 
 const osvReport = JSON.parse(await readFile(releaseOsvReportPath, 'utf8'))
-if (
-  osvReport.schemaVersion !== 1
-  || osvReport.sbomSha256 !== releaseSbomSha256
-  || osvReport.componentCount !== sbom.components.length
-  || osvReport.ecosystems?.maven !== sbom.components.filter((item) => item.purl?.startsWith('pkg:maven/')).length
-  || osvReport.findingCount !== 0
-  || !Array.isArray(osvReport.findings)
-  || osvReport.findings.length !== 0
-) throw new Error('OSV 审计报告与当前 SBOM 不一致或含已知漏洞')
+verifyOsvReportForRelease(osvReport, await readFile(releaseSbomPath), verifySecurityPatches({ root: repositoryRoot }))
 
 const manifest = JSON.parse(await readFile(resolve(releaseRoot, 'manifest.json'), 'utf8'))
 const signingPolicySha256 = await sha256(signingPolicyPath)
@@ -840,7 +834,9 @@ if (
   || manifest.dependencyInventory?.sbomSha256 !== releaseSbomSha256
   || manifest.dependencyInventory?.componentCount !== sbom.components.length
   || manifest.dependencyInventory?.osvReportSha256 !== releaseOsvReportSha256
-  || manifest.dependencyInventory?.osvFindingCount !== 0
+  || manifest.dependencyInventory?.osvFindingCount !== osvReport.findingCount
+  || manifest.dependencyInventory?.osvUnresolvedFindingCount !== 0
+  || manifest.dependencyInventory?.securityPatchManifestSha256 !== osvReport.assessment.evidence.manifestSha256
   || JSON.stringify(manifest.dependencyInventory?.gradleIntegrity) !== JSON.stringify(gradleIntegrity)
 ) throw new Error('Android manifest.json 未完整绑定 APK、签名、源码、工具链或 SBOM')
 let releaseRootInventory = null

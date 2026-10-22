@@ -24,6 +24,10 @@ import {
   shanghaiMidnight,
 } from '@wuyan/domain'
 import { summarizeSmokingLogs, toShanghaiDate } from './smokingLogs'
+import { parseQuitJourney } from './quitJourneySchema'
+import { validTimestamp } from './timestampValidation'
+
+export { validTimestamp } from './timestampValidation'
 
 export const STORAGE_KEY = 'wuyan-tongxing/client-state/v1'
 export const DAY_MS = 86_400_000
@@ -88,13 +92,14 @@ export function createId(_prefix: string): string {
 export interface PlanEligibility {
   adultConfirmed: boolean
   currentPaperCigaretteUser: boolean
+  formerPaperCigaretteUser?: boolean
   medicalBoundaryAccepted: boolean
   sensitiveHealthDataAccepted: boolean
 }
 
 export function canBeginPersonalPlan(input: PlanEligibility): boolean {
   return input.adultConfirmed
-    && input.currentPaperCigaretteUser
+    && (input.currentPaperCigaretteUser || input.formerPaperCigaretteUser === true)
     && input.medicalBoundaryAccepted
     && input.sensitiveHealthDataAccepted
 }
@@ -743,6 +748,7 @@ function parseStoredStateInternal(value: unknown, rejectInvalidCollectionItems: 
   const plan = parsePlan(candidate.plan, baseline?.pricePerPack)
 
   const hasResidualHealthData = Boolean(candidate.lastCigaretteAt)
+    || candidate.quitJourney !== undefined
     || [
       candidate.checkIns,
       candidate.cravings,
@@ -857,6 +863,12 @@ function parseStoredStateInternal(value: unknown, rejectInvalidCollectionItems: 
   // plan. An explicit, well-formed but unknown ID is different: accepting it
   // would leave history that no plan-scoped view can display or update.
   const knownPlanIds = new Set([plan, ...archivedPlans].map((item) => item.id))
+  let quitJourney: ClientState['quitJourney']
+  try {
+    quitJourney = parseQuitJourney(candidate.quitJourney, knownPlanIds)
+  } catch {
+    throw new StoredStateCorruptionError('本机记录包含无法识别的项目')
+  }
   const hasUnknownPlanReference = [
     ...checkIns.map((item) => item.attemptId),
     ...cravings.map((item) => item.attemptId),
@@ -876,6 +888,7 @@ function parseStoredStateInternal(value: unknown, rejectInvalidCollectionItems: 
     plan,
     archivedPlans,
     ...(lastCigaretteAt ? { lastCigaretteAt } : {}),
+    ...(quitJourney ? { quitJourney } : {}),
     checkIns,
     cravings,
     cigarettes: cigarettes.some((item, index) => (
@@ -936,43 +949,6 @@ function integerInRange(value: unknown, minimum: number, maximum: number): value
 
 function finiteInRange(value: unknown, minimum: number, maximum: number): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= minimum && value <= maximum
-}
-
-const RFC3339_TIMESTAMP = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{2}:\d{2})$/
-
-function daysInGregorianMonth(year: number, month: number): number {
-  if (month === 2) {
-    const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
-    return leapYear ? 29 : 28
-  }
-  return [4, 6, 9, 11].includes(month) ? 30 : 31
-}
-
-export function validTimestamp(value: unknown): value is string {
-  if (typeof value !== 'string' || value.length > 64) return false
-  const match = RFC3339_TIMESTAMP.exec(value)
-  if (!match) return false
-
-  const [, yearText, monthText, dayText, hourText, minuteText, secondText, , offsetText] = match
-  const year = Number(yearText)
-  const month = Number(monthText)
-  const day = Number(dayText)
-  const hour = Number(hourText)
-  const minute = Number(minuteText)
-  const second = Number(secondText)
-  if (
-    year < 1
-    || month < 1 || month > 12
-    || day < 1 || day > daysInGregorianMonth(year, month)
-    || hour > 23 || minute > 59 || second > 59
-  ) return false
-
-  if (offsetText !== 'Z') {
-    const offsetHour = Number(offsetText!.slice(1, 3))
-    const offsetMinute = Number(offsetText!.slice(4, 6))
-    if (offsetHour > 23 || offsetMinute > 59) return false
-  }
-  return Number.isFinite(new Date(value).getTime())
 }
 
 function validLocalDate(value: unknown): value is string {

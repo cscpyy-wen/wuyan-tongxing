@@ -1,8 +1,8 @@
 # Android 版构建、安装与信任边界
 
-v33 的发布版本为 `0.1.0-personal.33`（versionCode 33），正式包名为 `cn.wuyantongxing.personal`，最低 Android 15（API 35），目标 Android 16（API 36）。本版加入桌面小组件和锁屏下拉快捷记录，并包含确认竞争、连续无烟时长、导入、原生队列、横屏/大字号及安全依赖修复，详见[v33 发布说明](releases/v33.md)。
+当前源码准备 Android v34：`0.1.0-personal.34`（versionCode 34），正式包名为 `cn.wuyantongxing.personal`，最低 Android 15（API 35），目标 Android 16（API 36）。v34 的无烟生活首页、候选验证范围与发布状态见 [v34 发布准备](releases/v34.md)。本文是构建与维护说明，不表示 v34 已公开；安装版本以实际 [GitHub Release](https://github.com/cscpyy-wen/wuyan-tongxing/releases/latest) 为准。
 
-> 用户已确认在 Xiaomi 15 Pro（Xiaomi HyperOS 3）测试过前轮 debug 候选，SHA-256 为 `33cebfcaddcd17bef1091d3cfa629000f8f6e631cac40f652f6e950d91678137`。其包名为 `cn.wuyantongxing.personal.debug`，版本名为 `0.1.0-personal.32-debug`；这不是 v33 正式签名 APK 的安装结论。单台真机结果不等同于所有小米机型、HyperOS 版本或 Android 设备的兼容性保证。
+日常使用请看[使用指南](user-guide.md)。2026-10-22 用户报告前轮 v34 交付候选在 Xiaomi 15 Pro 使用正常；这是用户反馈，不是对后来依赖修补重建包的独立哈希确认或医学证明。下面保留的 v33 验证数字均明确列为历史记录。
 
 ## 两种构建身份
 
@@ -36,8 +36,8 @@ apps/android-shell/android/app/build/outputs/apk/debug/app-debug.apk
 
 ## 安装 GitHub Release 中的官方 APK
 
-1. 从本仓库的 [v33 GitHub Release](https://github.com/cscpyy-wen/wuyan-tongxing/releases/tag/v0.1.0-personal.33) 下载 APK 与 [SHA256SUMS.txt](https://github.com/cscpyy-wen/wuyan-tongxing/releases/download/v0.1.0-personal.33/SHA256SUMS.txt)。
-2. 在受信任的终端按同一 Release 中的 `SHA256SUMS.txt` 校验 `v0.1.0-personal.33` APK 的 SHA-256。
+1. 从本仓库实际公开的 [GitHub Release](https://github.com/cscpyy-wen/wuyan-tongxing/releases/latest) 下载 APK 与同一版本的 `SHA256SUMS.txt`。发布准备文档和源码附件不是已发布 APK。
+2. 在受信任的终端按同一 Release 中的 `SHA256SUMS.txt` 校验 APK 的 SHA-256，不混用其他版本清单。
 3. 如需进一步核验，使用 Android Build Tools 的 `apksigner verify --print-certs`；预期签名证书 SHA-256 为 `b0fdad152952a3c3c7c97fb214ac1a9b392cfaf7c160c55b40cf6eaa680bf1d7`。
 4. 把 APK 传到手机，在系统文件管理器中打开，并只为该来源临时允许“安装未知应用”。安装完成后可关闭这项授权。
 
@@ -78,24 +78,36 @@ apps/android-shell/android/app/build/outputs/apk/debug/app-debug.apk
 
 升级官方包时不要先卸载旧版。只有包名、签名证书一致且 `versionCode` 提高的 APK 才能覆盖安装并保留数据。升级前建议先在应用内导出本机数据副本。遇签名冲突应停止安装，不要通过卸载绕过。卸载、系统“清除数据”或应用内确认删除都会移除本机记录。debug 候选与正式包并存时，更新正式包不会自动迁移或合并 debug 包里的记录。
 
-历史上，v31→v32 的同签名覆盖升级与数据保留已在 Android 16 模拟器验证；这不替代本轮 v33 的升级检查。v32 新增了 `toilet`（“拉屎”）结构化原因；写入该值后，不支持通过调试工具强制降级到 v31 后继续读取同一份状态。Android 正常安装流程本来也会拒绝较低 `versionCode` 覆盖较高版本。
+历史上，v31→v32 的同签名覆盖升级与数据保留已在 Android 16 模拟器验证；这不替代 v34 新制品的升级检查。v32 新增了 `toilet`（“拉屎”）结构化原因；写入该值后，不支持通过调试工具强制降级到 v31 后继续读取同一份状态。Android 正常安装流程本来也会拒绝较低 `versionCode` 覆盖较高版本。
 
-## 已验证与未验证
+## 当前供应链与发布门禁
+
+正式判断要求 low 阈值下未处置项为 0，保留原始 npm/pnpm、OSV 警报，不宣称所有原始警报消失。本地补丁仍使用原包名、上游版本和 PURL；每次验证重新核对来源完整性、锁与补丁、回归程序和每份实际安装副本的全部文件，并逐副本运行回归。未知或变更公告、审查/报告过期、哈希不符、补丁未应用、测试失败/跳过或扫描不完整均停止发布。细节见[依赖风险登记](dependency-risk-register.md)与[补丁证据清单](security-patches/manifest.json)。
+
+维护准备阶段用 `pnpm audit:all --write-report` 保存原始审计和处置报告，用 `pnpm audit:sbom-osv` 更新 OSV 报告；审阅提交后，正式运行 `pnpm audit:all` 和 `pnpm audit:sbom-osv:check`，两者均不改写已提交报告。维护者构建会实时复查 OSV，构建与 APK 核验还将报告绑定到当前 SBOM 及新核验的补丁证据。报告需要刷新时应返回准备阶段，不在正式门禁中自动覆盖。完整步骤见[开发指南](development.md#供应链报告与只读门禁)和[运维手册](operations-runbook.md)。
+
+## v33 及之前的历史验证快照
+
+以下是既往制品的验证记录，不是当前 v34 新包的通过清单。v33 的历史发布版本为 `0.1.0-personal.33`（versionCode 33），其变化与归档证据见 [v33 发布说明](releases/v33.md)。
+
+> 历史用户反馈：用户确认在 Xiaomi 15 Pro（Xiaomi HyperOS 3）测试过当时的 debug 候选，SHA-256 为 `33cebfcaddcd17bef1091d3cfa629000f8f6e631cac40f652f6e950d91678137`。其包名为 `cn.wuyantongxing.personal.debug`，版本名为 `0.1.0-personal.32-debug`；这不是 v33 正式签名 APK 的安装结论，也不代表所有设备兼容。
 
 前轮 debug 候选完成了 Android 16 模拟器上的快捷记录、持续计时、只改时间、过时确认拒绝、横屏按钮与大字号人工复验。前轮浏览器端到端为 45/45、原生 JVM 为 43/43、最终 debug APK instrumentation 为 40/40；Lint 为 0 errors / 11 warnings。具体候选、执行范围与原始记录见[2026-09-22 审查文档](android-audit-2026-09-22.md)。用户随后确认测试过同一 debug 候选的 Xiaomi 15 Pro / Xiaomi HyperOS 3 真机版本。
 
-本轮隔离 Android 发布目录已实跑工作区 438/438、发布脚本 102/102、浏览器端到端 45/45、原生 JVM 43/43，原生 debug 与测试 APK 构建成功。工作区比前轮 440 项少 2 项专属 Harmony CSS 测试，发布脚本检查排除了未公开的 Harmony 专属脚本测试，未削减 Android 测试范围。根生产图、完整图与 Tencent 锁文件均通过 low 阈值的 0 已知漏洞门禁；OSV 扫描 npm 722 项与 Maven 51 项，共 773 项，0 发现。
+v33 当时的隔离 Android 发布目录实跑工作区 438/438、发布脚本 102/102、浏览器端到端 45/45、原生 JVM 43/43，原生 debug 与测试 APK 构建成功。工作区比此前 440 项少 2 项专属 Harmony CSS 测试，发布脚本检查排除了未公开的 Harmony 专属脚本测试，未削减 Android 测试范围。当时根生产图、完整图与 Tencent 锁文件通过 low 阈值的 0 已知漏洞门禁；当时 OSV 扫描 npm 722 项与 Maven 51 项，共 773 项，0 发现。这些仅是历史时点结果，不能用于声称当前原始警报为 0 或 v34 已通过供应链门禁。
 
-本轮 144 个共享 client 文件与已测源码逐字节相同，50 个界面资源与用户测过的 debug APK 中对应资源的哈希全部相同。该比对支持源码与界面资源的一致性，不把两种包身份等同。详细证据见[v33 发布说明](releases/v33.md)；正式签名、覆盖升级、最终 APK 设备验证与公开下载核验以同一 Release 的 [QA_REPORT.md](https://github.com/cscpyy-wen/wuyan-tongxing/releases/download/v0.1.0-personal.33/QA_REPORT.md) 和 [build-info-public.json](https://github.com/cscpyy-wen/wuyan-tongxing/releases/download/v0.1.0-personal.33/build-info-public.json) 为准。
+v33 当时的 144 个共享 client 文件与已测源码逐字节相同，50 个界面资源与用户测过的 debug APK 中对应资源的哈希全部相同。该比对支持当时源码与界面资源的一致性，不把两种包身份等同。详细证据见[v33 发布说明](releases/v33.md)；其正式签名、覆盖升级、最终 APK 设备验证与公开下载核验以同一历史 Release 的 [QA_REPORT.md](https://github.com/cscpyy-wen/wuyan-tongxing/releases/download/v0.1.0-personal.33/QA_REPORT.md) 和 [build-info-public.json](https://github.com/cscpyy-wen/wuyan-tongxing/releases/download/v0.1.0-personal.33/build-info-public.json) 为准。
+
+## 不能自动推出的结论
 
 以下结论不能由公开源码或 CI 自动推出：
 
 - 其他小米机型、其他 HyperOS 版本以及其他厂商实体机的兼容性；
-- v33 正式签名 APK 已在 Xiaomi 15 Pro 完成安装与逐项验收；前轮 debug 候选的用户实测不能代替这一结论；
+- 任何重新构建的正式签名 APK 已在 Xiaomi 15 Pro 完成安装与逐项验收；旧候选的用户反馈不能代替对新包身份的验证；
 - 所有设备都提供相同的小组件固定面板、锁屏下拉设置或锁屏磁贴行为；
 - 真实系统安全扫描结果；
 - TalkBack、大字号和低性能真机体验；
 - 任一 fork 的 APK 是否与其公开源码一致；
-- 任意第三方环境能否逐字节复现维护者签名的 `v0.1.0-personal.33` APK。
+- 任意第三方环境能否逐字节复现维护者签名 APK。
 
-正式发布流程应从干净的 `v0.1.0-personal.33` 标签提交构建，并在 Release 的公开构建信息中记录实际提交、工作树状态、源码快照摘要、签名证书与 APK 摘要。最终 APK 摘要以同一 Release 的 `SHA256SUMS.txt` 为准，不把构建产物摘要写回其自身的源码快照。由于维护者私钥和本机签名过程不公开，本项目不宣称第三方可逐字节复现签名 APK。APK、校验和、源码归档、SBOM、NOTICE 和第三方许可证包必须作为同一 Release 的相邻附件发布。
+正式发布流程应从该版本准确标签对应的干净提交构建，并在 Release 的公开构建信息中记录实际提交、工作树状态、源码快照摘要、签名证书与 APK 摘要。确认准确提交的 CI、Release 状态和附件，再从无需登录的公开下载地址复算 APK 哈希。最终摘要以同一 Release 的 `SHA256SUMS.txt` 为准，不把构建产物摘要写回其自身的源码快照。由于维护者私钥和本机签名过程不公开，本项目不宣称第三方可逐字节复现签名 APK。APK、校验和、源码归档、SBOM、NOTICE 和第三方许可证包必须作为同一 Release 的相邻附件发布。

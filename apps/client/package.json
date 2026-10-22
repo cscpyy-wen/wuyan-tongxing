@@ -49,14 +49,14 @@
     "@testing-library/react": "^16.1.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "4.1.12",
     "babel-preset-taro": "^4.2.1",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "react-refresh": "^0.14.2",
     "sass": "^1.83.4",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11",
+    "vitest": "4.1.12",
     "webpack": "5.104.1"
   }
 }

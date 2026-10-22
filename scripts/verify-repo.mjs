@@ -35,7 +35,12 @@ for (const sourceRoot of sourceRoots) {
       const normalized = relative.replaceAll('\\', '/')
       const isPlaceholderValidator = normalized === 'scripts/verify-repo.mjs'
         || normalized === 'packages/content/scripts/verify-content.mjs'
-      if (!isPlaceholderValidator && unfinishedPattern.test(value)) {
+      // TAP's standardized pending-test counter is a protocol literal, not an
+      // unfinished task. Only these exact literals in the TAP validator and
+      // its tests are exempt; unfinished comments/content remain checked.
+      const isTapValidator = ['scripts/security-patch-policy.mjs', 'scripts/security-patch-policy.test.mjs'].includes(normalized)
+      const unfinishedScanValue = isTapValidator ? value.replaceAll("'todo'", "'tap-pending'").replaceAll('# todo ', '# tap-pending ') : value
+      if (!isPlaceholderValidator && unfinishedPattern.test(unfinishedScanValue)) {
         failures.push(`${relative}: 含未完成占位标记`)
       }
       if (/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(value)) {

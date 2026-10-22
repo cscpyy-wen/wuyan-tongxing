@@ -149,6 +149,16 @@ export interface ClientSettings {
   analyticsConsentAt?: string | undefined
 }
 
+/** User-reported quit anchor and the baseline used only for dashboard estimates. */
+export interface ClientQuitJourney {
+  attemptId: string
+  startedAt: string
+  cigarettesPerDay: number
+  pricePerPack: number
+  cigarettesPerPack: number
+  confirmedAt: string
+}
+
 export interface ClientState {
   version: 1
   onboarded: boolean
@@ -157,6 +167,7 @@ export interface ClientState {
   /** Previous plans are retained when the user deliberately starts a new attempt. */
   archivedPlans: ClientQuitPlan[]
   lastCigaretteAt?: string
+  quitJourney?: ClientQuitJourney
   checkIns: ClientCheckIn[]
   cravings: ClientCravingEvent[]
   cigarettes: ClientCigaretteLog[]

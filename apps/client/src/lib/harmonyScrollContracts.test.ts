@@ -24,7 +24,7 @@ describe('Harmony scroll viewport contracts', () => {
 
   it('applies the shared viewport to every affected page and keeps sheets outside native scrolling', () => {
     const records = readClientSource('pages/records/index.tsx')
-    const today = readClientSource('pages/today/index.tsx')
+    const today = readClientSource('pages/today/SmokingToday.tsx')
     const progress = readClientSource('pages/progress/index.tsx')
     const profile = readClientSource('pages/profile/index.tsx')
     const sos = readClientSource('pages/sos/index.tsx')
@@ -96,7 +96,7 @@ describe('Harmony scroll viewport contracts', () => {
 
   it('replaces unsupported Harmony grids for records, today, progress, and SOS controls', () => {
     const records = readClientSource('pages/records/index.scss')
-    const today = readClientSource('pages/today/index.scss')
+    const today = readClientSource('pages/today/SmokingToday.scss')
     const progress = readClientSource('pages/progress/index.scss')
     const sos = readClientSource('pages/sos/index.scss')
 

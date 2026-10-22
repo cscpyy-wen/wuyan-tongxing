@@ -28,6 +28,8 @@ import {
 } from './android-release-store.mjs'
 import { createAndroidReleaseRootInventory } from './android-release-root-inventory.mjs'
 import { isSourceSnapshotExcluded } from './source-snapshot-policy.mjs'
+import { verifySecurityPatches } from './security-patch-policy.mjs'
+import { verifyOsvReportForRelease } from './audit-sbom-osv.mjs'
 import { verifyGradleWrapper } from './verify-gradle-wrapper.mjs'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
@@ -654,15 +656,7 @@ const sbomSha256 = createHash('sha256').update(sbomBytes).digest('hex')
 if (!await exists(sourceOsvReportPath)) throw new Error('缺少当前 SBOM 的 OSV 审计报告')
 const osvReportBytes = await readFile(sourceOsvReportPath)
 const osvReport = JSON.parse(osvReportBytes.toString('utf8'))
-if (
-  osvReport.schemaVersion !== 1
-  || osvReport.sbomSha256 !== sbomSha256
-  || osvReport.componentCount !== sbom.components.length
-  || osvReport.ecosystems?.maven !== sbom.components.filter((item) => item.purl?.startsWith('pkg:maven/')).length
-  || osvReport.findingCount !== 0
-  || !Array.isArray(osvReport.findings)
-  || osvReport.findings.length !== 0
-) throw new Error('OSV 审计报告与当前 SBOM 不一致或含已知漏洞')
+verifyOsvReportForRelease(osvReport, sbomBytes, verifySecurityPatches({ root: repositoryRoot }))
 await writeAtomic(resolve(publicationRoot, 'osv-audit.json'), osvReportBytes)
 const osvReportSha256 = createHash('sha256').update(osvReportBytes).digest('hex')
 const lockfileSha256 = await sha256(lockfilePath)
@@ -784,6 +778,8 @@ const manifest = {
     osvReportSha256,
     osvCheckedAt: osvReport.generatedAt,
     osvFindingCount: osvReport.findingCount,
+    osvUnresolvedFindingCount: osvReport.assessment.unresolvedFindingCount,
+    securityPatchManifestSha256: osvReport.assessment.evidence.manifestSha256,
     gradleIntegrity,
   },
 }

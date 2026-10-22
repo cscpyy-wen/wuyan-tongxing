@@ -1,16 +1,20 @@
 # 运行、事件与回滚手册
 
+当前面向用户的产品是本地优先的 Android App；日常安装与备份恢复见[使用指南](user-guide.md)。本手册区分 Android 发布与仓库保留的实验服务，不要求普通 Android 用户部署后端。v34 仍处于[发布准备](releases/v34.md)，本文不宣称已经公开新版 APK。
+
 ## 当前可运行环境
 
 | 环境 | 状态 | 数据边界 |
 | --- | --- | --- |
-| 本机开发/测试 | 可运行 | PGlite、模拟身份和提醒；只允许回环地址 |
-| 社区 H5 静态包 | 可构建、未随仓库部署 | 免登录离线客户端；部署者使用自己的环境、域名和备案配置 |
 | Android 社区调试包 | 可构建 | 包名带 `.debug` 后缀、使用 Android Debug 证书，不能覆盖官方签名包 |
-| Android 维护者签名包 | 仅维护者本机 | 私钥和口令不进入仓库；公开 Release 必须单独校验附件和来源说明 |
-| 正式微信/境内生产 | 阻断 | PostgreSQL、KMS、备案、真实 AppID、监控和审核尚未完成 |
+| Android 维护者签名包 | 构建仅由维护者执行；下载以已公开 Release 为准 | 不申请 INTERNET；本机记录，不自动云同步；私钥和口令不进入仓库；每次公开发布单独核验附件和来源 |
+| 实验 API/Worker/后台 | 仅本机开发/测试 | PGlite、模拟身份和提醒；只允许回环地址，不是 Android 必需服务 |
+| 实验 H5 静态包 | 可构建，不作为当前普通用户产品入口 | 构建也用于 Android 内置页面；单独托管需部署者自己的环境和安全验收 |
+| 正式微信/联网生产服务 | 阻断 | PostgreSQL、KMS、备案、真实 AppID、监控和审核尚未完成；不是离线 Android 侧载发布的同一范围 |
 
-## 本地启动与停止
+## 可选实验后端的本地启动与停止
+
+以下仅适用于实验服务开发。Android 社区调试使用[开发指南](development.md)中的 `pnpm build:android`，无需启动这些服务。
 
 1. 安装 `.node-version` 指定的 Node.js 24.14.1 和 pnpm 11.19.0。
 2. 执行 `pnpm install --frozen-lockfile`，复制 `.env.example` 为不入库的 `.env`，仅使用开发值。
@@ -20,19 +24,21 @@
 
 `TOKEN_SECRET`、`IDENTIFIER_SECRET`、`DEV_DATA_ENCRYPTION_KEY` 和管理员密码必须不同；前两者至少 32 个随机字符，加密密钥必须是 32 字节的 Base64。示例占位值只能用于本机开发，生产配置会失败关闭。
 
-## 发布候选流程
+## Android 发布候选流程
 
-1. 从干净 clone 创建候选，禁止从 dirty tree 发布。
-2. `pnpm install --frozen-lockfile`；包装目录执行 `npm ci`。
-3. 运行 `pnpm verify:ci`、`pnpm build:cn-preview`、`pnpm audit:all`、`pnpm supply-chain` 和 `pnpm verify:licenses`，确保依赖审计、SBOM 与许可证清单一致，并确保生成清单无差异。
-4. 记录源提交、内容/规则版本、测试计数、SBOM、依赖审计和 H5/微信制品 SHA-256。
-5. 公开 H5 只能发布草案工程预览；正式微信包还必须取得发布清单中的医学、法律、主体、备案、真机和生产基础设施签署。
-6. 国内 H5 部署后先检查根页面、JS/CSS/chunk 和 `/sw.js` 的 200/MIME、无登录跳转、CSP/防嵌入/最小权限响应头、`noindex`、`robots.txt`、Service Worker 作用域和离线重载；再以微信 iOS/Android 及中国移动、联通、电信网络完成真实访问验收。
+1. 安装冻结的依赖：`pnpm install --frozen-lockfile`，并在 `deploy/tencent-cloudbase` 执行 `npm ci`。该包装目录参与 Android 页面构建，不等于把 H5 部署为正式服务。
+2. 在维护准备阶段完成依赖/补丁更新，运行 `pnpm verify:ci`、`pnpm supply-chain`、`pnpm verify:licenses`、`pnpm audit:all --write-report` 与 `pnpm audit:sbom-osv`。审阅并提交源码、锁文件、补丁和生成报告；不要修改历史报告来抹去失败。
+3. 从准确提交的干净 checkout 执行正式门禁。`pnpm audit:all` 保留 low 阈值，要求未处置项为 0，不写报告；`pnpm audit:sbom-osv:check` 实时查询并核对已提交 OSV 报告，不自动刷新。重新生成的 SBOM/许可证清单也必须无差异。
+4. 执行维护者签名构建与 `pnpm release:gate`；按下文显式选择设备完成升级保留、快捷入口和数据恢复检查。记录真实源提交、版本、源码快照、APK/证书摘要及各检查范围，不沿用旧包的实测身份。
+5. 确认该准确提交的 GitHub CI 成功；核对待公开标签、Release 状态、APK、校验和、源码归档、SBOM、NOTICE 和许可证包对应同一候选。公开后再从无需登录的下载地址取回 APK 复算哈希，才能确认发布完成。
+
+原始警报与处置结果分别保留。本地补丁不改包名/上游版本/PURL；每次门禁核对补丁、锁、官方来源、回归入口和所有实际安装副本的文件，并逐副本运行回归。未知或变更公告、审查/报告过期、补丁未应用、哈希不符、失败/跳过测试或不完整查询均失败关闭。需要刷新证据时回到步骤 2，重新审阅提交，不降低阈值或添加免查项。详见[开发指南](development.md#供应链报告与只读门禁)与[依赖风险登记](dependency-risk-register.md)。
 
 社区贡献者使用 `pnpm build:android` 生成隔离的 debug APK。该命令不读取维护者私钥，也不生成可冒充官方包名和签名的产物。`pnpm build:android:maintainer-release` 与 `pnpm release:gate` 是维护者的严格签名链；运行前必须把 `WUYAN_ANDROID_SIGNING_ROOT` 设置为仓库外的绝对目录，目录内固定放置密钥库、签名配置与证书指纹。缺少本机私钥、证书策略或 Android 工具链时必须失败关闭。设备验收还必须显式设置目标 `ANDROID_SERIAL` 后运行 `pnpm release:gate:device`，不能把桌面 CI 或模拟器结果写成实体机验收。
 
 ## 回滚
 
+- Android：不得靠卸载、清除数据或强制降低 versionCode 解决升级问题。先保护人工构造的复现证据和用户自行保存的备份，再发布同包名/同签名且更高 versionCode 的修复包；数据格式变化必须验证兼容性。既有备份不会因回滚代码而自动恢复。
 - H5：使用部署者自己的版本化静态托管发布记录回滚；共享默认域名只准小范围测试。未完成真实回滚演练、自有 HTTPS 域名和响应头在线核验时，不得称为生产入口。
 - 内容：使用内容后台的不可覆盖快照回滚并保留审计记录。
 - API/Worker：正式上线前必须建立版本化数据库迁移、向后兼容窗口和二进制回滚演练；当前 PGlite 内测不能作为生产回滚方案。
@@ -51,4 +57,10 @@
 
 ## 备份、恢复与数据权利
 
-当前没有生产备份，因此“备份最长 30 天自然清除”只是目标策略，不是已验证能力。生产前须完成 PostgreSQL PITR、KMS 恢复、隔离恢复演练、RPO/RTO、删除抑制清单与备份过期证据。导出/删除需用测试主体演练；禁止用真实健康数据做演示或截图。
+Android 当前通过系统文件选择器手动导出/恢复完整本地 JSON；本机档案和导出副本没有应用层加密，系统自动备份/迁移关闭。应用不自动上传，但用户选定的文件服务商可能同步副本；清除 App 数据不会删除已经导出的文件。只使用合成数据验证恢复与删除，不把真实健康档案放入工单、截图或仓库。
+
+实验后端没有已验证的生产备份。“备份最长 30 天自然清除”只是后端目标策略，不是 Android 手动导出副本的到期承诺。联网生产服务上线前仍须完成 PostgreSQL PITR、KMS 恢复、隔离演练、RPO/RTO、删除抑制清单与备份过期证据。
+
+## 实验 H5 / 微信的额外边界
+
+单独公开 H5 只能作为草案工程预览；正式微信或联网生产服务还须完成医学、法律、主体、备案、真机和生产基础设施签署。H5 托管需独立核验根页面与资源的状态/MIME、安全响应头、noindex/robots、Service Worker 作用域与离线重载，并取得目标设备和网络的真实访问证据。这些验收不由 Android 构建或侧载发布代替。
